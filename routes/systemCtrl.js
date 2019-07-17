@@ -1,6 +1,6 @@
 import express from 'express'
 import cityService from '../service/cityService.js'
-import chefService from '../service/chefService';
+import chefService from '../service/chefService';//引入了就会创建表 ,当model.sync()存在
 
 
 const router = express.Router()
