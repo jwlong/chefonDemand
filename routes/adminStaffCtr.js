@@ -8,12 +8,13 @@ class AdminStaffController {
     static initRouter(){
         /***************chef 业务***************/
         router.get('/all', async (req, res, next) => {
-            try{res.json(await chefService.baseFindAll())}catch(err){next(err)}
+            //try{res.json(await chefService.baseFindAll())}catch(err){next(err)}
+            try{res.json(await chefService.getChefList(req.query))}catch(err){next(err)}
         })
-
         router.get('/find',async (req,res,next) =>{
             try{res.json(await chefService.baseFindByFilter(null,req.query))}catch(err){next(err)}
         })
+
         router.put('/update', async (req, res, next) => {
             // 拼update sql
             if (!req.body['where']){

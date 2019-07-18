@@ -15,6 +15,14 @@ app.use(multipart())
 app.use(compression())
 app.use(cookieParser())
 app.use('/public', express.static('public'))
+
+app.oauth = new OAuth2Server({
+    model: require('./model/authModel.js'),
+    accessTokenLifetime: 60 * 60,
+    allowBearerTokensInQueryString: true
+});
+
+
 // 全局拦截配置CROS
 app.all('*',function(req,res,next){
 	res.header('Access-Control-Allow-origin','*')

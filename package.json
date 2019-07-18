@@ -18,7 +18,8 @@
     "mysql2": "^1.5.1",
     "nodemon": "^1.19.1",
     "sequelize": "^4.31.2",
-    "serve-favicon": "~2.3.2"
+    "serve-favicon": "~2.3.2",
+    "oauth2-server": "^3.0.1"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",

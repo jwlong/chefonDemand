@@ -1,11 +1,16 @@
 import express from 'express'
 import cityService from '../service/cityService.js'
+import systemService from '../service/systemService'
 
 const router = express.Router()
 
 class SystemController {
     static initRouter(){
-        /***************city 业务***************/
+        /***************system 业务***************/
+        router.get('/obtainAccessToken', async (req, res, next) => {
+            try{res.json(await systemService.obtainAccessToken(req.query))}catch(err){next(err)}
+        })
+
         router.get('/all', async (req, res, next) => {
             try{res.json(await cityService.baseFindAll())}catch(err){next(err)}
         })
