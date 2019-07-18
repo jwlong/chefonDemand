@@ -26,6 +26,7 @@ app.all('*',function(req,res,next){
 })
 // 路由列表
 app.use('/system',require('./routes/systemCtrl'))
+app.use('/staff',require('./routes/adminStaffCtr'))
 // 错误处理中间件
 app.use(function(req, res, next) {
   let err = new Error('Not Found')
