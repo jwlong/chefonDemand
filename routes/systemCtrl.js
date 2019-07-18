@@ -1,10 +1,13 @@
 import express from 'express'
 import cityService from '../service/cityService.js'
+import chefService from '../service/chefService';//引入了就会创建表 ,当model.sync()存在
+
+
 const router = express.Router()
 
 class SystemController {
     static initRouter(){
-        /***************city 业务***************/
+        /***************city 业务1***************/
         router.get('/all', async (req, res, next) => {
             try{res.json(await cityService.baseFindAll())}catch(err){next(err)}
         })
