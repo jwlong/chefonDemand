@@ -18,6 +18,9 @@ module.exports = {
     AutoWritedCityModel(target, key, descriptor){
         target.model = require('../model/cityModel')
     },
+    AutoWritedCountry(target, key, descriptor){
+        target.model = require('../model/country')
+    },
     AutoWritedCuisineType(target, key, descriptor){
         target.model = require('../model/cuisineType')
     },
@@ -30,4 +33,8 @@ module.exports = {
     AutoWritedMenuType(target,key,desc) {
         target.model = require('../model/menuType')
     },
+    AutoWritedProvince(target,key,desc) {
+        target.model = require('../model/province')
+    },
+
 }

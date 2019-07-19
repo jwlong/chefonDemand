@@ -25,7 +25,7 @@ var getAccessToken = function(token) {
 };
 
 var getClient = function(clientId, clientSecret) {
-
+    console.log(config);
     var clients = config.clients.filter(function(client) {
         console.log(clientSecret);
         return client.clientId === clientId && client.clientSecret === clientSecret;
