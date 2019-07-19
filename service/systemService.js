@@ -2,7 +2,6 @@ import BaseService from './baseService.js'
 import countryService from  './countryService'
 import provinceService from './provinceService'
 import areaService from './areaService'
-
 import cityService from './cityService'
 
 

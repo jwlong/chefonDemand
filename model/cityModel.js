@@ -19,7 +19,7 @@ class CityModel extends BaseModel {
         this.model = super.getModel()
         this.model.sync()
         this.model.belongsTo(province['model'],{as:'province',foreignKey:'province_code'}) // add province_code to cityModel
-        this.model.belongsTo(area['model'],{as:'area',foreignKey:'area_code'}) // add area_code to cityModel
+      //  this.model.hasOne(area['model'],{as:'area',foreignKey:'area_code'}) // add area_code to cityModel,这个在多的一端来维护
 
     }
 }

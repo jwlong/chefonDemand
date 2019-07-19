@@ -1,6 +1,7 @@
 import Sequelize from 'sequelize'
 import BaseModel from './baseModel.js'
 import  province from './province'
+import  city from './cityModel'
 class Area extends BaseModel {
     constructor () {
         super('area', {
@@ -17,7 +18,7 @@ class Area extends BaseModel {
         this.model = super.getModel()
         this.model.sync()
         this.model.belongsTo(province['model'],{as:'province',foreignKey:'province_code'});// add province_code to Area Model
-        //this.model.belongsTo(city['model'],{as: 'city',foreignKey:'city_code'}) // add city_code to Area Model
+        this.model.belongsTo(city['model'],{as: 'city',foreignKey:'city_code'}) // add city_code to Area Model
     }
 }
 module.exports = new Area()
