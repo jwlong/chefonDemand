@@ -15,7 +15,6 @@ class Province extends BaseModel {
         })
         this.model = super.getModel()
         this.model.sync()
-        console.log("hello")
         this.model.belongsTo(country['model'],{as:'country', foreignKey:'country_code'})
     }
 }

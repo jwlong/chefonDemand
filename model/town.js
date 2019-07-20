@@ -1,5 +1,7 @@
 import Sequelize from 'sequelize'
 import BaseModel from './baseModel.js'
+import province from  './province'
+import area from  './area'
 
 class Town extends BaseModel {
     constructor () {
@@ -16,6 +18,8 @@ class Town extends BaseModel {
         })
         this.model = super.getModel()
         this.model.sync()
+        this.model.belongsTo(province['model'],{foreignKey:'province_code'})
+        this.model.belongsTo(area['model'],{foreignKey:'area_code'})
     }
 }
 module.exports = new Town()

@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize'
 import BaseModel from './baseModel.js'
-
+import chef from './chefModel'
 class Language extends BaseModel {
     constructor () {
         super('language', {

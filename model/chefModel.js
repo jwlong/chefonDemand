@@ -1,6 +1,7 @@
 import Sequelize from 'sequelize'
 import BaseModel from './baseModel.js'
 import db from '../config/db.js'
+import language from './language'
 class ChefModel extends BaseModel {
     constructor () {
         super('chef', {
@@ -15,6 +16,8 @@ class ChefModel extends BaseModel {
         })
         this.model = super.getModel()
         this.model.sync()
+       // this.model.belongsToMany(language['model'],{through:'chef_language',as:'chef_language'})
+        //this.model.belongsToMany(language['model'],{as:'langs',through:'chef_language',foreignKey:'chef_id'})
     }
 
     getChefList(attr) {

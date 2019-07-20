@@ -4,7 +4,7 @@ import BaseModel from './baseModel.js'
 class CuisineType extends BaseModel {
     constructor () {
         super('cuisine_type', {
-            cuisine_type:{type: Sequelize.INTERGER(9), primaryKey: true,autoIncrement:true},
+            cuisine_type_id:{type: Sequelize.INTEGER(9), primaryKey: true,autoIncrement:true},
             cuisine_type_name:{type: Sequelize.STRING(30), allowNull: false},
             description:{type: Sequelize.STRING(300)},
         },{
