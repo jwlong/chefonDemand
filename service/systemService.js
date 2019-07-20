@@ -11,6 +11,7 @@ import districtService from './districtService'
 import menuTypeService from './menuTypeService'
 import chefMenuService from './chefMenuService'
 import cityDistrictService from './cityDistrictService'
+import chefDistrictService from  './chefDistrictService'
 
 class SystemService extends BaseService{
     constructor(){
