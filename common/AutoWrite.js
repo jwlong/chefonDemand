@@ -36,6 +36,9 @@ module.exports = {
     AutoWritedMenuType(target,key,desc) {
         target.model = require('../model/menuType')
     },
+    AutoWritedMenuDetails(target,key,desc) {
+        target.model = require('../model/menuDetails')
+    },
     AutoWritedProvince(target,key,desc) {
         target.model = require('../model/province')
     },

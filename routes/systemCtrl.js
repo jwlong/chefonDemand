@@ -3,12 +3,15 @@ import express from 'express'
 import systemService from '../service/systemService'
 
 const router = express.Router()
-
+// 请求前缀为/system
 class SystemController {
     static initRouter(){
         /***************system 业务***************/
-        router.get('/obtainAccessToken', async (req, res, next) => {
-            try{res.json(await systemService.obtainAccessToken(req.query))}catch(err){next(err)}
+        router.post('/cuisineType/createBatch', async (req, res, next) => {
+            try{res.json(await systemService.cuisineTypeCreateBatch(req.body))}catch(err){next(err)}
+        })
+        router.post('/city/createBatch', async (req, res, next) => {
+            try{res.json(await systemService.cityCreateBatch(req.body))}catch(err){next(err)}
         })
 /*
         router.get('/all', async (req, res, next) => {

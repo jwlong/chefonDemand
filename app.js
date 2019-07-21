@@ -30,7 +30,7 @@ app.oauth = new OAuth2Server({
 //关于auth
 app.all('/oauth/token', obtainToken);
 // 全局拦截配置CROS
-app.all('*',authenticateRequest,function(req,res,next){
+app.all('*'/*authenticateRequest*/,function(req,res,next){
     console.log("Congratulations, you are in a secret area!")
 	res.header('Access-Control-Allow-origin','*')
 	res.header('Access-Control-Allow-Headers','accept, origin, X-Requested-With, content-type, token, userId')

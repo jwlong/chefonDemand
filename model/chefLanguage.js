@@ -17,5 +17,16 @@ class ChefLanguage extends BaseModel {
         this.model.belongsTo(chef['model'],{foreignKey:'chef_id'})
         this.model.belongsTo(language['model'],{foreignKey:'language_code'})
     }
+    getChefLangByChefId(attr) {
+        return this.model.findAll({
+            include:[{
+                model:language['model'],
+              //  where:{attr}
+            },{
+                model:chef['model'],
+                }],
+            where:attr
+        })
+    }
 }
 module.exports = new ChefLanguage()

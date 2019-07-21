@@ -1,7 +1,6 @@
 import Sequelize from 'sequelize'
 import BaseModel from './baseModel.js'
 import db from '../config/db.js'
-import language from './language'
 class ChefModel extends BaseModel {
     constructor () {
         super('chef', {
@@ -20,10 +19,14 @@ class ChefModel extends BaseModel {
         //this.model.belongsToMany(language['model'],{as:'langs',through:'chef_language',foreignKey:'chef_id'})
     }
 
-    getChefList(attr) {
+   /* getChefList(attr) {
         console.log(attr);
         attr = {chef_id:attr.chef_id,first_name:(attr.first_name)?(attr.first_name): ''};
         return db.query('select c.first_name,c.last_name from chef  c left join chef_district d on d.chef_id = c.chef_id where c.chef_id= :chef_id and c.first_name = :first_name',{ replacements:attr,type:db.QueryTypes.SELECT});
-    }
+    }*/
+     getChefList(attr) {
+     console.log(attr);
+     attr = {chef_id:attr.chef_id,first_name:(attr.first_name)?(attr.first_name): ''};
+     }
 }
 module.exports = new ChefModel()
