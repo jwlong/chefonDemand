@@ -24,8 +24,9 @@ class ChefLanguage extends BaseModel {
               //  where:{attr}
             },{
                 model:chef['model'],
+                where:attr
                 }],
-            where:attr
+
         })
     }
 }

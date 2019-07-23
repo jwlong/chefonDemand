@@ -39,7 +39,7 @@ class AdminStaffController {
         })
 
         router.get('/getChefLangByChefId', async (req, res, next) => {
-            try{res.json(await chefLanguageService.getChefLangByChefId(req.body))}catch(err){next(err)}
+            try{res.json(await chefLanguageService.getChefLangByChefId(req.query))}catch(err){next(err)}
         })
 
 
