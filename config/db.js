@@ -1,10 +1,7 @@
 import Sequelize from 'sequelize'
-const config = {
-	database:'food',
-	user: 'root',
-	pwd: 'lllongjin'
-}
-const sequelize = new Sequelize(config['database'], config['user'], config['pwd'], {dialect: 'mysql'})
+var configIndex =  require('./index');
+var config = configIndex.mysql;
+const sequelize = new Sequelize(config['database'], config['user'], config['pwd'], {dialect: 'mysql',host:config['host']})
 sequelize.authenticate().then(() => {
     console.log('数据库连接成功...')
 }).catch(err => {console.error('数据库连接失败...', err)})

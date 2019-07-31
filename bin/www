@@ -9,6 +9,7 @@ var debug = require('debug')('myapp:server');
 var http = require('http');
 var https = require('https');
 var fs = require('fs');
+var serverConf = require('../config')
 var path = require('path');
 // var httpsOpt = {
 //   key : fs.readFileSync(path.join(path.dirname(__dirname),'public/httpsCert/214099849550308.key')),
@@ -30,8 +31,8 @@ var server = http.createServer(app);
 /**
  * Listen on provided port, on all network interfaces.
  */
-
-server.listen('3333','127.0.0.1',()=>{
+console.log("server port :" +serverConf.port," server host:" +serverConf.host)
+server.listen(serverConf.port,serverConf.host,()=>{
     const host = server.address().address;
     const port = server.address().port;
     console.log("应用实例，访问地址为 http://%s:%s", host, port|3333)

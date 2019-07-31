@@ -1,22 +1,31 @@
 import Sequelize from 'sequelize'
 import BaseModel from './baseModel.js'
 import moment from 'moment'
-class Province extends BaseModel {
+class ChefServiceLocation extends BaseModel {
     constructor () {
-        super('t_language', {
-            Language_Code: {
+        super('t_chef_service_location', {
+            chef: {
+                type: Sequelize.INTEGER(11),
+                allowNull: false,
+                primaryKey: true,
+                references: {
+                    model: 't_chef',
+                    key: 'chef_id'
+                }
+            },
+            district: {
                 type: Sequelize.STRING(5),
                 allowNull: false,
-                primaryKey: true
-            },
-            Language_Name: {
-                type: Sequelize.STRING(50),
-                allowNull: false
+                primaryKey: true,
+                references: {
+                    model: 't_district',
+                    key: 'District_Code'
+                }
             },
             Create_On: {
                 type: Sequelize.DATE,
                 allowNull: false,
-                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+                defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
                 get() {
                     return moment(this.getDataValue('Create_On')).format('DD/MM/YYYY HH:mm:ss');
                 }
@@ -28,7 +37,7 @@ class Province extends BaseModel {
             Update_On: {
                 type: Sequelize.DATE,
                 allowNull: false,
-                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+                defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
                 get() {
                     return moment(this.getDataValue('Update_On')).format('DD/MM/YYYY HH:mm:ss');
                 }
@@ -42,12 +51,10 @@ class Province extends BaseModel {
                 allowNull: false
             }
         }, {
-            tableName: 't_language',
+            tableName: 't_chef_service_location',
             timestamps: false,
         });
-        this.model = super.getModel()
-//        this.model.sync()
-  //      this.model.belongsTo(country['model'],{as:'country', foreignKey:'country_code'})*/
+        this.model = super.getModel();
     }
 }
-module.exports = new Province()
+module.exports = new ChefServiceLocation()

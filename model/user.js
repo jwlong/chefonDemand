@@ -1,17 +1,46 @@
 import Sequelize from 'sequelize'
 import BaseModel from './baseModel.js'
 import moment from 'moment'
-class Province extends BaseModel {
+class User extends BaseModel {
     constructor () {
-        super('t_language', {
-            Language_Code: {
-                type: Sequelize.STRING(5),
+        super('t_user', {
+            user_id: {
+                type: Sequelize.INTEGER(11),
                 allowNull: false,
                 primaryKey: true
             },
-            Language_Name: {
-                type: Sequelize.STRING(50),
+            user_name: {
+                type: Sequelize.STRING(45),
+                allowNull: false,
+                unique: true
+            },
+            password: {
+                type: Sequelize.STRING(100),
                 allowNull: false
+            },
+            email_address: {
+                type: Sequelize.STRING(45),
+                allowNull: false
+            },
+            contact_no: {
+                type: Sequelize.STRING(15),
+                allowNull: false
+            },
+            birthday: {
+                type: Sequelize.DATEONLY,
+                allowNull: true
+            },
+            address_1: {
+                type: Sequelize.STRING(200),
+                allowNull: true
+            },
+            address_2: {
+                type: Sequelize.STRING(200),
+                allowNull: true
+            },
+            address_3: {
+                type: Sequelize.STRING(200),
+                allowNull: true
             },
             Create_On: {
                 type: Sequelize.DATE,
@@ -23,7 +52,7 @@ class Province extends BaseModel {
             },
             Create_By: {
                 type: Sequelize.INTEGER(11),
-                allowNull: false
+                allowNull: true
             },
             Update_On: {
                 type: Sequelize.DATE,
@@ -42,12 +71,11 @@ class Province extends BaseModel {
                 allowNull: false
             }
         }, {
-            tableName: 't_language',
+            tableName: 't_user',
             timestamps: false,
         });
         this.model = super.getModel()
-//        this.model.sync()
-  //      this.model.belongsTo(country['model'],{as:'country', foreignKey:'country_code'})*/
+        //this.model.sync()
     }
 }
-module.exports = new Province()
+module.exports = new User()

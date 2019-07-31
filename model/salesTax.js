@@ -1,17 +1,34 @@
 import Sequelize from 'sequelize'
 import BaseModel from './baseModel.js'
+import province from  './province'
 import moment from 'moment'
-class Province extends BaseModel {
+class SalesTax extends BaseModel {
     constructor () {
-        super('t_language', {
-            Language_Code: {
-                type: Sequelize.STRING(5),
+        super('t_sales_tax', {
+            sales_tax_id: {
+                type: Sequelize.INTEGER(11),
                 allowNull: false,
                 primaryKey: true
             },
-            Language_Name: {
+            sales_tax_name: {
                 type: Sequelize.STRING(50),
                 allowNull: false
+            },
+            display: {
+                type: Sequelize.STRING(20),
+                allowNull: false
+            },
+            sales_tax_rate: {
+                type: Sequelize.DECIMAL,
+                allowNull: false
+            },
+            province_code: {
+                type: Sequelize.STRING(5),
+                allowNull: true
+            },
+            country_code: {
+                type: Sequelize.STRING(3),
+                allowNull: true
             },
             Create_On: {
                 type: Sequelize.DATE,
@@ -42,12 +59,10 @@ class Province extends BaseModel {
                 allowNull: false
             }
         }, {
-            tableName: 't_language',
+            tableName: 't_sales_tax',
             timestamps: false,
         });
         this.model = super.getModel()
-//        this.model.sync()
-  //      this.model.belongsTo(country['model'],{as:'country', foreignKey:'country_code'})*/
     }
 }
-module.exports = new Province()
+module.exports = new SalesTax()

@@ -1,16 +1,29 @@
 import Sequelize from 'sequelize'
 import BaseModel from './baseModel.js'
+import province from './province'
 import moment from 'moment'
-class Province extends BaseModel {
+class City extends BaseModel {
     constructor () {
-        super('t_language', {
-            Language_Code: {
+        super('t_city', {
+            City_Code: {
                 type: Sequelize.STRING(5),
                 allowNull: false,
                 primaryKey: true
             },
-            Language_Name: {
-                type: Sequelize.STRING(50),
+            City_Name: {
+                type: Sequelize.STRING(30),
+                allowNull: true
+            },
+            Province_Code: {
+                type: Sequelize.STRING(5),
+                allowNull: true,
+                references: {
+                    model: 't_province',
+                    key: 'Province_Code'
+                }
+            },
+            Country_Code: {
+                type: Sequelize.STRING(3),
                 allowNull: false
             },
             Create_On: {
@@ -42,12 +55,10 @@ class Province extends BaseModel {
                 allowNull: false
             }
         }, {
-            tableName: 't_language',
+            tableName: 't_city',
             timestamps: false,
         });
-        this.model = super.getModel()
-//        this.model.sync()
-  //      this.model.belongsTo(country['model'],{as:'country', foreignKey:'country_code'})*/
+        this.model = super.getModel();
     }
 }
-module.exports = new Province()
+module.exports = new City()

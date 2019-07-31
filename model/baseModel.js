@@ -9,6 +9,10 @@ class BaseModel{
 	getModel(){
 		return this.model
 	}
+	// schema 公共属性
+	schemaPostProcessor(schema) {
+		if (schema && schema.updateTime) 
+	}
 	/**************************************查询方法**************************************/
 	// 不带过滤条件的查询
 	findAll(attributes){

@@ -54,6 +54,12 @@ app.use(function(req, res, next) {
   res.json({error:err})
 })
 app.use(errorHandler);
+if (!module.parent) {
+    app.listen(config.port, function() {
+        console.log(`app is listening at http://localhost:${config.port}`);
+    });
+}
+
 function errorHandler(err, req, res, next) {
 	console.error(err)
 	res.json({error: err})
