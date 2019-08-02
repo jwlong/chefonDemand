@@ -33,7 +33,7 @@ class AccessToken extends BaseModel {
                 allowNull: false,
                 defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
                 get() {
-                    return moment(this.getDataValue('updatedAt')).format('DD/MM/YYYY HH:mm:ss');
+                    return moment(this.getDataValue('Create_On')).format('DD/MM/YYYY HH:mm:ss');
                 }
             },
             Create_By: {
