@@ -27,4 +27,7 @@ module.exports = {
     AutoWritedProvince(target,key,desc) {
         target.model = require('../model/province')
     },
+    AutoWritedUser(target,key,desc) {
+        target.model = require('../model/user')
+    },
 }

@@ -13,6 +13,10 @@ class SystemController {
         router.post('/city/createBatch', async (req, res, next) => {
             try{res.json(await systemService.cityCreateBatch(req.body))}catch(err){next(err)}
         })
+
+        router.post('/user/createUser', async (req, res, next) => {
+            try{res.json(await systemService.userCreate(req.body))}catch(err){next(err)}
+        })
 /*
         router.get('/all', async (req, res, next) => {
             try{res.json(await cityService.baseFindAll())}catch(err){next(err)}

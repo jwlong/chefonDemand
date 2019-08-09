@@ -11,7 +11,7 @@ class BaseModel{
 	}
 	// schema 公共属性
 	schemaPostProcessor(schema) {
-		if (schema && schema.updateTime) 
+		if (schema && schema.updateTime) {}
 	}
 	/**************************************查询方法**************************************/
 	// 不带过滤条件的查询
@@ -58,6 +58,7 @@ class BaseModel{
 	/**************************************插入方法**************************************/
 	// 插入单个实体
 	create(entity){
+		console.log("=======>",entity)
 		return this.model.create(entity)
 	}
 	// 批量插入实体集
