@@ -17,6 +17,10 @@ class ChefService extends BaseService{
             res.status(400).json({msg:'user name already taken.'});
         }
     }
+
+    createChef(attr) {
+
+    }
     findChefByPopularity() {
    /*     var sql = "select * from chef left join "
 

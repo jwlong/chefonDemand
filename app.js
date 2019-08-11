@@ -44,6 +44,7 @@ app.all('*'/*authenticateRequest*/,function(req,res,next){
 // 路由列表
 app.use('/system',require('./routes/systemCtrl'))
 app.use('/chef',require('./routes/chefCtrl'))
+app.use('/user',require('./routes/userCtrl'))
 app.use('/staff',require('./routes/adminStaffCtr'))
 
 // 错误处理中间件
