@@ -3,7 +3,7 @@ const config = {
     host:'127.0.0.1',
     mysql :{
         host:'127.0.0.1',
-        database:'food',
+        database:'chefondemand',
         user: 'root',
         pwd: 'lllongjin'
     }
