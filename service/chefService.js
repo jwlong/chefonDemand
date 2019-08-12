@@ -10,8 +10,7 @@ class ChefService extends BaseService{
         return ChefService.model.getChefList(attr)
     }
     checkBeforeCreate(attr,res) {
-        var sql = "select count(chef.*) from t_chef chef left join t_user u on u.user_id = chef.user_id " +
-            " where u.user_name = :user_name";
+        var sql = "select count(u.user_id) from  t_user u  where u.user_name = :user_name";
         let cnt = db.query(sql,{replacements:{user_name:attr.user_name},type:db.QueryTypes.SELECT});
         if (cnt && cnt >0 ) {
             res.status(400).json({msg:'user name already taken.'});

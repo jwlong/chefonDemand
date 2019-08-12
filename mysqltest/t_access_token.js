@@ -1,40 +1,46 @@
 /* jshint indent: 2 */
-import Sequelize from 'sequelize'
-import BaseModel from './baseModel.js'
 
-module.exports = function(sequelize, Sequelize) {
+module.exports = function(sequelize, DataTypes) {
   return sequelize.define('t_access_token', {
     token_id: {
-      type: Sequelize.INTEGER(11),
-      allowNull: false
+      type: DataTypes.INTEGER(11),
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true
     },
     user_id: {
-      type: Sequelize.INTEGER(11),
-      allowNull: true
+      type: DataTypes.INTEGER(11),
+      allowNull: false,
+      primaryKey: true,
+      references: {
+        model: 't_user',
+        key: 'user_id'
+      }
     },
     token_string: {
-      type: Sequelize.STRING(100),
-      allowNull: false
+      type: DataTypes.STRING(100),
+      allowNull: false,
+      unique: true
     },
     valid_until: {
-      type: Sequelize.DATE,
+      type: DataTypes.DATE,
       allowNull: true
     },
-    ip_address: {
-      type: Sequelize.STRING(100),
-      allowNull: true
+    ipv4_address: {
+      type: DataTypes.STRING(15),
+      allowNull: false
     },
     for_order: {
-      type: Sequelize.BOOLEAN,
+      type: DataTypes.BOOLEAN,
       allowNull: true
     },
-    Create_On: {
-      type: Sequelize.DATE,
+    create_on: {
+      type: DataTypes.DATE,
       allowNull: false,
       defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
     },
-    Create_By: {
-      type: Sequelize.INTEGER(11),
+    create_by: {
+      type: DataTypes.INTEGER(11),
       allowNull: false
     }
   }, {

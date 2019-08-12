@@ -9,6 +9,11 @@ class BaseModel{
 	getModel(){
 		return this.model
 	}
+
+    max(key) {
+		//let nextId = 0;
+		return this.model.max(key);
+	}
 	// schema 公共属性
 	schemaPostProcessor(schema) {
 		if (schema && schema.updateTime) {}
@@ -58,7 +63,6 @@ class BaseModel{
 	/**************************************插入方法**************************************/
 	// 插入单个实体
 	create(entity){
-		console.log("=======>",entity)
 		return this.model.create(entity)
 	}
 	// 批量插入实体集

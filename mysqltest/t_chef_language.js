@@ -1,9 +1,9 @@
 /* jshint indent: 2 */
 
-module.exports = function(sequelize, Sequelize) {
+module.exports = function(sequelize, DataTypes) {
   return sequelize.define('t_chef_language', {
     chef_id: {
-      type: Sequelize.INTEGER(11),
+      type: DataTypes.INTEGER(11),
       allowNull: false,
       primaryKey: true,
       references: {
@@ -12,34 +12,34 @@ module.exports = function(sequelize, Sequelize) {
       }
     },
     lang_code: {
-      type: Sequelize.STRING(2),
+      type: DataTypes.STRING(2),
       allowNull: false,
       primaryKey: true,
       references: {
         model: 't_language',
-        key: 'Language_Code'
+        key: 'language_code'
       }
     },
-    Create_On: {
-      type: Sequelize.DATE,
+    create_on: {
+      type: DataTypes.DATE,
       allowNull: false,
       defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
     },
-    Create_By: {
-      type: Sequelize.INTEGER(11),
+    create_by: {
+      type: DataTypes.INTEGER(11),
       allowNull: false
     },
-    Update_On: {
-      type: Sequelize.DATE,
+    update_on: {
+      type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: '0000-00-00 00:00:00'
+      defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
     },
-    Update_By: {
-      type: Sequelize.INTEGER(11),
+    update_by: {
+      type: DataTypes.INTEGER(11),
       allowNull: false
     },
-    Active_Ind: {
-      type: Sequelize.STRING(1),
+    active_ind: {
+      type: DataTypes.STRING(1),
       allowNull: false
     }
   }, {

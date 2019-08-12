@@ -1,52 +1,61 @@
 /* jshint indent: 2 */
 
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('t_chef', {
-    chef_id: {
+  return sequelize.define('t_chef_default_scheule', {
+    chef_default_scheule_id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
       primaryKey: true
     },
-    user_id: {
+    chef_id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
-      primaryKey: true,
       references: {
-        model: 't_user',
-        key: 'user_id'
+        model: 't_chef',
+        key: 'chef_id'
       }
     },
-    short_desc: {
-      type: DataTypes.STRING(100),
-      allowNull: true
-    },
-    detail_desc: {
-      type: DataTypes.STRING(4000),
-      allowNull: true
-    },
-    verified_chef_ind: {
-      type: DataTypes.BOOLEAN,
-      allowNull: true,
-      defaultValue: '0'
-    },
-    food_safety_certified_ind: {
-      type: DataTypes.BOOLEAN,
-      allowNull: true,
-      defaultValue: '0'
-    },
-    payment_protection_ind: {
-      type: DataTypes.BOOLEAN,
-      allowNull: true,
-      defaultValue: '0'
-    },
-    verified: {
+    mon: {
       type: DataTypes.BOOLEAN,
       allowNull: true
     },
-    verified_on: {
-      type: DataTypes.DATE,
+    tue: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true
+    },
+    wed: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true
+    },
+    thu: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true
+    },
+    fri: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true
+    },
+    sat: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true
+    },
+    sun: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true
+    },
+    holiday: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true
+    },
+    apply_meal: {
+      type: DataTypes.INTEGER(11),
       allowNull: false,
-      defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
+      defaultValue: '3'
+    },
+    instant_ind: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: '1'
     },
     create_on: {
       type: DataTypes.DATE,
@@ -71,6 +80,6 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     }
   }, {
-    tableName: 't_chef'
+    tableName: 't_chef_default_scheule'
   });
 };

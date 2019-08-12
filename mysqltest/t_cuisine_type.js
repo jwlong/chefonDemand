@@ -1,44 +1,44 @@
 /* jshint indent: 2 */
 
-module.exports = function(sequelize, Sequelize) {
+module.exports = function(sequelize, DataTypes) {
   return sequelize.define('t_cuisine_type', {
     cuisine_type_id: {
-      type: Sequelize.INTEGER(11),
+      type: DataTypes.INTEGER(11),
       allowNull: false,
       primaryKey: true
     },
     cuisine_type_name: {
-      type: Sequelize.STRING(30),
+      type: DataTypes.STRING(30),
       allowNull: false
     },
-    Description: {
-      type: Sequelize.STRING(4000),
+    description: {
+      type: DataTypes.STRING(4000),
       allowNull: false
     },
     orgin_country: {
-      type: Sequelize.STRING(3),
+      type: DataTypes.STRING(3),
       allowNull: true
     },
-    Create_On: {
-      type: Sequelize.DATE,
+    create_on: {
+      type: DataTypes.DATE,
       allowNull: false,
       defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
     },
-    Create_By: {
-      type: Sequelize.INTEGER(11),
+    create_by: {
+      type: DataTypes.INTEGER(11),
       allowNull: false
     },
-    Update_On: {
-      type: Sequelize.DATE,
+    update_on: {
+      type: DataTypes.DATE,
       allowNull: false,
       defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
     },
-    Update_By: {
-      type: Sequelize.INTEGER(11),
+    update_by: {
+      type: DataTypes.INTEGER(11),
       allowNull: false
     },
-    Active_Ind: {
-      type: Sequelize.STRING(1),
+    active_ind: {
+      type: DataTypes.STRING(1),
       allowNull: false
     }
   }, {

@@ -2,6 +2,9 @@ class BaseService{
 	constructor(instance){
 		this.instance = instance
 	}
+	max (key) {
+		return this.instance.max(key);
+	}
 	baseFindAll(attributes){
 		return this.instance.findAll(attributes)
 	}

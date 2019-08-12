@@ -1,30 +1,18 @@
 /* jshint indent: 2 */
 
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('t_district', {
-    district_code: {
-      type: DataTypes.STRING(5),
+  return sequelize.define('t_meal_type', {
+    meal_type_id: {
+      type: DataTypes.INTEGER(11),
       allowNull: false,
       primaryKey: true
     },
-    district_name: {
-      type: DataTypes.STRING(80),
-      allowNull: false
-    },
-    city_code: {
-      type: DataTypes.STRING(5),
-      allowNull: true,
-      references: {
-        model: 't_city',
-        key: 'city_code'
-      }
-    },
-    province_code: {
-      type: DataTypes.STRING(5),
+    meal_type_name: {
+      type: DataTypes.STRING(100),
       allowNull: true
     },
-    country_code: {
-      type: DataTypes.STRING(3),
+    meal_type_desc: {
+      type: DataTypes.STRING(100),
       allowNull: true
     },
     create_on: {
@@ -50,6 +38,6 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     }
   }, {
-    tableName: 't_district'
+    tableName: 't_meal_type'
   });
 };

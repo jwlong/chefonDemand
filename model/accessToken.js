@@ -6,7 +6,9 @@ class AccessToken extends BaseModel {
         super('t_access_token', {
             token_id: {
                 type: Sequelize.INTEGER(11),
-                allowNull: false
+                primaryKey:true,
+                allowNull: false,
+                autoIncrement:true
             },
             user_id: {
                 type: Sequelize.INTEGER(11),
@@ -20,7 +22,7 @@ class AccessToken extends BaseModel {
                 type: Sequelize.DATE,
                 allowNull: true
             },
-            ip_address: {
+            ipv4_address: {
                 type: Sequelize.STRING(100),
                 allowNull: true
             },
@@ -28,15 +30,15 @@ class AccessToken extends BaseModel {
                 type: Sequelize.BOOLEAN,
                 allowNull: true
             },
-            Create_On: {
+            create_on: {
                 type: Sequelize.DATE,
                 allowNull: false,
-                defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
                 get() {
                     return moment(this.getDataValue('Create_On')).format('DD/MM/YYYY HH:mm:ss');
                 }
             },
-            Create_By: {
+            create_by: {
                 type: Sequelize.INTEGER(11),
                 allowNull: false
             }

@@ -6,6 +6,8 @@ const config = {
         database:'chefondemand',
         user: 'root',
         pwd: 'lllongjin'
-    }
+    },
+    jwtSecret: "asdfsafsafsafsafsafsafsafd",
+    jwtSession: {session: false}
 }
 module.exports = config;

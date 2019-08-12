@@ -1,4 +1,4 @@
-import Sequelize from 'sequelize'
+import Sequelize from 'Sequelize'
 import BaseModel from './baseModel.js'
 import moment from 'moment'
 class User extends BaseModel {
@@ -7,7 +7,8 @@ class User extends BaseModel {
             user_id: {
                 type: Sequelize.INTEGER(11),
                 allowNull: false,
-                primaryKey: true
+                primaryKey: true,
+                autoIncrement:true
             },
             user_name: {
                 type: Sequelize.STRING(45),
@@ -18,13 +19,34 @@ class User extends BaseModel {
                 type: Sequelize.STRING(100),
                 allowNull: false
             },
+            salutation: {
+                type: Sequelize.STRING(10),
+                allowNull: false
+            },
+            first_name: {
+                type: Sequelize.STRING(50),
+                allowNull: true
+            },
+            middle_name: {
+                type: Sequelize.STRING(50),
+                allowNull: true
+            },
+            last_name: {
+                type: Sequelize.STRING(50),
+                allowNull: true
+            },
             email_address: {
                 type: Sequelize.STRING(45),
-                allowNull: false
+                allowNull: true
             },
             contact_no: {
                 type: Sequelize.STRING(15),
-                allowNull: false
+                allowNull: true
+            },
+            sms_notify_ind: {
+                type: Sequelize.BOOLEAN,
+                allowNull: true,
+                defaultValue: '0'
             },
             birthday: {
                 type: Sequelize.DATEONLY,
@@ -42,7 +64,60 @@ class User extends BaseModel {
                 type: Sequelize.STRING(200),
                 allowNull: true
             },
-            Create_On: {
+            accept_marketing_ind: {
+                type: Sequelize.BOOLEAN,
+                allowNull: true,
+                defaultValue: '0'
+            },
+            accept_terms_ind: {
+                type: Sequelize.BOOLEAN,
+                allowNull: true,
+                defaultValue: '0'
+            },
+            robot_ind: {
+                type: Sequelize.BOOLEAN,
+                allowNull: true,
+                defaultValue: '0'
+            },
+            ipv4_address: {
+                type: Sequelize.STRING(15),
+                allowNull: false
+            },
+            verified_email: {
+                type: Sequelize.BOOLEAN,
+                allowNull: true,
+                defaultValue: '0'
+            },
+            verified_email_on: {
+                type: Sequelize.DATE,
+                allowNull: false,
+                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+            },
+            verified_contact_no: {
+                type: Sequelize.BOOLEAN,
+                allowNull: true,
+                defaultValue: '0'
+            },
+            verified_contact_no_on: {
+                type: Sequelize.DATE,
+                allowNull: false,
+                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+            },
+            verified_user_information: {
+                type: Sequelize.BOOLEAN,
+                allowNull: true,
+                defaultValue: '0'
+            },
+            verified_user_information_on: {
+                type: Sequelize.DATE,
+                allowNull: false,
+                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+            },
+            rating_level: {
+                type: Sequelize.INTEGER(1),
+                allowNull: true
+            },
+            create_on: {
                 type: Sequelize.DATE,
                 allowNull: false,
                 defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
@@ -50,11 +125,11 @@ class User extends BaseModel {
                     return moment(this.getDataValue('Create_On')).format('DD/MM/YYYY HH:mm:ss');
                 }
             },
-            Create_By: {
+            create_by: {
                 type: Sequelize.INTEGER(11),
                 allowNull: true
             },
-            Update_On: {
+            update_on: {
                 type: Sequelize.DATE,
                 allowNull: false,
                 defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
@@ -62,11 +137,11 @@ class User extends BaseModel {
                     return moment(this.getDataValue('Update_On')).format('DD/MM/YYYY HH:mm:ss');
                 }
             },
-            Update_By: {
+            update_by: {
                 type: Sequelize.INTEGER(11),
                 allowNull: false
             },
-            Active_Ind: {
+            active_ind: {
                 type: Sequelize.STRING(1),
                 allowNull: false
             }
@@ -76,6 +151,9 @@ class User extends BaseModel {
         });
         this.model = super.getModel()
         //this.model.sync()
+    }
+    nextId() {
+        return this.model.max('user_id');
     }
 }
 module.exports = new User()

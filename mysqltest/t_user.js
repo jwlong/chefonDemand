@@ -1,65 +1,139 @@
 /* jshint indent: 2 */
 
-module.exports = function(sequelize, Sequelize) {
+module.exports = function(sequelize, DataTypes) {
   return sequelize.define('t_user', {
     user_id: {
-      type: Sequelize.INTEGER(11),
+      type: DataTypes.INTEGER(11),
       allowNull: false,
       primaryKey: true
     },
     user_name: {
-      type: Sequelize.STRING(45),
+      type: DataTypes.STRING(45),
       allowNull: false,
       unique: true
     },
     password: {
-      type: Sequelize.STRING(100),
+      type: DataTypes.STRING(100),
       allowNull: false
+    },
+    salutation: {
+      type: DataTypes.STRING(10),
+      allowNull: false
+    },
+    first_name: {
+      type: DataTypes.STRING(50),
+      allowNull: true
+    },
+    middle_name: {
+      type: DataTypes.STRING(50),
+      allowNull: true
+    },
+    last_name: {
+      type: DataTypes.STRING(50),
+      allowNull: true
     },
     email_address: {
-      type: Sequelize.STRING(45),
-      allowNull: false
+      type: DataTypes.STRING(45),
+      allowNull: true
     },
     contact_no: {
-      type: Sequelize.STRING(15),
-      allowNull: false
+      type: DataTypes.STRING(15),
+      allowNull: true
+    },
+    sms_notify_ind: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: '0'
     },
     birthday: {
-      type: Sequelize.DATEONLY,
+      type: DataTypes.DATEONLY,
       allowNull: true
     },
     address_1: {
-      type: Sequelize.STRING(200),
+      type: DataTypes.STRING(200),
       allowNull: true
     },
     address_2: {
-      type: Sequelize.STRING(200),
+      type: DataTypes.STRING(200),
       allowNull: true
     },
     address_3: {
-      type: Sequelize.STRING(200),
+      type: DataTypes.STRING(200),
       allowNull: true
     },
-    Create_On: {
-      type: Sequelize.DATE,
-      allowNull: false,
-      defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
+    accept_marketing_ind: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: '0'
     },
-    Create_By: {
-      type: Sequelize.INTEGER(11),
-      allowNull: true
+    accept_terms_ind: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: '0'
     },
-    Update_On: {
-      type: Sequelize.DATE,
-      allowNull: false,
-      defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
+    robot_ind: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: '0'
     },
-    Update_By: {
-      type: Sequelize.INTEGER(11),
+    ipv4_address: {
+      type: DataTypes.STRING(15),
       allowNull: false
     },
-    Active_Ind: {
-      type: Sequelize.STRING(1),
+    verified_email: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: '0'
+    },
+    verified_email_on: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
+    },
+    verified_contact_no: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: '0'
+    },
+    verified_contact_no_on: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
+    },
+    verified_user_information: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: '0'
+    },
+    verified_user_information_on: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
+    },
+    rating_level: {
+      type: DataTypes.INTEGER(1),
+      allowNull: true
+    },
+    create_on: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
+    },
+    create_by: {
+      type: DataTypes.INTEGER(11),
+      allowNull: true
+    },
+    update_on: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
+    },
+    update_by: {
+      type: DataTypes.INTEGER(11),
+      allowNull: false
+    },
+    active_ind: {
+      type: DataTypes.STRING(1),
       allowNull: false
     }
   }, {

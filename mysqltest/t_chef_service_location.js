@@ -1,9 +1,9 @@
 /* jshint indent: 2 */
 
-module.exports = function(sequelize, Sequelize) {
+module.exports = function(sequelize, DataTypes) {
   return sequelize.define('t_chef_service_location', {
     chef: {
-      type: Sequelize.INTEGER(11),
+      type: DataTypes.INTEGER(11),
       allowNull: false,
       primaryKey: true,
       references: {
@@ -12,34 +12,34 @@ module.exports = function(sequelize, Sequelize) {
       }
     },
     district: {
-      type: Sequelize.STRING(5),
+      type: DataTypes.STRING(5),
       allowNull: false,
       primaryKey: true,
       references: {
         model: 't_district',
-        key: 'District_Code'
+        key: 'district_code'
       }
     },
-    Create_On: {
-      type: Sequelize.DATE,
+    create_on: {
+      type: DataTypes.DATE,
       allowNull: false,
       defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
     },
-    Create_By: {
-      type: Sequelize.INTEGER(11),
+    create_by: {
+      type: DataTypes.INTEGER(11),
       allowNull: false
     },
-    Update_On: {
-      type: Sequelize.DATE,
+    update_on: {
+      type: DataTypes.DATE,
       allowNull: false,
       defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
     },
-    Update_By: {
-      type: Sequelize.INTEGER(11),
+    update_by: {
+      type: DataTypes.INTEGER(11),
       allowNull: false
     },
-    Active_Ind: {
-      type: Sequelize.STRING(1),
+    active_ind: {
+      type: DataTypes.STRING(1),
       allowNull: false
     }
   }, {
