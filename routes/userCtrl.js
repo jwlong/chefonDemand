@@ -5,6 +5,7 @@ import express from 'express'
 import userService from '../service/userService';
 import accessTokenService from '../service/accessTokenService';
 import jwt from "jsonwebtoken"
+import cfg from '../config/index'
 import uuid from 'uuid';
 
 const router = express.Router()
@@ -49,30 +50,29 @@ class UserController {
         router.get('/userLogin',async(req, res,next) => {
             console.log("Login param:=>",req.query);
             if (req.query) {
-                console.log(req.query.IPv4_address);
+                console.log(req.query);
                 if (!req.query.IPv4_address) {
-                    res.status(401).json({msg: 'IPv4_address must be supplied'});
+                   return  res.status(401).json({msg: 'IPv4_address must be supplied'});
                 }else {
                     try {
                         const  rows = await userService.login(req.query,res)
                         if (rows.length>0 && rows[0].user_id) {
                             console.log("userId:",rows[0].user_id);
-                            const payload = {id: rows[0].user_id};
-                            let jwtSecret = uuid.v1();
-                            const tokenInfo = {
-                                access_status:'ok',
-                                access_token: jwt.sign(payload, jwtSecret,{expiresIn:'1h'}),
-                            };
-
+                            let uniqueString = uuid.v1();
                             let tokenData = {};
-                            tokenData.token_id = (await accessTokenService.max('token_id')) +1;
+                            let maxTokenId = (await accessTokenService.max('token_id'));
+                            tokenData.token_id = maxTokenId?(maxTokenId +1):1;
                             tokenData.user_id = rows[0].user_id;
-                            tokenData.token_string = jwtSecret;
+                            tokenData.token_string = uniqueString;
                             tokenData.ipv4_address = req.query.IPv4_address;
                             tokenData.create_by = rows[0].user_id;
                             try{
                                 var result = await accessTokenService.baseCreate(tokenData)
                                 if (result) {
+                                    const tokenInfo = {
+                                        access_status:'ok',
+                                        access_token: jwt.sign({id:result.user_id}, cfg.jwtSecret,{expiresIn:'1h'}),
+                                    };
                                     res.json(tokenInfo);
                                 }
                             }catch (e) {

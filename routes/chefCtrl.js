@@ -3,23 +3,32 @@
  */
 import express from 'express'
 import chefService from '../service/chefService';
-
+import userService from  '../service/userService'
 const router = express.Router()
 // 请求前缀为/chef
 class ChefController {
     static initRouter(){
         /***************chef 业务***************/
-        router.post('/createChef',  (req, res) => {
-            chefService.checkBeforeCreate(req.body,res);
-            chefService.createChef(req.body).then(result => {
-                return res.sendStatus(200);
-            }).catch(error => {
-                res.status(401).json({msg:'Chef\'s first name, last name and short description fields are mandatory.'})
-            })
+        router.post('/createChef',  async (req, res,next) => {
+            try {
+                let result = await chefService.checkBeforeCreate(req.body)
+                if(result && result.code) {
+                    return res.status(result.code).json(result);
+                }
+                let user = req.body;
+                user.user_id = await userService.max('user_id')+1;
+                user.update_by = 100001;
+                user.active_ind = 1;
+                user.ipv4_address = user.IPv4_address;
+                user.sms_notify_ind = user.SMS_notify_ind;
+                await chefService.processCreateChef(req.body);
+            }catch (e) {
+                next(e);
+            }
+            next();
            // try{res.json(await chefService.baseCreate(req.body))}catch(err){next(err)}
         })
         return router;
     }
-
 }
 module.exports = ChefController.initRouter();

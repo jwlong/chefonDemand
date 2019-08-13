@@ -1,6 +1,7 @@
 import BaseService from './baseService.js'
 import {AutoWritedChefModel} from '../common/AutoWrite.js'
 import db from '../config/db.js'
+import userService from './userService'
 @AutoWritedChefModel
 class ChefService extends BaseService{
     constructor(){
@@ -9,17 +10,20 @@ class ChefService extends BaseService{
     getChefList(attr) {
         return ChefService.model.getChefList(attr)
     }
-    checkBeforeCreate(attr,res) {
-        var sql = "select count(u.user_id) from  t_user u  where u.user_name = :user_name";
-        let cnt = db.query(sql,{replacements:{user_name:attr.user_name},type:db.QueryTypes.SELECT});
-        if (cnt && cnt >0 ) {
-            res.status(400).json({msg:'user name already taken.'});
-        }
+    checkBeforeCreate(attr) {
+        var sql = "select count(u.user_id) cnt from  t_user u  where u.user_name = :user_name";
+       return db.query(sql,{replacements:{user_name:attr.user_name},type:db.QueryTypes.SELECT}).then(result =>{
+           if (result && result[0].cnt >0 ) {
+              return {code:400,msg:"user name already taken."};
+           }else {
+               return null;
+           }
+       });
+    }
+    processCreateChef(attr){
+        userService.baseCreate(attr);
     }
 
-    createChef(attr) {
-
-    }
     findChefByPopularity() {
    /*     var sql = "select * from chef left join "
 
