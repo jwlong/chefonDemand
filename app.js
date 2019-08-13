@@ -54,7 +54,7 @@ function authenticateRequest(req, res, next) {
         if ( req.headers.access_token) {
             let decoded = jwt.decode(req.headers.access_token);
             if (decoded && decoded.id) {
-                return next();
+                return next();  
             }else {
                 res.status(401);
             }
