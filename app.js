@@ -56,10 +56,10 @@ function authenticateRequest(req, res, next) {
             if (decoded && decoded.id) {
                 return next();
             }else {
-               return res.status(401);
+                res.status(401);
             }
         }else {
-           return res.status(401);
+            res.status(401);
         }
     }
     return next();
