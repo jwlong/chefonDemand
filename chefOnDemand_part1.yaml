@@ -1,0 +1,1017 @@
+swagger: "2.0"
+info:
+  description: "This is Chef On Demand server."
+  version: "0.0.1"
+  title: "Chef On Demand"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "eric.mok@tecfuz.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "tecfuz"
+basePath: "/v1"
+tags:
+- name: "chef"
+  description: "Access to Chef operations"
+- name: "timeslot"
+  description: "Access to Timeslot operations"
+- name: "user"
+  description: "Access to User operations"
+
+  
+schemes:
+- "https"
+
+paths:
+  /chef/createChef:
+    post:
+      tags:
+      - "chef"
+      summary: "(Func4) Creates a new chef user"
+      description: "Creates a new chef user account to manage his orders"
+      operationId: "createChef"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Create chef"
+        required: true
+        schema:
+          $ref: "#/definitions/CreateChefRequest"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "user name already taken."
+        401:
+          description: "Chef's first name, last name and short description fields are mandatory."
+
+  /chef/updateChef:
+    post:
+      tags:
+      - "chef"
+      summary: "(Func5) Update chef user account's information"
+      description: "update chef user account's information by chef or by verification methods"
+      operationId: "updateChef"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Update chef info"
+        required: true
+        schema:
+          $ref: "#/definitions/UpdateChefRequest"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "user Id does not exist."
+        401:
+          description: "Chef's first name, last name and short description fields are mandatory."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+
+  /chef/updateChefQualification:
+    post:
+      tags:
+      - "chef"
+      summary: "(Func5b) Update chef user qualification information"
+      description: "update chef user qualification information by chef or by verification methods"
+      operationId: "updateChefQualification"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Update chef qualification info"
+        required: true
+        schema:
+          $ref: "#/definitions/UpdateChefQualificationRequest"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "user Id does not exist."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+
+
+  /chef/setupChefLanguage:
+    post:
+      tags:
+      - "chef"
+      summary: "(Func6) Update Language list for chef user account"
+      description: "update chef user account's language list by chef"
+      operationId: "updateChefLanguageList"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Update chef language list info"
+        required: true
+        schema:
+          $ref: "#/definitions/UpdateChefLanguageListRequest"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "user Id does not exist."
+        401:
+          description: "language list can not be empty."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+
+  /chef/updateChefServiceLocation:
+    post:
+      tags:
+      - "chef"
+      summary: "(Func8) Update Service Locations for chef user account"
+      description: "update chef user account's service locations by chef"
+      operationId: "updateChefLocationList"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Update chef location list info"
+        required: true
+        schema:
+          $ref: "#/definitions/UpdateChefLocationListRequest"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "chef Id does not exist."
+        401:
+          description: "district code does not exist."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+ 
+          
+  /chef/getChefDetailByChefId:
+    get:
+      tags:
+      - "chef"
+      summary: "(Func5a) Return chef detail by Chef Id"
+      description: "Return chef detail by Chef Id"
+      operationId: "getChefDetailByChefId"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "chef_Id"
+        in: "header"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+              $ref: "#/definitions/ChefDetail"
+        400:
+          description: "chef Id does not exist."
+
+
+  /user/userLogin:
+    get:
+      tags:
+      - "user"
+      summary: "(Func2) Logs user into the system"
+      description: "login user"
+      operationId: "userLogin"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "query"
+        description: "The user name for login"
+        required: true
+        type: "string"
+      - name: "password"
+        in: "query"
+        description: "The password for login in clear text"
+        required: true
+        type: "string"
+        format: "password"
+      - name: "IPv4_address"
+        in: "query"
+        description: "The user's IPv4 address"
+        required: true
+        type: "string"
+        format: "ipv4"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+              $ref: "#/definitions/LoginSuccess"
+        400:
+          description: "Invalid username/password supplied"
+        401:
+          description: "IPv4_address must be supplied"
+
+  /user/createUser:
+    post:
+      tags:
+      - "user"
+      summary: "(Func1) Creates a new user"
+      description: "Creates a new user account to manage his orders"
+      operationId: "createUser"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Create user"
+        required: true
+        schema:
+          $ref: "#/definitions/CreateUserRequest"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "user name already taken."
+        401:
+          description: "user first name, last name, email address and contact no. fields are mandatory."
+        402:
+          description: "user must accept terms and conditions."
+        403:
+          description: "system does not accept robot."
+
+  /user/updateUser:
+    post:
+      tags:
+      - "user"
+      summary: "(Func3) Update user account's basic information"
+      description: "update user account's basic information by user or by verification methods"
+      operationId: "updateUser"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Update user info"
+        required: true
+        schema:
+          $ref: "#/definitions/UpdateUserRequest"
+      responses:
+        200:
+          description: "successful operation"
+        401:
+          description: "user first name, last name, email address and contact no. fields are mandatory."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+     
+  /timeslot/updateChefAvailableTimeSlot:
+    post:
+      tags:
+      - "timeslot"
+      summary: "(Func9) Update available timeslots for chef with chef Id"
+      description: "Chef select available timeslots"
+      operationId: "updateAvailableTimeslots"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Creates available timeslots by chef Id"
+        required: true
+        schema:
+          $ref: "#/definitions/UpdateAvailableTimeslotsByChef"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ConfirmUpdateAvailablelTimeslots"
+        400:
+          description: "Timeslot List is Empty"
+        402:
+          description: "Chef Not Found."
+        407:
+          description: "Timeslot start datetime can not later than end datetime."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+
+  /timeslot/updateChefUnAvailableTimeSlot:
+    post:
+      tags:
+      - "timeslot"
+      summary: "(Func10) Update un-available timeslots for chef with chef Id"
+      description: "Chef select un-available timeslots"
+      operationId: "updateUnAvailableTimeslots"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Creates un-available timeslots by chef Id"
+        required: true
+        schema:
+          $ref: "#/definitions/UpdateUnAvailableTimeslotsByChef"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ConfirmUpdateUnAvailablelTimeslots"
+        400:
+          description: "Timeslot List is Empty"
+        402:
+          description: "Chef Not Found."
+        407:
+          description: "Timeslot start datetime can not later than end datetime."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+          
+  /chef/retrieveAvailTimeslots:
+    get:
+      tags:
+      - "chef"
+      summary: "(Func11) Retrieve available timeslots by chef Id"
+      description: "Return available timeslots by chef Id"
+      operationId: "retrieveAvailTimeslots"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - name: "chef_Id"
+        in: "query"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+              $ref: "#/definitions/ReturnAvailTimeslots"
+        400:
+          description: "chef Id does not exist."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+
+
+
+  /timeslot/updateChefDefaultTimeSlot:
+    post:
+      tags:
+      - "timeslot"
+      summary: "(Func7) update Default Timeslot for Chef (if chef has no default timeslot, this becomes create a default timeslot)"
+      description: "Chef setup default available timeslots"
+      operationId: "setupDefaultTimeslots"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Setup default timeslots by chef Id"
+        required: true
+        schema:
+          $ref: "#/definitions/UpdateDefaultTimeslotsByChef"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ConfirmTimeslotsCreation"
+        400:
+          description: "Timeslot List is Empty"
+        402:
+          description: "Chef Not Found."
+        407:
+          description: "Timeslot start datetime can not later than end datetime."
+        420:
+          description: "Must pick at least one day of the week."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+
+          
+definitions:
+
+
+
+  ChefDetail:
+    type: "object"
+    properties:
+      chef_Id:
+        type: "integer"
+        format: "int64"
+      user_Id: 
+        type: "integer"
+        format: "int64"
+      password: 
+        type: "string"
+        format: "password"
+      salutation: 
+        type: "string"
+      first_name: 
+        type: "string"
+      middle_name: 
+        type: "string"
+      last_name: 
+        type: "string"
+      email_address: 
+        type: "string"
+        format: "email"
+      contact_no: 
+        type: "string"
+      SMS_notify_ind:
+        type: "boolean"
+      birthday: 
+        type: "string"
+        format: "date"
+      short_description: 
+        type: "string"
+      detail_description: 
+        type: "string"
+      address_1: 
+        type: "string"
+      address_2: 
+        type: "string"
+      address_3: 
+        type: "string"
+      accept_marketing_ind: 
+        type: "boolean"
+      IPv4_address: 
+        type: "string"
+        format: "ipv4"
+      verified_email:
+        type: "boolean"
+      verified_contact_no:
+        type: "boolean"
+      Active_Ind:
+        type: "boolean"
+      experience_list:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            start_date:
+              type: "string"
+              format: "date-time"
+            end_date:
+              type: "string"
+              format: "date-time"
+            experience_description:
+              type: "string"
+          required:
+            - start_date
+            - experience_description
+      cuisine_type:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            cuisine_type_id:
+              type: "string"
+      attribute_list:
+        type: "array"
+        items: 
+          type: "string"
+      language_code_list:
+        type: "array"
+        items: 
+          type: "string"
+    xml:
+      name: "ChefDetail"
+
+      
+  LoginSuccess:
+    type: "object"
+    properties:
+      access_status:
+        type: "string"
+        default:
+        - "0"
+      access_token:
+        type: "string"
+    xml:
+      name: "LoginSuccess"
+
+      
+  UpdateAvailableTimeslotsByChef:
+    type: "object"
+    properties:
+      chef_Id:
+        type: "integer"
+        format: "int64"
+      available_timeslot_list:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            start_date:
+              type: "string"
+              format: "date-time"
+            end_date:
+              type: "string"
+              format: "date-time"
+            instant_ind:
+              default: "true"
+              type: "boolean"
+            available_meal:
+              type: "string"
+              default: "3-both Lunch & Dinner"
+              enum:
+                - "1-Lunch"
+                - "2-Dinner"
+                - "3-both Lunch & Dinner"
+    xml:
+      name: "UpdateAvailableTimeslotsByChef"
+
+  UpdateUnAvailableTimeslotsByChef:
+    type: "object"
+    properties:
+      chef_Id:
+        type: "integer"
+        format: "int64"
+      available_timeslot_list:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            start_date:
+              type: "string"
+              format: "date-time"
+            end_date:
+              type: "string"
+              format: "date-time"
+            instant_ind:
+              default: "true"
+              type: "boolean"
+            available_meal:
+              type: "string"
+              default: "3-both Lunch & Dinner"
+              enum:
+                - "1-Lunch"
+                - "2-Dinner"
+                - "3-both Lunch & Dinner"
+    xml:
+      name: "UpdateUnAvailableTimeslotsByChef"
+      
+
+  ConfirmTimeslotsCreation:
+    type: "object"
+    properties:
+      ack_code:
+        type: "string"
+        description: "acknowledge code 0 is return upon successful creation of timeslot"
+    xml:
+      name: "ConfirmTimeslotsCreation"
+
+  ConfirmUpdateAvailablelTimeslots:
+    type: "object"
+    properties:
+      ack_code:
+        type: "string"
+        description: "acknowledge code 0 is return upon successful update of available timeslot"
+    xml:
+      name: "ConfirmUpdateAvailablelTimeslots"
+
+  ConfirmUpdateUnAvailablelTimeslots:
+    type: "object"
+    properties:
+      ack_code:
+        type: "string"
+        description: "acknowledge code 0 is return upon successful update of un-available timeslot"
+    xml:
+      name: "ConfirmUpdateUnAvailablelTimeslots"
+      
+
+  ReturnAvailTimeslots:
+    type: "object"
+    properties:
+      chef_Id:
+        type: "integer"
+        format: "int64"
+      avail_timeslot_list:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            start_date:
+              type: "string"
+              format: "date-time"
+            end_date:
+              type: "string"
+              format: "date-time"
+            instant_ind:
+              default: "true"
+              type: "boolean"
+            available_meal:
+              type: "string"
+              default: "3-both Lunch & Dinner"
+              enum:
+                - "1-Lunch"
+                - "2-Dinner"
+                - "3-both Lunch & Dinner"
+    xml:
+      name: "ReturnAvailTimeslots"
+
+  UpdateDefaultTimeslotsByChef:
+    type: "object"
+    properties:
+      chef_Id:
+        type: "integer"
+        format: "int64"
+      Monday:
+        type: "boolean"
+      Tuesday:
+        type: "boolean"
+      Wednesday:
+        type: "boolean"
+      Thursday:
+        type: "boolean"
+      Friday:
+        type: "boolean"
+      Saturday:
+        type: "boolean"
+      Sunday:
+        type: "boolean"
+      holiday:
+        type: "boolean"
+      instant_ind:
+        default: "true"
+        type: "boolean"
+      meal_type:
+        type: "string"
+        default: "3-both Lunch & Dinner"
+        enum:
+          - "1-Lunch"
+          - "2-Dinner"
+          - "3-both Lunch & Dinner"
+    xml:
+      name: "UpdateDefaultTimeslotsByChef"
+      
+  CreateUserRequest:
+    type: "object"
+    properties:
+      user_name: 
+        type: "string"
+      password: 
+        type: "string"
+        format: "password"
+      salutation: 
+        type: "string"
+      first_name: 
+        type: "string"
+      middle_name: 
+        type: "string"
+      last_name: 
+        type: "string"
+      email_address: 
+        type: "string"
+        format: "email"
+      contact_no: 
+        type: "string"
+      SMS_notify_ind:
+        type: "boolean"
+      birthday: 
+        type: "string"
+        format: "date"
+      address_1: 
+        type: "string"
+      address_2: 
+        type: "string"
+      address_3: 
+        type: "string"
+      accept_marketing_ind: 
+        type: "boolean"
+      accept_terms_ind: 
+        type: "boolean"
+      robot_ind: 
+        type: "boolean"
+      IPv4_address: 
+        type: "string"
+        format: "ipv4"
+    xml:
+      name: "CreateUserRequest"
+      
+  UpdateUserRequest:
+    type: "object"
+    properties:
+      user_name: 
+        type: "string"
+      password: 
+        type: "string"
+        format: "password"
+      salutation: 
+        type: "string"
+      first_name: 
+        type: "string"
+      middle_name: 
+        type: "string"
+      last_name: 
+        type: "string"
+      email_address: 
+        type: "string"
+        format: "email"
+      contact_no: 
+        type: "string"
+      SMS_notify_ind:
+        type: "boolean"
+      birthday: 
+        type: "string"
+        format: "date"
+      address_1: 
+        type: "string"
+      address_2: 
+        type: "string"
+      address_3: 
+        type: "string"
+      accept_marketing_ind: 
+        type: "boolean"
+      IPv4_address: 
+        type: "string"
+        format: "ipv4"
+      verified_email:
+        type: "boolean"
+      verified_contact_no:
+        type: "boolean"
+      Active_Ind:
+        type: "boolean"
+    xml:
+      name: "UpdateUserRequest"
+      
+
+  CreateChefRequest:
+    type: "object"
+    properties:
+      user_name: 
+        type: "string"
+      password: 
+        type: "string"
+        format: "password"
+      salutation: 
+        type: "string"
+      first_name: 
+        type: "string"
+      middle_name: 
+        type: "string"
+      last_name: 
+        type: "string"
+      email_address: 
+        type: "string"
+        format: "email"
+      contact_no: 
+        type: "string"
+      SMS_notify_ind:
+        type: "boolean"
+      birthday: 
+        type: "string"
+        format: "date"
+      address_1: 
+        type: "string"
+      address_2: 
+        type: "string"
+      address_3: 
+        type: "string"
+      accept_marketing_ind: 
+        type: "boolean"
+      accept_terms_ind: 
+        type: "boolean"
+      robot_ind: 
+        type: "boolean"
+      IPv4_address: 
+        type: "string"
+        format: "ipv4"
+      photo_url:
+        type: "string"
+    xml:
+      name: "CreateChefRequest"
+
+  UpdateChefRequest:
+    type: "object"
+    properties:
+      chef_Id: 
+        type: "integer"
+        format: "int64"
+      password: 
+        type: "string"
+        format: "password"
+      salutation: 
+        type: "string"
+      first_name: 
+        type: "string"
+      middle_name: 
+        type: "string"
+      last_name: 
+        type: "string"
+      email_address: 
+        type: "string"
+        format: "email"
+      contact_no: 
+        type: "string"
+      SMS_notify_ind:
+        type: "boolean"
+      birthday: 
+        type: "string"
+        format: "date"
+      short_description: 
+        type: "string"
+      detail_description: 
+        type: "string"
+      address_1: 
+        type: "string"
+      address_2: 
+        type: "string"
+      address_3: 
+        type: "string"
+      accept_marketing_ind: 
+        type: "boolean"
+      IPv4_address: 
+        type: "string"
+        format: "ipv4"
+      verified_email:
+        type: "boolean"
+      verified_contact_no:
+        type: "boolean"
+      Active_Ind:
+        type: "boolean"
+      experience_list:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            start_date:
+              type: "string"
+              format: "date-time"
+            end_date:
+              type: "string"
+              format: "date-time"
+            experience_description:
+              type: "string"
+          required:
+            - start_date
+            - experience_description
+      cuisine_type:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            cuisine_type_id:
+              type: "string"
+      verified_chef_ind: 
+        type: "boolean"
+      food_safety_certified_ind: 
+        type: "boolean"
+      payment_protection_ind: 
+        type: "boolean"
+    xml:
+      name: "UpdateChefRequest"
+
+  UpdateChefQualificationRequest:
+    type: "object"
+    properties:
+      chef_Id: 
+        type: "integer"
+        format: "int64"
+      verified_chef_ind: 
+        type: "boolean"
+      food_safety_certified_ind: 
+        type: "boolean"
+      payment_protection_ind: 
+        type: "boolean"
+    xml:
+      name: "UpdateChefQualificationRequest"
+      
+  UpdateChefLanguageListRequest:
+    type: "object"
+    properties:
+      chef_Id: 
+        type: "integer"
+        format: "int64"
+      language_list:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            language_code:
+              type: "string"
+            active_ind:
+              type: "boolean"
+    xml:
+      name: "UpdateChefLanguageListRequest"
+      
+  UpdateChefLocationListRequest:
+    type: "object"
+    properties:
+      chef_Id: 
+        type: "integer"
+        format: "int64"
+      location_list:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            district_code:
+              type: "string"
+            active_ind:
+              type: "boolean"
+    xml:
+      name: "UpdateChefLocationListRequest"
