@@ -6,6 +6,7 @@ import bodyParser from 'body-parser'
 import multipart from 'connect-multiparty'
 import compression from 'compression'
 import jwt from 'jsonwebtoken'
+import cfg from './config/index'
 const WHITE_LIST_URL = ["/user/userLogin",'/user/createUser'];
 
 //配置express中间件
@@ -50,26 +51,36 @@ function errorHandler(err, req, res, next) {
 
 function authenticateRequest(req, res, next) {
     console.log(req.url);
+    var token = req.body.access_token || req.query.access_token || req.headers.access_token || req.headers['x-access-token'] ;
     if (!WHITE_LIST_URL.includes(req.url) ) {
-        if ( req.headers.access_token) {
-            let decoded = jwt.decode(req.headers.access_token);
-            if (decoded && decoded.id) {
-                return next();
-            }else {
-                res.status(401);
-            }
+        if (token) {
+            jwt.verify(token,cfg.jwtSecret , function(err, decoded) {
+                if (err) {
+                     if (err.name === 'TokenExpiredError') {
+                         return res.status(422).json(err);
+                     }else {
+                         return res.status(421).json(err);
+                     }
+                } else {
+                    // 如果没问题就把解码后的信息保存到请求中，供后面的路由使用
+                    req.user_id = decoded.id;
+                    console.log(req.user_id );
+                    next();
+                }
+            });
+               // Verification Code is invalid.
         }else {
             res.status(401);
         }
     }
-    return next();
+
 }
 
 // 错误处理中间件
 app.use(function(req, res, next) {
     let err = new Error('Not Found')
     err.status = 404
-    res.status(404).json({error:err})
+    res.json({error:err})
 })
 
 module.exports = app
