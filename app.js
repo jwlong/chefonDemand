@@ -62,6 +62,7 @@ function authenticateRequest(req, res, next) {
            return res.status(401);
         }
     }
+    return next();
 }
 
 // 错误处理中间件

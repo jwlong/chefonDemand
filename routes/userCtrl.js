@@ -33,7 +33,8 @@ class UserController {
                            let result = await userService.baseCreate(user);
                            return res.sendStatus(200);
                        }catch(e) {
-                            next(e);
+                             res.status(401).json({msg:'user first name, last name, email address and contact no. fields are mandatory.'})
+                           next(e);
                        }
 
                    }catch (err2) {
@@ -43,13 +44,6 @@ class UserController {
             }catch (err) {
                 next(err);
             }
-
-           /* await userService.baseCreate(req.body).then(result => {
-                return res.sendStatus(200);
-            }).catch(error => {
-                res.status(401);
-            })*/
-
         })
 
         router.get('/userLogin',async(req, res,next) => {
@@ -82,7 +76,7 @@ class UserController {
                                     res.json(tokenInfo);
                                 }
                             }catch (e) {
-                               //res.status(401).json(e.errors)
+                                res.status(401).json(e.errors)
                                 next(e);
                             }
                         } else {

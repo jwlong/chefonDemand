@@ -12,6 +12,7 @@ class UserService extends BaseService{
         var sql = "select count(u.user_id) from  t_user u  where u.user_name = :user_name";
         let cnt = db.query(sql,{replacements:{user_name:attr.user_name},type:db.QueryTypes.SELECT});
         if (cnt && cnt >0 ) {
+            console.error("cnt===>"+cnt);
             res.status(400).json({msg:'user name already taken.'});
         }
     }
