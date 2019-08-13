@@ -1,4 +1,6 @@
-config 目录 配置Mysql链接
-systemCtrl.js 类似于controller
-npm install
-npm start
+config 目录 配置Mysql,以及server 连接信息
+-- 
+安装依赖库
+- npm install
+运行服务器 
+- npm start
