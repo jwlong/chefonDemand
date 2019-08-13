@@ -18,6 +18,11 @@ class UserService extends BaseService{
     login(attr,res) {
         return this.baseFindByFilter(null,{user_name:attr.username,password:attr.password});
     }
-
+    getUser(username,password) {
+        return this.baseFindByFilter(null,{user_name:username,password:password});
+    }
+    getById(userId) {
+        return this.baseFindByFilter(null,{user_id:userId})
+    }
 }
 module.exports = new UserService()

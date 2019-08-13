@@ -67,17 +67,17 @@ class User extends BaseModel {
             accept_marketing_ind: {
                 type: Sequelize.BOOLEAN,
                 allowNull: true,
-                defaultValue: '0'
+                defaultValue: false
             },
             accept_terms_ind: {
                 type: Sequelize.BOOLEAN,
                 allowNull: true,
-                defaultValue: '0'
+                defaultValue: false
             },
             robot_ind: {
                 type: Sequelize.BOOLEAN,
                 allowNull: true,
-                defaultValue: '0'
+                defaultValue: false,
             },
             ipv4_address: {
                 type: Sequelize.STRING(15),
@@ -86,7 +86,7 @@ class User extends BaseModel {
             verified_email: {
                 type: Sequelize.BOOLEAN,
                 allowNull: true,
-                defaultValue: '0'
+                defaultValue:false
             },
             verified_email_on: {
                 type: Sequelize.DATE,
@@ -96,7 +96,7 @@ class User extends BaseModel {
             verified_contact_no: {
                 type: Sequelize.BOOLEAN,
                 allowNull: true,
-                defaultValue: '0'
+                defaultValue: false
             },
             verified_contact_no_on: {
                 type: Sequelize.DATE,
@@ -106,7 +106,7 @@ class User extends BaseModel {
             verified_user_information: {
                 type: Sequelize.BOOLEAN,
                 allowNull: true,
-                defaultValue: '0'
+                defaultValue: false
             },
             verified_user_information_on: {
                 type: Sequelize.DATE,
@@ -151,9 +151,6 @@ class User extends BaseModel {
         });
         this.model = super.getModel()
         //this.model.sync()
-    }
-    nextId() {
-        return this.model.max('user_id');
     }
 }
 module.exports = new User()

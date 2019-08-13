@@ -8,6 +8,6 @@ const config = {
         pwd: 'lllongjin'
     },
     jwtSecret: "asdfsafsafsafsafsafsafsafd",
-    jwtSession: {session: false}
+    jwtSession: {session: true}
 }
 module.exports = config;
