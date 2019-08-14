@@ -11,22 +11,37 @@ class ChefController {
     static initRouter(){
         /***************chef 业务***************/
         router.post('/createChef',  async (req, res,next) => {
+            console.log("come in createChef...");
             try {
-                let result = await userService.checkBeforeCreate(req.body)
+                // 此时不验证是否为robot
+                let result = await userService.checkBeforeCreate(req.body,false)
+                console.log("new result ",result);
+
                 if(result && result.code) {
                     return res.status(result.code).json(result);
                 }
+
                 let user = req.body;
                 user.user_id = await userService.max('user_id')+1;
-                user.update_by = req.user_id || cfg.robot_id; // 0 表示机器人
-                user.active_ind = 0; // 初始为0，表示不激活
+                console.log("in request user_id : ",req.user_id);
+                user.update_by = req.user_id? req.user_id:cfg.robot_id; // 0 表示机器人
+                user.create_by = req.user_id? req.user_id:cfg.robot_id; // 0 表示机器人
+                user.active_ind = 'A'; // 初始为0，表示不激活
                 user.ipv4_address = user.IPv4_address;
                 user.sms_notify_ind = user.SMS_notify_ind;
-                await chefService.processCreateChef(req.body);
+
+                let createdUser = await userService.baseCreate(user);
+                let newChef = await chefService.processCreateChef(createdUser);
+                console.log("new Chef",newChef);
+                if (newChef) {
+                    res.sendStatus(200);
+                }
             }catch (e) {
-                next(e);
+                console.warn(e);
+                res.sendStatus(401).json({msg:'Chef\'s first name, last name and short description fields are mandatory.'})
+                next(e)
             }
-            next();
+            //next();
            // try{res.json(await chefService.baseCreate(req.body))}catch(err){next(err)}
         })
         return router;
