@@ -8,13 +8,15 @@ class UserService extends BaseService{
     constructor(){
         super(UserService.model)
     }
-    checkBeforeCreate(attr,res) {
-        var sql = "select count(u.user_id) from  t_user u  where u.user_name = :user_name";
-        let cnt = db.query(sql,{replacements:{user_name:attr.user_name},type:db.QueryTypes.SELECT});
-        if (cnt && cnt >0 ) {
-            console.error("cnt===>"+cnt);
-            res.status(400).json({msg:'user name already taken.'});
-        }
+    checkBeforeCreate(attr) {
+        var sql = "select count(u.user_id) cnt from  t_user u  where u.user_name = :user_name";
+        return db.query(sql,{replacements:{user_name:attr.user_name},type:db.QueryTypes.SELECT}).then(result =>{
+            if (result && result[0].cnt >0 ) {
+                return {code:400,msg:"user name already taken."};
+            }else {
+                return null;
+            }
+        });
     }
     login(attr,res) {
         return this.baseFindByFilter(null,{user_name:attr.username,password:attr.password});
