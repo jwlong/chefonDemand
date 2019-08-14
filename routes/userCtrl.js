@@ -42,6 +42,8 @@ class UserController {
                    }catch (err2) {
                        next(err2);
                    }
+                }else {
+                    res.status(hasError.code).json(hasError);
                 }
             }catch (err) {
                 next(err);
