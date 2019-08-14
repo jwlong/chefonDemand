@@ -34,6 +34,7 @@ class UserController {
                            let result = await userService.baseCreate(user);
                            return res.sendStatus(200);
                        }catch(e) {
+                           console.log(e);
                              res.status(401).json({msg:'user first name, last name, email address and contact no. fields are mandatory.'})
                            next(e);
                        }
