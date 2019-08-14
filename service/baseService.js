@@ -5,7 +5,7 @@ class BaseService{
 	max (key) {
         let maxId = this.instance.max(key);
         if (!maxId) {
-        	maxId = 1;
+        	maxId = 0;
 		}
 		return maxId;
 	}

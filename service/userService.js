@@ -8,8 +8,9 @@ class UserService extends BaseService{
     constructor(){
         super(UserService.model)
     }
-    checkBeforeCreate(attr) {
-        if (attr.robot_ind === true) {
+    checkBeforeCreate(attr,isValidRobot) {
+        console.log("checkBeforeCreate....")
+        if (isValidRobot && attr.robot_ind) {
             return {code:403,msg:"system does not accept robot."}
            // return new baseResult(403,"system does not accept robot.")
         }

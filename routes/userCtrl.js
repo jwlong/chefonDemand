@@ -26,7 +26,7 @@ class UserController {
                            user.user_id = max +1;
                        }
                        user.update_by = req.user_id;
-                       user.active_ind = 1;
+                       user.active_ind = 'A';
                        user.ipv4_address = user.IPv4_address;
                        user.sms_notify_ind = user.SMS_notify_ind;
                        console.log("user:",user);
@@ -74,7 +74,7 @@ class UserController {
                                 if (result) {
                                     const tokenInfo = {
                                         access_status:'ok',
-                                        access_token: jwt.sign({id:result.user_id}, cfg.jwtSecret,{expiresIn:'1h'}),
+                                        access_token: jwt.sign({id:result.user_id}, cfg.jwtSecret,{expiresIn:'24h'}),
                                     };
                                     res.json(tokenInfo);
                                 }

@@ -10,18 +10,31 @@ class ChefService extends BaseService{
     getChefList(attr) {
         return ChefService.model.getChefList(attr)
     }
-    processCreateChef(attr){
-        let createdUser = userService.baseCreate(attr);
-        if (createdUser && createdUser.user_id) {
-            //add chef
-            attr.chefId = (this.max('chef_id')?this.max('chef_id')+1 : 1);
-           // attr.short_desc = attr.short_description;
-            //attr.detail_desc = attr.detail_description;
-            attr.active_ind = 0;
-            //insert a new record to t_chef
-            return  this.baseCreate(attr);
 
+    async processCreateChef(createdUser){
+        try {
+            if (createdUser && createdUser.user_id) {
+                //add chef
+                let chef = {};
+                chef.user_id = createdUser.user_id;
+
+                chef.chef_id = await this.max('chef_id')+1;
+                // attr.short_desc = attr.short_description;
+                //attr.detail_desc = attr.detail_description;
+                chef.active_ind = 'A';
+                chef.create_by = createdUser.create_by;
+                chef.update_by = createdUser.update_by;
+                //insert a new record to t_chef
+                console.log("it will insert chef",chef);
+                let result = await  this.baseCreate(chef);
+                if (result) {
+                    return result;
+                }
+            }
+        }catch (e) {
+            throw e;
         }
+
     }
 
     findChefByPopularity() {
