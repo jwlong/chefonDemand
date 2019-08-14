@@ -10,18 +10,15 @@ class ChefService extends BaseService{
     getChefList(attr) {
         return ChefService.model.getChefList(attr)
     }
-    checkBeforeCreate(attr) {
-        var sql = "select count(u.user_id) cnt from  t_user u  where u.user_name = :user_name";
-       return db.query(sql,{replacements:{user_name:attr.user_name},type:db.QueryTypes.SELECT}).then(result =>{
-           if (result && result[0].cnt >0 ) {
-              return {code:400,msg:"user name already taken."};
-           }else {
-               return null;
-           }
-       });
-    }
     processCreateChef(attr){
-        userService.baseCreate(attr);
+        let createdUser = userService.baseCreate(attr);
+        if (createdUser && createdUser.user_id) {
+            //add chef
+            attr.chefId = (this.max('chef_id')?this.max('chef_id')+1 : 1);
+            attr.short_desc = attr.short_description;
+            attr.detail_desc = attr.detail_description;
+            console.toString();
+        }
     }
 
     findChefByPopularity() {
