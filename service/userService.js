@@ -9,10 +9,10 @@ class UserService extends BaseService{
         super(UserService.model)
     }
     checkBeforeCreate(attr) {
-       /* if (attr.robot_ind === true) {
-           // return {code:403,msg:"system does not accept robot."}
-            return new baseResult()
-        }*/
+        if (attr.robot_ind === true) {
+            return {code:403,msg:"system does not accept robot."}
+           // return new baseResult(403,"system does not accept robot.")
+        }
 
         var sql = "select count(u.user_id) cnt from  t_user u  where u.user_name = :user_name";
         return db.query(sql,{replacements:{user_name:attr.user_name},type:db.QueryTypes.SELECT}).then(result =>{
