@@ -25,7 +25,7 @@ class UserController {
                        if (!user.user_id) {
                            user.user_id = max +1;
                        }
-                       user.update_by = 100001;
+                       user.update_by = req.user_id;
                        user.active_ind = 1;
                        user.ipv4_address = user.IPv4_address;
                        user.sms_notify_ind = user.SMS_notify_ind;

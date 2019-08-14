@@ -7,7 +7,7 @@ import multipart from 'connect-multiparty'
 import compression from 'compression'
 import jwt from 'jsonwebtoken'
 import cfg from './config/index'
-const WHITE_LIST_URL = ["/user/userLogin",'/user/createUser'];
+const WHITE_LIST_URL = ["/user/userLogin"];
 
 //配置express中间件
 const app = express()
