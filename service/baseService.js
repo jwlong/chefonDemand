@@ -3,7 +3,11 @@ class BaseService{
 		this.instance = instance
 	}
 	max (key) {
-		return this.instance.max(key);
+        let maxId = this.instance.max(key);
+        if (!maxId) {
+        	maxId = 1;
+		}
+		return maxId;
 	}
 	baseFindAll(attributes){
 		return this.instance.findAll(attributes)
