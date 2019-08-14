@@ -11,13 +11,13 @@ class ChefController {
         /***************chef 业务***************/
         router.post('/createChef',  async (req, res,next) => {
             try {
-                let result = await chefService.checkBeforeCreate(req.body)
+                let result = await userService.checkBeforeCreate(req.body)
                 if(result && result.code) {
                     return res.status(result.code).json(result);
                 }
                 let user = req.body;
                 user.user_id = await userService.max('user_id')+1;
-                user.update_by = 100001;
+                user.update_by = req.user_id;
                 user.active_ind = 1;
                 user.ipv4_address = user.IPv4_address;
                 user.sms_notify_ind = user.SMS_notify_ind;

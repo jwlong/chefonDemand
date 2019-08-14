@@ -8,6 +8,7 @@ const config = {
         pwd: 'lllongjin'
     },
     jwtSecret: "asdfsafsafsafsafsafsafsafd",
-    jwtSession: {session: true}
+    jwtSession: {session: true},
+    WHITE_LIST_URL:["/user/userLogin"]
 }
 module.exports = config;
