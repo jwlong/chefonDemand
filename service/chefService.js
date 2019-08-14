@@ -19,9 +19,10 @@ class ChefService extends BaseService{
             attr.detail_desc = attr.detail_description;
             attr.active_ind = 0;
             //insert a new record to t_chef
-            this.baseCreate(attr);
+            let newChef = this.baseCreate(attr);
             // insert a new record to t_chef_cuisine
-
+            console.log(newChef)
+            // this is test branches
             // insert a new record to  t_chef_language
 
             //
