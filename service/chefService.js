@@ -15,18 +15,11 @@ class ChefService extends BaseService{
         if (createdUser && createdUser.user_id) {
             //add chef
             attr.chefId = (this.max('chef_id')?this.max('chef_id')+1 : 1);
-            attr.short_desc = attr.short_description;
-            attr.detail_desc = attr.detail_description;
+           // attr.short_desc = attr.short_description;
+            //attr.detail_desc = attr.detail_description;
             attr.active_ind = 0;
             //insert a new record to t_chef
-            let newChef = this.baseCreate(attr);
-            // insert a new record to t_chef_cuisine
-            console.log(newChef)
-            // this is test branches
-            // insert a new record to  t_chef_language
-
-            //
-
+            return  this.baseCreate(attr);
 
         }
     }
