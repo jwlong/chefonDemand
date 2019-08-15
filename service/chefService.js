@@ -11,29 +11,33 @@ class ChefService extends BaseService{
         return ChefService.model.getChefList(attr)
     }
 
-    async processCreateChef(createdUser){
-        try {
-            if (createdUser && createdUser.user_id) {
-                //add chef
-                let chef = {};
-                chef.user_id = createdUser.user_id;
-
-                chef.chef_id = await this.max('chef_id')+1;
-                // attr.short_desc = attr.short_description;
-                //attr.detail_desc = attr.detail_description;
-                chef.active_ind = 'A';
-                chef.create_by = createdUser.create_by;
-                chef.update_by = createdUser.update_by;
-                //insert a new record to t_chef
-                console.log("it will insert chef",chef);
-                let result = await  this.baseCreate(chef);
-                if (result) {
-                    return result;
-                }
-            }
-        }catch (e) {
-            throw e;
-        }
+     processCreateChef(user){
+        let chef = {};
+            return  db.transaction( t=> {
+                return userService.getNextId('user_id').then(nextId => {
+                    console.log("in request user_id : ", nextId);
+                    user.user_id = nextId;
+                    user.active_ind = 'A'; // 初始为0，表示不激活
+                    user.ipv4_address = user.IPv4_address;
+                    user.sms_notify_ind = user.SMS_notify_ind;
+                    return userService.baseCreate(user).then(createdUser => {
+                        //add chef
+                        chef.user_id = createdUser.user_id;
+                        // attr.short_desc = attr.short_description;
+                        //attr.detail_desc = attr.detail_description;
+                        chef.active_ind = 'A';
+                        chef.create_by = createdUser.create_by;
+                        chef.update_by = createdUser.update_by;
+                        return this.getNextId('chef_id').then(nextId => {
+                            chef.chef_id = nextId;
+                            console.log("===========>", chef);
+                            return this.baseCreate(chef);
+                        })
+                    });
+                }).catch(err => {
+                    throw  err;
+                })
+            })
 
     }
 
