@@ -77,6 +77,7 @@ function authenticateRequest(req, res, next) {
         });
         // Verification Code is invalid.
     } else {
+        if (isExcludeValidUrl) return next();
         return res.json(baseResult.USER_VERITY_INVALID);
     }
 }
