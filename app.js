@@ -7,6 +7,7 @@ import multipart from 'connect-multiparty'
 import compression from 'compression'
 import jwt from 'jsonwebtoken'
 import cfg from './config/index'
+import baseResult from './model/baseResult'
 
 //配置express中间件
 const app = express()
@@ -52,28 +53,32 @@ function authenticateRequest(req, res, next) {
     console.log(req.url);
     var token = req.body.access_token || req.query.access_token || req.headers.access_token || req.headers['x-access-token'] ;
     if (cfg.WHITE_LIST_URL.some(url =>{
-        return (req.url.indexOf(url) == -1);
+        return (req.url.indexOf(url) >= 0 );
     })) {
+        next()
+    }else {
         if (token) {
             jwt.verify(token,cfg.jwtSecret , function(err, decoded) {
                 if (err) {
-                     if (err.name === 'TokenExpiredError') {
-                          res.status(422).json(err);
-                     }else {
-                          res.status(421).json(err);
-                     }
+                    if (err.name === 'TokenExpiredError') {
+                     //return res.status(422).json(err);
+                        return res.json(new baseResult(422,err));
+                    }else {
+                        return res.json(new baseResult(421,err));
+                     //return res.status(421).json(err);
+                    }
                 } else {
                     // 如果没问题就把解码后的信息保存到请求中，供后面的路由使用
                     req.user_id = decoded.id;
                     console.log(req.user_id );
+                    next()
                 }
             });
-               // Verification Code is invalid.
+            // Verification Code is invalid.
         }else {
-            res.status(401);
+           return res.status(401);
         }
     }
-    next();
 }
 
 // 错误处理中间件
