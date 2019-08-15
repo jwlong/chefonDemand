@@ -18,11 +18,11 @@ class ChefController {
                 console.log("new result ",result);
 
                 if(result && result.code) {
-                    return res.status(result.code).json(result);
+                    return res.json(result);
                 }
 
                 let user = req.body;
-                user.user_id = await userService.max('user_id')+1;
+                user.user_id = await userService.getNextId('user_id');
                 console.log("in request user_id : ",req.user_id);
                 user.update_by = req.user_id? req.user_id:cfg.robot_id; // 0 表示机器人
                 user.create_by = req.user_id? req.user_id:cfg.robot_id; // 0 表示机器人

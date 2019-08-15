@@ -7,6 +7,7 @@ import accessTokenService from '../service/accessTokenService';
 import jwt from "jsonwebtoken"
 import cfg from '../config/index'
 import uuid from 'uuid';
+import baseResult from "../model/baseResult";
 
 const router = express.Router()
 // 请求前缀为/user
@@ -21,29 +22,24 @@ class UserController {
                    try {
                        let user = req.body;
 
-                       let max = await  userService.max('user_id');
-                       if (!user.user_id) {
-                           user.user_id = max +1;
-                       }
-                       user.update_by = req.user_id;
+                       user.user_id = await  userService.getNextId('user_id');
+
+                       user.update_by = req.user_id || cfg.robot_id;
                        user.active_ind = 'A';
                        user.ipv4_address = user.IPv4_address;
                        user.sms_notify_ind = user.SMS_notify_ind;
                        console.log("user:",user);
                        try {
                            let result = await userService.baseCreate(user);
-                           return res.sendStatus(200);
+                           return res.json(baseResult.SUCCESS);
                        }catch(e) {
-                           console.log(e);
-                             res.status(401).json({msg:'user first name, last name, email address and contact no. fields are mandatory.'})
                            next(e);
                        }
-
                    }catch (err2) {
                        next(err2);
                    }
                 }else {
-                    res.status(hasError.code).json(hasError);
+                    res.json(hasError);
                 }
             }catch (err) {
                 next(err);
@@ -54,40 +50,45 @@ class UserController {
             console.log("Login param:=>",req.query);
             if (req.query) {
                 console.log(req.query);
-                if (!req.query.IPv4_address) {
-                   return  res.status(401).json({msg: 'IPv4_address must be supplied'});
-                }else {
-                    try {
-                        const  rows = await userService.login(req.query,res)
-                        if (rows.length>0 && rows[0].user_id) {
-                            console.log("userId:",rows[0].user_id);
-                            let uniqueString = uuid.v1();
-                            let tokenData = {};
-                            let maxTokenId = (await accessTokenService.max('token_id'));
-                            tokenData.token_id = maxTokenId?(maxTokenId +1):1;
-                            tokenData.user_id = rows[0].user_id;
-                            tokenData.token_string = uniqueString;
-                            tokenData.ipv4_address = req.query.IPv4_address;
-                            tokenData.create_by = rows[0].user_id;
-                            try{
-                                var result = await accessTokenService.baseCreate(tokenData)
-                                if (result) {
-                                    const tokenInfo = {
-                                        access_status:'ok',
-                                        access_token: jwt.sign({id:result.user_id}, cfg.jwtSecret,{expiresIn:'24h'}),
-                                    };
-                                    res.json(tokenInfo);
-                                }
-                            }catch (e) {
-                                res.status(401).json(e.errors)
-                                next(e);
-                            }
-                        } else {
-                            res.status(400).json({msg: 'Invalid username/password supplied'})
+                let userLoginParam = req.query;
+                if (!userLoginParam.IPv4_address) {
+                    return res.json(baseResult.USER_IPV4_ERROR);
+                }
+                if (!userLoginParam.username || !userLoginParam.password) {
+                    return res.json(baseResult.USER_INVALID_NAME_PASSWD)
+                }
+                try {
+                    const rows = await userService.login(userLoginParam, res)
+                    if (rows.length > 0 && rows[0].user_id) {
+                        console.log("userId:", rows[0].user_id);
+                        if (!userService.validPassword(rows[0].password,userLoginParam.password)) {
+                            return res.json(baseResult.USER_INVALID_NAME_PASSWD);
                         }
-                    }catch (e) {
-                         next(e);
+                        let uniqueString = uuid.v1();
+                        let tokenData = {};
+                        tokenData.token_id = await accessTokenService.getNextId('token_id');
+                        tokenData.user_id = rows[0].user_id;
+                        tokenData.token_string = uniqueString;
+                        tokenData.ipv4_address = userLoginParam.IPv4_address;
+                        tokenData.create_by = rows[0].user_id;
+                        try {
+                            console.log("will insert into access_token_record:",tokenData);
+                            var result = await accessTokenService.baseCreate(tokenData)
+                            if (result) {
+                                const tokenInfo = {
+                                    access_status: '0',
+                                    access_token: jwt.sign({id: result.user_id}, cfg.jwtSecret, {expiresIn: cfg.expiresIn}),
+                                };
+                                return res.json(tokenInfo);
+                            }
+                        } catch (e) {
+                            next(e);
+                        }
+                    } else {
+                        return res.json(baseResult.USER_INVALID_NAME_PASSWD);
                     }
+                } catch (e) {
+                    next(e);
                 }
             }
         })
@@ -99,17 +100,22 @@ class UserController {
                 let userForUpdated = req.body;
                 userForUpdated.ipv4_address = userForUpdated.IPv4_address;
                 userForUpdated.sms_notify_ind = userForUpdated.SMS_notify_ind;
+
                 try {
+                    let validResult = await userService.checkBeforeCreate(userForUpdated,true);
+                    if (validResult) {
+                        return res.json(validResult);
+                    }
                     await userService.baseUpdate(userForUpdated,{user_id:decoded.id});
+
+                    return res.json(baseResult.SUCCESS);
                 }catch (e) {
-                    console.error(e);
-                    return res.status(401).json({msg:'user first name, last name, email address and contact no. fields are mandatory.'})
+                    next(e);
                 }
-                return res.status(200).json({msg:'successful operation'});
+
             }else {
-                return res.status(421).json({msg:'Verification Code is invalid.'});
+                return res.json(baseResult.USER_VERITY_INVALID)
             }
-            next();
         })
         return router;
     }

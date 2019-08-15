@@ -9,6 +9,9 @@ class BaseService{
 		}
 		return maxId;
 	}
+	async getNextId(key) {
+		return (await this.max(key))+1;
+	}
 	baseFindAll(attributes){
 		return this.instance.findAll(attributes)
 	}
