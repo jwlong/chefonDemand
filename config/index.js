@@ -7,8 +7,10 @@ const config = {
         user: 'root',
         pwd: 'lllongjin'
     },
+    //jwt
     jwtSecret: "asdfsafsafsafsafsafsafsafd",
     jwtSession: {session: true},
+    expiresIn:'24h',
 
     // the WHITE_LIST_URL allow to access system ,but them is not  necessary to authenticate
     WHITE_LIST_URL:["/user/userLogin"],

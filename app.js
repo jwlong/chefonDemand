@@ -52,32 +52,32 @@ function errorHandler(err, req, res, next) {
 function authenticateRequest(req, res, next) {
     console.log(req.url);
     var token = req.body.access_token || req.query.access_token || req.headers.access_token || req.headers['x-access-token'] ;
-    if (cfg.WHITE_LIST_URL.some(url =>{
+    let isExcludeValidUrl = cfg.WHITE_LIST_URL.some(url =>{
         return (req.url.indexOf(url) >= 0 );
-    })) {
-        next()
-    }else {
-        if (token) {
-            jwt.verify(token,cfg.jwtSecret , function(err, decoded) {
-                if (err) {
-                    if (err.name === 'TokenExpiredError') {
-                     //return res.status(422).json(err);
-                        return res.json(new baseResult(422,err));
-                    }else {
-                        return res.json(new baseResult(421,err));
-                     //return res.status(421).json(err);
-                    }
+    });
+
+    if (token) {
+        jwt.verify(token, cfg.jwtSecret, function (err, decoded) {
+            if (err) {
+                if (isExcludeValidUrl) return next();
+
+                if (err.name === 'TokenExpiredError') {
+                    //return res.status(422).json(err);
+                    return res.json(baseResult.USER_VERITY_EXPIRED);
                 } else {
-                    // 如果没问题就把解码后的信息保存到请求中，供后面的路由使用
-                    req.user_id = decoded.id;
-                    console.log(req.user_id );
-                    next()
+                    return res.json(baseResult.USER_VERITY_INVALID);
+                    //return res.status(421).json(err);
                 }
-            });
-            // Verification Code is invalid.
-        }else {
-           return res.status(401);
-        }
+            } else {
+                // 如果没问题就把解码后的信息保存到请求中，供后面的路由使用
+                req.user_id = decoded.id;
+                console.log(req.user_id);
+                next()
+            }
+        });
+        // Verification Code is invalid.
+    } else {
+        return res.json(baseResult.USER_VERITY_INVALID);
     }
 }
 

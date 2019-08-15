@@ -1,6 +1,8 @@
 import Sequelize from 'Sequelize'
 import BaseModel from './baseModel.js'
 import moment from 'moment'
+import bcrypt from "bcrypt"
+
 class User extends BaseModel {
     constructor () {
         super('t_user', {
@@ -148,9 +150,20 @@ class User extends BaseModel {
         }, {
             tableName: 't_user',
             timestamps: false,
-        });
+            hooks: {
+                beforeCreate: user => {
+                    const salt = bcrypt.genSaltSync();
+                    user.password = bcrypt.hashSync(user.password, salt);
+                }
+            }
+        })
         this.model = super.getModel()
+
         //this.model.sync()
     }
+    isPassword (encodedPassword, password){
+        console.log(bcrypt.compareSync(password, encodedPassword))
+        return bcrypt.compareSync(password, encodedPassword);
+    };
 }
 module.exports = new User()
