@@ -1,30 +1,18 @@
 import Sequelize from 'sequelize'
 import BaseModel from './baseModel.js'
-import province from './province'
 import moment from 'moment'
-class City extends BaseModel {
+class ChefCuisine extends BaseModel {
     constructor () {
-        super('t_city', {
-            city_code: {
-                type: Sequelize.STRING(5),
+        super('t_chef_cuisine', {
+            chef_id: {
+                type: Sequelize.INTEGER(11),
                 allowNull: false,
                 primaryKey: true
             },
-            city_name: {
-                type: Sequelize.STRING(30),
-                allowNull: true
-            },
-            province_code: {
-                type: Sequelize.STRING(5),
-                allowNull: true,
-                references: {
-                    model: 't_province',
-                    key: 'province_code'
-                }
-            },
-            country_code: {
-                type: Sequelize.STRING(3),
-                allowNull: false
+            cuisine_type_id: {
+                type: Sequelize.INTEGER(11),
+                allowNull: false,
+                primaryKey: true
             },
             create_on: {
                 type: Sequelize.DATE,
@@ -49,10 +37,10 @@ class City extends BaseModel {
                 allowNull: false
             }
         }, {
-            tableName: 't_city',
+            tableName: 't_chef_cuisine',
             timestamp:false
         });
         this.model = super.getModel();
     }
 }
-module.exports = new City()
+module.exports = new ChefCuisine()

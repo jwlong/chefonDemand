@@ -1,30 +1,40 @@
 import Sequelize from 'sequelize'
 import BaseModel from './baseModel.js'
-import province from './province'
+import db from '../config/db.js'
 import moment from 'moment'
-class City extends BaseModel {
+class ChefAvailableTimeslot extends BaseModel {
     constructor () {
-        super('t_city', {
-            city_code: {
-                type: Sequelize.STRING(5),
+        super('t_chef_available_timeslot', {
+            timeslot_id: {
+                type: Sequelize.INTEGER(11),
                 allowNull: false,
                 primaryKey: true
             },
-            city_name: {
-                type: Sequelize.STRING(30),
-                allowNull: true
-            },
-            province_code: {
-                type: Sequelize.STRING(5),
-                allowNull: true,
+            chef_id: {
+                type: Sequelize.INTEGER(11),
+                allowNull: false,
                 references: {
-                    model: 't_province',
-                    key: 'province_code'
+                    model: 't_chef',
+                    key: 'chef_id'
                 }
             },
-            country_code: {
-                type: Sequelize.STRING(3),
+            start_date: {
+                type: Sequelize.DATEONLY,
                 allowNull: false
+            },
+            end_date: {
+                type: Sequelize.DATEONLY,
+                allowNull: false
+            },
+            available_meal: {
+                type: Sequelize.INTEGER(11),
+                allowNull: false,
+                defaultValue: '3'
+            },
+            instant_ind: {
+                type: Sequelize.BOOLEAN,
+                allowNull: true,
+                defaultValue: '1'
             },
             create_on: {
                 type: Sequelize.DATE,
@@ -49,10 +59,11 @@ class City extends BaseModel {
                 allowNull: false
             }
         }, {
-            tableName: 't_city',
+            tableName: 't_chef_available_timeslot',
             timestamp:false
         });
+
         this.model = super.getModel();
     }
 }
-module.exports = new City()
+module.exports = new ChefAvailableTimeslot()

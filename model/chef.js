@@ -12,27 +12,35 @@ class Chef extends BaseModel {
             },
             user_id: {
                 type: Sequelize.INTEGER(11),
-                allowNull: true
+                allowNull: false,
+                primaryKey: true,
+                references: {
+                    model: 't_user',
+                    key: 'user_id'
+                }
             },
-            First_Name: {
-                type: Sequelize.STRING(50),
-                allowNull: true
-            },
-            Middle_Name: {
-                type: Sequelize.STRING(50),
-                allowNull: true
-            },
-            Last_Name: {
-                type: Sequelize.STRING(50),
-                allowNull: true
-            },
-            Short_Desc: {
+            short_desc: {
                 type: Sequelize.STRING(100),
                 allowNull: true
             },
-            Detail_Desc: {
+            detail_desc: {
                 type: Sequelize.STRING(4000),
                 allowNull: true
+            },
+            verified_chef_ind: {
+                type: Sequelize.BOOLEAN,
+                allowNull: true,
+                defaultValue: '0'
+            },
+            food_safety_certified_ind: {
+                type: Sequelize.BOOLEAN,
+                allowNull: true,
+                defaultValue: '0'
+            },
+            payment_protection_ind: {
+                type: Sequelize.BOOLEAN,
+                allowNull: true,
+                defaultValue: '0'
             },
             verified: {
                 type: Sequelize.BOOLEAN,
@@ -41,18 +49,12 @@ class Chef extends BaseModel {
             verified_on: {
                 type: Sequelize.DATE,
                 allowNull: false,
-                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-                get() {
-                    return moment(this.getDataValue('verified_on')).format('DD/MM/YYYY HH:mm:ss');
-                }
+                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
             },
             create_on: {
                 type: Sequelize.DATE,
                 allowNull: false,
-                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-                get() {
-                    return moment(this.getDataValue('Create_On')).format('DD/MM/YYYY HH:mm:ss');
-                }
+                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
             },
             create_by: {
                 type: Sequelize.INTEGER(11),
@@ -61,10 +63,7 @@ class Chef extends BaseModel {
             update_on: {
                 type: Sequelize.DATE,
                 allowNull: false,
-                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-                get() {
-                    return moment(this.getDataValue('Update_On')).format('DD/MM/YYYY HH:mm:ss');
-                }
+                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
             },
             update_by: {
                 type: Sequelize.INTEGER(11),

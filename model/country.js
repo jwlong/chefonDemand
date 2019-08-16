@@ -4,46 +4,40 @@ import moment from 'moment'
 class Country extends BaseModel {
     constructor () {
         super('t_country', {
-            Country_Code: {
+            country_code: {
                 type: Sequelize.STRING(3),
                 allowNull: false,
                 primaryKey: true
             },
-            Country_Name: {
+            country_name: {
                 type: Sequelize.STRING(50),
                 allowNull: false
             },
-            Create_On: {
+            create_on: {
                 type: Sequelize.DATE,
                 allowNull: false,
-                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-                get() {
-                    return moment(this.getDataValue('Create_On')).format('DD/MM/YYYY HH:mm:ss');
-                }
+                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
             },
-            Create_By: {
+            create_by: {
                 type: Sequelize.INTEGER(11),
                 allowNull: false
             },
-            Update_On: {
+            update_on: {
                 type: Sequelize.DATE,
                 allowNull: false,
-                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-                get() {
-                    return moment(this.getDataValue('Update_On')).format('DD/MM/YYYY HH:mm:ss');
-                }
+                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
             },
-            Update_By: {
+            update_by: {
                 type: Sequelize.INTEGER(11),
                 allowNull: false
             },
-            Active_Ind: {
+            active_ind: {
                 type: Sequelize.STRING(1),
                 allowNull: false
             }
         }, {
             tableName: 't_country',
-            timestamps: false,
+            timestamp:false
         });
         this.model = super.getModel();
     }

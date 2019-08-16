@@ -4,16 +4,16 @@ import moment from 'moment'
 class Language extends BaseModel {
     constructor () {
         super('t_language', {
-            Language_Code: {
+            language_code: {
                 type: Sequelize.STRING(5),
                 allowNull: false,
                 primaryKey: true
             },
-            Language_Name: {
+            language_name: {
                 type: Sequelize.STRING(50),
                 allowNull: false
             },
-            Create_On: {
+            create_on: {
                 type: Sequelize.DATE,
                 allowNull: false,
                 defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
@@ -21,11 +21,11 @@ class Language extends BaseModel {
                     return moment(this.getDataValue('Create_On')).format('DD/MM/YYYY HH:mm:ss');
                 }
             },
-            Create_By: {
+            create_by: {
                 type: Sequelize.INTEGER(11),
                 allowNull: false
             },
-            Update_On: {
+            update_on: {
                 type: Sequelize.DATE,
                 allowNull: false,
                 defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
@@ -33,11 +33,11 @@ class Language extends BaseModel {
                     return moment(this.getDataValue('Update_On')).format('DD/MM/YYYY HH:mm:ss');
                 }
             },
-            Update_By: {
+            update_by: {
                 type: Sequelize.INTEGER(11),
                 allowNull: false
             },
-            Active_Ind: {
+            active_ind: {
                 type: Sequelize.STRING(1),
                 allowNull: false
             }

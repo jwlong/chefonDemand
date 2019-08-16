@@ -5,62 +5,56 @@ import moment from 'moment'
 class District extends BaseModel {
     constructor () {
         super('t_district', {
-            District_Code: {
+            district_code: {
                 type: Sequelize.STRING(5),
                 allowNull: false,
                 primaryKey: true
             },
-            District_Name: {
+            district_name: {
                 type: Sequelize.STRING(80),
                 allowNull: false
             },
-            City_Code: {
+            city_code: {
                 type: Sequelize.STRING(5),
                 allowNull: true,
                 references: {
                     model: 't_city',
-                    key: 'City_Code'
+                    key: 'city_code'
                 }
             },
-            Province_Code: {
+            province_code: {
                 type: Sequelize.STRING(5),
                 allowNull: true
             },
-            Country_Code: {
+            country_code: {
                 type: Sequelize.STRING(3),
                 allowNull: true
             },
-            Create_On: {
+            create_on: {
                 type: Sequelize.DATE,
                 allowNull: false,
-                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-                get() {
-                    return moment(this.getDataValue('Create_On')).format('DD/MM/YYYY HH:mm:ss');
-                }
+                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
             },
-            Create_By: {
+            create_by: {
                 type: Sequelize.INTEGER(11),
                 allowNull: false
             },
-            Update_On: {
+            update_on: {
                 type: Sequelize.DATE,
                 allowNull: false,
-                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-                get() {
-                    return moment(this.getDataValue('Update_On')).format('DD/MM/YYYY HH:mm:ss');
-                }
+                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
             },
-            Update_By: {
+            update_by: {
                 type: Sequelize.INTEGER(11),
                 allowNull: false
             },
-            Active_Ind: {
+            active_ind: {
                 type: Sequelize.STRING(1),
                 allowNull: false
             }
         }, {
             tableName: 't_district',
-            timestamps: false,
+            timestamp:false
         });
         this.model = super.getModel();
      /*   this.model.belongsTo(town['model'],{foreignKey:'town_code'})
