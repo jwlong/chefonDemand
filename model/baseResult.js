@@ -31,7 +31,7 @@ class baseResult {
 //export  default baseResult;
 
 export default  {
-    SUCCESS:new baseResult(200, "successful operation",{}),
+    SUCCESS:new baseResult(200, "successful operation"),
     // user 部分
     USER_INVALID_NAME_PASSWD:new baseResult(400,"Invalid username/password supplied"),
     USER_IPV4_ERROR:new baseResult(401,"IPv4_address must be supplied"),
