@@ -39,5 +39,8 @@ class BaseService{
 	baseCreateBatch(entitys){
 		return this.instance.createBatch(entitys)
 	}
+	getModel() {
+		return this.instance.model;
+	}
 }
 module.exports = BaseService

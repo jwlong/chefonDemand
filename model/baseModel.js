@@ -11,6 +11,7 @@ class BaseModel{
 	}
 
     max(key) {
+		console.log("come==============>max")
 		//let nextId = 0;
 		return this.model.max(key);
 	}
@@ -63,6 +64,7 @@ class BaseModel{
 	/**************************************插入方法**************************************/
 	// 插入单个实体
 	create(entity){
+		console.log("come=================created>")
 		return this.model.create(entity)
 	}
 	// 批量插入实体集

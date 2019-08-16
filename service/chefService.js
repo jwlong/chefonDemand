@@ -11,33 +11,35 @@ class ChefService extends BaseService{
         return ChefService.model.getChefList(attr)
     }
 
-     processCreateChef(user){
+    processCreateChef(user) {
         let chef = {};
-            return  db.transaction( t=> {
-                return userService.getNextId('user_id').then(nextId => {
-                    console.log("in request user_id : ", nextId);
-                    user.user_id = nextId;
-                    user.active_ind = 'A'; // 初始为0，表示不激活
-                    user.ipv4_address = user.IPv4_address;
-                    user.sms_notify_ind = user.SMS_notify_ind;
-                    return userService.baseCreate(user).then(createdUser => {
-                        //add chef
-                        chef.user_id = createdUser.user_id;
-                        // attr.short_desc = attr.short_description;
-                        //attr.detail_desc = attr.detail_description;
-                        chef.active_ind = 'A';
-                        chef.create_by = createdUser.create_by;
-                        chef.update_by = createdUser.update_by;
-                        return this.getNextId('chef_id').then(nextId => {
-                            chef.chef_id = nextId;
-                            console.log("===========>", chef);
-                            return this.baseCreate(chef);
+        chef = user;
+        return db.transaction(t => {
+            return userService.getModel().max('user_id',{transaction: t}).then(maxId => {
+                console.log("in request user_id : ", maxId+1);
+                user.user_id = maxId+1;
+                user.active_ind = 'A'; // 初始为0，表示不激活
+                // getModel是获取实例model.调用的是Sequelize 自身提供的方法操作数据库的方法
+                return userService.getModel().create(user, {transaction: t}).then(createdUser => {
+                    //add chef
+                    chef.user_id = createdUser.user_id;
+                    chef.active_ind = 'A';
+                    chef.create_by = createdUser.create_by;
+                    chef.update_by = createdUser.update_by;
+                    // throw new Error("error occour!");
+                    return this.getModel().max('chef_id',{transaction: t}).then(maxId => {
+                        chef.chef_id = maxId+1;
+                      return  this.getModel().create(chef,{transaction: t}).then(chef => {
+                            console.log("chef", chef);
+                            return chef;
                         })
                     });
-                }).catch(err => {
-                    throw  err;
+
                 })
+            }).catch(err => {
+                throw  err;
             })
+        })
 
     }
 
