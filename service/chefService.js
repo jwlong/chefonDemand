@@ -30,7 +30,6 @@ class ChefService extends BaseService{
                     return this.getModel().max('chef_id',{transaction: t}).then(maxId => {
                         chef.chef_id = maxId+1;
                       return  this.getModel().create(chef,{transaction: t}).then(chef => {
-                            console.log("chef", chef);
                             return chef;
                         })
                     });

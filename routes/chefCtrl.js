@@ -5,7 +5,7 @@ import express from 'express'
 import chefService from '../service/chefService';
 import userService from  '../service/userService'
 import cfg from '../config/index'
-import baseResult from '../model/baseModel'
+import baseResult from '../model/baseResult'
 const router = express.Router()
 // 请求前缀为/chef
 class ChefController {
