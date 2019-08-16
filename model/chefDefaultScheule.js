@@ -1,65 +1,69 @@
 import Sequelize from 'sequelize'
 import BaseModel from './baseModel.js'
 import moment from 'moment'
-class ChefMenuModel extends BaseModel {
-    constructor () {
-        super('t_chef_menu', {
-            menu_id: {
+
+class ChefDefaultScheule extends BaseModel {
+    constructor() {
+        super('t_chef_default_scheule', {
+            chef_default_scheule_id: {
                 type: Sequelize.INTEGER(11),
                 allowNull: false,
                 primaryKey: true
             },
             chef_id: {
                 type: Sequelize.INTEGER(11),
-                allowNull: true
+                allowNull: false,
+                references: {
+                    model: 't_chef',
+                    key: 'chef_id'
+                }
             },
-            cusine_type: {
-                type: Sequelize.STRING(5),
-                allowNull: true
-            },
-            unit_price: {
-                type: Sequelize.DECIMAL,
-                allowNull: true
-            },
-            min_guest: {
-                type: Sequelize.INTEGER(11),
-                allowNull: true
-            },
-            max_guest: {
-                type: Sequelize.INTEGER(11),
-                allowNull: true
-            },
-            meal_courses: {
-                type: Sequelize.INTEGER(11),
-                allowNull: true
-            },
-            event_duration_hr: {
-                type: Sequelize.INTEGER(11),
-                allowNull: true
-            },
-            chef_arrival_time: {
-                type: Sequelize.DATE,
-                allowNull: true
-            },
-            advance_booking_days: {
-                type: Sequelize.INTEGER(11),
-                allowNull: true
-            },
-            kid_menu: {
+            mon: {
                 type: Sequelize.BOOLEAN,
                 allowNull: true
             },
-            desc: {
-                type: Sequelize.STRING(100),
+            tue: {
+                type: Sequelize.BOOLEAN,
                 allowNull: true
+            },
+            wed: {
+                type: Sequelize.BOOLEAN,
+                allowNull: true
+            },
+            thu: {
+                type: Sequelize.BOOLEAN,
+                allowNull: true
+            },
+            fri: {
+                type: Sequelize.BOOLEAN,
+                allowNull: true
+            },
+            sat: {
+                type: Sequelize.BOOLEAN,
+                allowNull: true
+            },
+            sun: {
+                type: Sequelize.BOOLEAN,
+                allowNull: true
+            },
+            holiday: {
+                type: Sequelize.BOOLEAN,
+                allowNull: true
+            },
+            apply_meal: {
+                type: Sequelize.INTEGER(11),
+                allowNull: false,
+                defaultValue: '3'
+            },
+            instant_ind: {
+                type: Sequelize.BOOLEAN,
+                allowNull: true,
+                defaultValue: '1'
             },
             create_on: {
                 type: Sequelize.DATE,
                 allowNull: false,
-                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-                get() {
-                    return moment(this.getDataValue('Create_On')).format('DD/MM/YYYY HH:mm:ss');
-                }
+                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
             },
             create_by: {
                 type: Sequelize.INTEGER(11),
@@ -68,10 +72,7 @@ class ChefMenuModel extends BaseModel {
             update_on: {
                 type: Sequelize.DATE,
                 allowNull: false,
-                defaultValue: '0000-00-00 00:00:00',
-                get() {
-                    return moment(this.getDataValue('Update_On')).format('DD/MM/YYYY HH:mm:ss');
-                }
+                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
             },
             update_by: {
                 type: Sequelize.INTEGER(11),
@@ -82,10 +83,8 @@ class ChefMenuModel extends BaseModel {
                 allowNull: false
             }
         }, {
-            tableName: 't_chef_menu',
-            timestamps: false,
+            tableName: 't_chef_default_scheule'
         });
-        this.model = super.getModel();
     }
 }
-module.exports = new ChefMenuModel()
+module.exports= new ChefDefaultScheule();

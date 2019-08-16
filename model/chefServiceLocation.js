@@ -22,31 +22,31 @@ class ChefServiceLocation extends BaseModel {
                     key: 'District_Code'
                 }
             },
-            Create_On: {
+            create_on: {
                 type: Sequelize.DATE,
                 allowNull: false,
-                defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
                 get() {
                     return moment(this.getDataValue('Create_On')).format('DD/MM/YYYY HH:mm:ss');
                 }
             },
-            Create_By: {
+            create_by: {
                 type: Sequelize.INTEGER(11),
                 allowNull: false
             },
-            Update_On: {
+            update_on: {
                 type: Sequelize.DATE,
                 allowNull: false,
-                defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
                 get() {
                     return moment(this.getDataValue('Update_On')).format('DD/MM/YYYY HH:mm:ss');
                 }
             },
-            Update_By: {
+            update_by: {
                 type: Sequelize.INTEGER(11),
                 allowNull: false
             },
-            Active_Ind: {
+            active_ind: {
                 type: Sequelize.STRING(1),
                 allowNull: false
             }

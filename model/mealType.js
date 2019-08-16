@@ -1,30 +1,21 @@
 import Sequelize from 'sequelize'
 import BaseModel from './baseModel.js'
-import province from './province'
 import moment from 'moment'
-class City extends BaseModel {
-    constructor () {
-        super('t_city', {
-            city_code: {
-                type: Sequelize.STRING(5),
+class MealType extends BaseModel {
+    constructor() {
+        super('t_meal_type', {
+            meal_type_id: {
+                type: Sequelize.INTEGER(11),
                 allowNull: false,
                 primaryKey: true
             },
-            city_name: {
-                type: Sequelize.STRING(30),
+            meal_type_name: {
+                type: Sequelize.STRING(100),
                 allowNull: true
             },
-            province_code: {
-                type: Sequelize.STRING(5),
-                allowNull: true,
-                references: {
-                    model: 't_province',
-                    key: 'province_code'
-                }
-            },
-            country_code: {
-                type: Sequelize.STRING(3),
-                allowNull: false
+            meal_type_desc: {
+                type: Sequelize.STRING(100),
+                allowNull: true
             },
             create_on: {
                 type: Sequelize.DATE,
@@ -49,10 +40,10 @@ class City extends BaseModel {
                 allowNull: false
             }
         }, {
-            tableName: 't_city',
+            tableName: 't_meal_type',
             timestamp:false
         });
         this.model = super.getModel();
-    }
+    };
 }
-module.exports = new City()
+module.exports = new MealType();

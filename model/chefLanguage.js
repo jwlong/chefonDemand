@@ -21,40 +21,34 @@ class ChefLanguage extends BaseModel {
                 primaryKey: true,
                 references: {
                     model: 't_language',
-                    key: 'Language_Code'
+                    key: 'language_code'
                 }
             },
-            Create_On: {
+            create_on: {
                 type: Sequelize.DATE,
                 allowNull: false,
-                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-                get() {
-                    return moment(this.getDataValue('Create_On')).format('DD/MM/YYYY HH:mm:ss');
-                }
+                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
             },
-            Create_By: {
+            create_by: {
                 type: Sequelize.INTEGER(11),
                 allowNull: false
             },
-            Update_On: {
+            update_on: {
                 type: Sequelize.DATE,
                 allowNull: false,
-                defaultValue: '0000-00-00 00:00:00',
-                get() {
-                    return moment(this.getDataValue('Update_On')).format('DD/MM/YYYY HH:mm:ss');
-                }
+                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
             },
-            Update_By: {
+            update_by: {
                 type: Sequelize.INTEGER(11),
                 allowNull: false
             },
-            Active_Ind: {
+            active_ind: {
                 type: Sequelize.STRING(1),
                 allowNull: false
             }
         }, {
             tableName: 't_chef_language',
-            timestamps: false,
+            timestamp:false
         });
         this.model = super.getModel()
        // this.model.sync()
