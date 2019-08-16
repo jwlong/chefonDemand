@@ -30,17 +30,17 @@ class Chef extends BaseModel {
             verified_chef_ind: {
                 type: Sequelize.BOOLEAN,
                 allowNull: true,
-                defaultValue: '0'
+                defaultValue: false
             },
             food_safety_certified_ind: {
                 type: Sequelize.BOOLEAN,
                 allowNull: true,
-                defaultValue: '0'
+                defaultValue:false
             },
             payment_protection_ind: {
                 type: Sequelize.BOOLEAN,
                 allowNull: true,
-                defaultValue: '0'
+                defaultValue: false
             },
             verified: {
                 type: Sequelize.BOOLEAN,
@@ -69,6 +69,10 @@ class Chef extends BaseModel {
                 type: Sequelize.INTEGER(11),
                 allowNull: false
             },
+            photo_url: {
+                type: Sequelize.STRING(300),
+                allowNull: true
+            },
             active_ind: {
                 type: Sequelize.STRING(1),
                 allowNull: false
@@ -77,6 +81,7 @@ class Chef extends BaseModel {
             tableName: 't_chef',
             timestamps: false,
         });
+        this.model = super.getModel();
        // this.model.belongsToMany(language['model'],{through:'chef_language',as:'chef_language'})
         //this.model.belongsToMany(language['model'],{as:'langs',through:'chef_language',foreignKey:'chef_id'})
     }

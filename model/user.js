@@ -45,7 +45,7 @@ class User extends BaseModel {
                 type: Sequelize.STRING(15),
                 allowNull: true
             },
-            sms_notify_ind: {
+            SMS_notify_ind: {
                 type: Sequelize.BOOLEAN,
                 allowNull: true,
                 defaultValue: '0'
@@ -81,7 +81,8 @@ class User extends BaseModel {
                 allowNull: true,
                 defaultValue: false,
             },
-            ipv4_address: {
+
+            IPv4_address: {
                 type: Sequelize.STRING(15),
                 allowNull: false
             },
@@ -123,9 +124,6 @@ class User extends BaseModel {
                 type: Sequelize.DATE,
                 allowNull: false,
                 defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-                get() {
-                    return moment(this.getDataValue('Create_On')).format('DD/MM/YYYY HH:mm:ss');
-                }
             },
             create_by: {
                 type: Sequelize.INTEGER(11),
@@ -135,9 +133,6 @@ class User extends BaseModel {
                 type: Sequelize.DATE,
                 allowNull: false,
                 defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-                get() {
-                    return moment(this.getDataValue('Update_On')).format('DD/MM/YYYY HH:mm:ss');
-                }
             },
             update_by: {
                 type: Sequelize.INTEGER(11),
@@ -158,7 +153,6 @@ class User extends BaseModel {
             }
         })
         this.model = super.getModel()
-
         //this.model.sync()
     }
     isPassword (encodedPassword, password){
