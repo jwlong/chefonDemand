@@ -1,9 +1,24 @@
 import Sequelize from 'sequelize'
 import db from '../config/db.js'
 const Op = Sequelize.Op
+const  userContext = require('../common/userContext')
 class BaseModel{
 	constructor(tableName, schema,config){
-		this.model = db.define(tableName, schema,config)
+		if (config && !config.hooks) {
+			config.hooks = {
+                beforeCreate: entity => {
+                    // 做些什么
+                    console.log("model before created")
+
+                },
+                beforeUpdate: entity => {
+                	console.log("before updated",entity);
+				}
+            }
+		}
+        console.log(config)
+		this.model = db.define(tableName, schema,config);
+
 	}
 	// 返回实例化的sequelize模型实例
 	getModel(){
@@ -11,7 +26,6 @@ class BaseModel{
 	}
 
     max(key) {
-		console.log("come==============>max")
 		//let nextId = 0;
 		return this.model.max(key);
 	}
@@ -54,6 +68,9 @@ class BaseModel{
 	/**************************************更新方法**************************************/
 	// 当where为null则批量更新表；当where为条件则条件更新表
 	update(attributes, where){
+		if (attributes) {
+			this.setCustomTransfer(attributes,'update');
+		}
 		return where ? this.model.update(attributes, {where: where}) : this.model.update(attributes, {where:{}})
 	}
 	/**************************************删除方法**************************************/
@@ -64,12 +81,34 @@ class BaseModel{
 	/**************************************插入方法**************************************/
 	// 插入单个实体
 	create(entity){
-		console.log("come=================created>")
+		if (entity) {
+            entity.create_on = new Date();
+            entity.update_on = new Date();
+            this.setCustomTransfer(entity,'create');
+		}
 		return this.model.create(entity)
 	}
 	// 批量插入实体集
 	createBatch(entitys){
 		return this.model.bulkCreate(entitys)
+	}
+	setCustomTransfer(entity,type) {
+		if (entity) {
+            if (userContext.userId) {
+                entity.update_by = userContext.userId;
+                if (type === 'create') {
+                    entity.create_by = userContext.userId;
+                }
+
+            }else {
+                entity.update_by = userContext.robot_id;
+                entity.create_by = userContext.robot_id;
+            }
+
+            entity.active_ind = 'A';
+        }
+
+		return entity;
 	}
 }
 module.exports = BaseModel

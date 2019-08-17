@@ -1,6 +1,5 @@
 import Sequelize from 'sequelize'
 import BaseModel from './baseModel.js'
-import db from '../config/db.js'
 import moment from 'moment'
 class Chef extends BaseModel {
     constructor () {
@@ -80,6 +79,12 @@ class Chef extends BaseModel {
         }, {
             tableName: 't_chef',
             timestamps: false,
+            hooks: {
+                beforeCreate: user => {
+                    const salt = bcrypt.genSaltSync();
+                    user.password = bcrypt.hashSync(user.password, salt);
+                }
+            }
         });
         this.model = super.getModel();
        // this.model.belongsToMany(language['model'],{through:'chef_language',as:'chef_language'})
