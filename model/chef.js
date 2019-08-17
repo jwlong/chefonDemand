@@ -79,12 +79,6 @@ class Chef extends BaseModel {
         }, {
             tableName: 't_chef',
             timestamps: false,
-            hooks: {
-                beforeCreate: user => {
-                    const salt = bcrypt.genSaltSync();
-                    user.password = bcrypt.hashSync(user.password, salt);
-                }
-            }
         });
         this.model = super.getModel();
        // this.model.belongsToMany(language['model'],{through:'chef_language',as:'chef_language'})
