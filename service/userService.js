@@ -2,7 +2,6 @@ import BaseService from './baseService.js'
 import {AutoWritedUser} from '../common/AutoWrite.js'
 import db from "../config/db";
 import baseResult from '../model/baseResult'
-
 @AutoWritedUser
 class UserService extends BaseService{
     constructor(){
