@@ -25,6 +25,8 @@ class ChefController {
                     return res.json(result);
                 }
                 let user = req.body;
+                user.update_by = req.user_id? req.user_id:cfg.robot_id; // 0 表示机器人
+                user.create_by = req.user_id? req.user_id:cfg.robot_id; // 0 表示机器人
                 let newChef = await chefService.processCreateChef(user);
                 console.log("inserted new chef success! it's :",newChef);
                 return res.json(baseResult.SUCCESS);
