@@ -6,6 +6,7 @@ import chefService from '../service/chefService';
 import userService from  '../service/userService'
 import cfg from '../config/index'
 import baseResult from '../model/baseResult'
+import chefLanguageService from   '../service/chefLanguageService'
 import utils from "../common/utils";
 const router = express.Router()
 var userContext = require('../common/userContext')
@@ -65,7 +66,7 @@ class ChefController {
             let attrs = utils.keyLowerCase(req.body);
             try {
                 await chefService.checkChefIsExist(attrs.chef_id)
-                let result = await chefService.setupChefLanguage(attrs);
+                let result = await chefLanguageService.setupChefLanguage(attrs);
                 console.log("result=>",result)
                 res.json(baseResult.SUCCESS);
             }catch (e) {
