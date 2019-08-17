@@ -54,27 +54,6 @@ class ChefService extends BaseService{
         return this.baseUpdate(attr,{chef_id:attr.chef_id})
     }
 
-    /**
-     *
-     * @param attr
-     * {
-          "chef_Id": 0,
-          "language_list": [
-            {
-              "language_code": "string",
-              "active_ind": true
-            }
-          ]
-        }
-     */
-    setupChefLanguage(attr) {
-        return db.transaction(t=> {
-            return this.getModel().findOne({where:{chef_id:chefId},transaction:t}).then(_chef => {
-              //  this.getModel().
-            })
-        })
-
-    }
 
     findChefByPopularity() {
    /*     var sql = "select * from chef left join "
