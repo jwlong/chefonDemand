@@ -8,11 +8,12 @@ class BaseModel{
 			config.hooks = {
                 beforeCreate: entity => {
                     // 做些什么
-                    console.log("model before created")
+                    this.setCustomTransfer(entity,'create')
 
                 },
-                beforeUpdate: entity => {
-                	console.log("before updated",entity);
+                beforeBulkUpdate: entity => {
+                    this.setCustomTransfer(entity,'update')
+
 				}
             }
 		}
@@ -81,11 +82,6 @@ class BaseModel{
 	/**************************************插入方法**************************************/
 	// 插入单个实体
 	create(entity){
-		if (entity) {
-            entity.create_on = new Date();
-            entity.update_on = new Date();
-            this.setCustomTransfer(entity,'create');
-		}
 		return this.model.create(entity)
 	}
 	// 批量插入实体集
@@ -94,9 +90,11 @@ class BaseModel{
 	}
 	setCustomTransfer(entity,type) {
 		if (entity) {
+            entity.update_on = new Date();
             if (userContext.userId) {
                 entity.update_by = userContext.userId;
                 if (type === 'create') {
+                    entity.create_on = new Date();
                     entity.create_by = userContext.userId;
                 }
 
