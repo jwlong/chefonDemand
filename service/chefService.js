@@ -2,6 +2,7 @@ import BaseService from './baseService.js'
 import {AutoWritedChefModel} from '../common/AutoWrite.js'
 import db from '../config/db.js'
 import userService from './userService'
+import baseResult from "../model/baseResult";
 @AutoWritedChefModel
 class ChefService extends BaseService{
     constructor(){
@@ -23,9 +24,6 @@ class ChefService extends BaseService{
                 return userService.getModel().create(user, {transaction: t}).then(createdUser => {
                     //add chef
                     chef.user_id = createdUser.user_id;
-                    chef.active_ind = 'A';
-                    chef.create_by = createdUser.create_by;
-                    chef.update_by = createdUser.update_by;
                     // throw new Error("error occour!");
                     return this.getModel().max('chef_id',{transaction: t}).then(maxId => {
                         chef.chef_id = maxId+1;
@@ -37,6 +35,42 @@ class ChefService extends BaseService{
                 })
             }).catch(err => {
                 throw  err;
+            })
+        })
+
+    }
+
+    async checkChefIsExist(chefId) {
+       let chef =  await this.getChefByChefId(chefId);
+       if (!chef) {
+           throw (baseResult.CHEF_USER_ID_NOT_EXIST);
+       }
+    }
+    getChefByChefId (chefId) {
+        return this.getModel().findOne({where:{chef_id:chefId}})
+
+    }
+    updateChefQualification(attr) {
+        return this.baseUpdate(attr,{chef_id:attr.chef_id})
+    }
+
+    /**
+     *
+     * @param attr
+     * {
+          "chef_Id": 0,
+          "language_list": [
+            {
+              "language_code": "string",
+              "active_ind": true
+            }
+          ]
+        }
+     */
+    setupChefLanguage(attr) {
+        return db.transaction(t=> {
+            return this.getModel().findOne({where:{chef_id:chefId},transaction:t}).then(_chef => {
+              //  this.getModel().
             })
         })
 

@@ -8,6 +8,7 @@ import compression from 'compression'
 import jwt from 'jsonwebtoken'
 import cfg from './config/index'
 import baseResult from './model/baseResult'
+var userContext = require('./common/userContext')
 
 //配置express中间件
 const app = express()
@@ -72,6 +73,7 @@ function authenticateRequest(req, res, next) {
                 // 如果没问题就把解码后的信息保存到请求中，供后面的路由使用
                 req.user_id = decoded.id;
                 console.log(req.user_id);
+                userContext.userId =req.user_id;
                 next()
             }
         });
