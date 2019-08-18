@@ -106,11 +106,11 @@ class ChefController {
             console.log("Retrieve available timeslots by chef Id,req query:",req.query)
             let query = utils.keyLowerCase(req.query);
             console.log("hello",req.query.chef_id);
-            /*if (!query.chef_id){
+            if (!query['chef_id']){
                return res.json(baseResult.CHEF_ID_NOT_EXIST);
-            }*/
+            }
             try {
-                let result = await chefAvailableTimeSlotService.retrieveAvailTimeslots(1)
+                let result = await chefAvailableTimeSlotService.retrieveAvailTimeslots(query)
                // result.chef_Id = query.chef_id;
                 return res.json(result);
             }catch (e){
