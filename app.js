@@ -32,7 +32,7 @@ app.all('*',function(req,res,next){
 	res.header('Content-Type','application/json;charset=utf-8')
 	res.header('Access-Control-Allow-Credentials','true')
 	next()
-})
+},authenticateRequest)
 
 // 路由列表
 app.use('/chef',require('./routes/chefCtrl'))
