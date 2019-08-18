@@ -1,6 +1,5 @@
 import Sequelize from 'sequelize'
 import BaseModel from './baseModel.js'
-import province from './province'
 import moment from 'moment'
 class City extends BaseModel {
     constructor () {

@@ -21,6 +21,7 @@
     "morgan": "^1.9.1",
     "mysql2": "^1.5.1",
     "nodemon": "^1.19.1",
+    "dottie": "2.0.1",
     "sequelize": "^6.0.0",
     "serve-favicon": "^2.5.0",
     "uuid": "^3.3.2"

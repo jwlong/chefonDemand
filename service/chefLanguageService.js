@@ -8,8 +8,8 @@ class ChefLanguageService extends BaseService{
     constructor(){
         super(ChefLanguageService.model)
     }
-    getChefLangByChefId(attr) {
-        return ChefLanguageService.model.getChefLangByChefId(attr)
+    getChefLangByChefId(chefId) {
+        return ChefLanguageService.model.getChefLangByChefId(chefId)
     }
 
     /**
@@ -26,7 +26,7 @@ class ChefLanguageService extends BaseService{
         }
      */
     setupChefLanguage(attr) {
-        if (!attr.language_list || attr.language_list && attr.language_list.length ==0 ){
+        if (!attr.language_list || (attr.language_list && attr.language_list.length ==0) ){
             throw baseResult.CHEF_LANG_LIST_EMPTY;
         }
         return this.baseCreateBatch(attr.language_list);

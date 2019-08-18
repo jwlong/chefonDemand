@@ -7,6 +7,8 @@ import userService from  '../service/userService'
 import cfg from '../config/index'
 import baseResult from '../model/baseResult'
 import chefLanguageService from   '../service/chefLanguageService'
+import chefAvailableTimeSlotService from '../service/chefAvailableTimeSlotService'
+import districtService from '../service/districtService'
 import utils from "../common/utils";
 const router = express.Router()
 var userContext = require('../common/userContext')
@@ -74,8 +76,47 @@ class ChefController {
             }
 
         })
+        router.post('/updateChefServiceLocation',async(req,res,next) => {
+            console.log("update chef user account's service locations by chef,request body =>",req.body);
+            let attrs = utils.keyLowerCase(req.body);
+            try {
+                await  chefService.checkChefIsExist(attrs.chef_id)
 
+                let result = await districtService.updateChefServiceLocation(attrs);
+                res.json(baseResult.SUCCESS);
+            }catch (e) {
+                next(e);
+            }
 
+        })
+        // chef_Id  header
+        router.get('/getChefDetailByChefId',async(req,res,next) => {
+            let chef_id = req.headers.chef_Id || req.headers.chef_id;
+            if (!chef_id) res.json(baseResult.CHEF_ID_NOT_EXIST);
+            try {
+                let result = await chefService.getChefDetailByChefId(chef_id);
+                res.json(result);
+            }catch (e) {
+                next(e);
+            }
+        })
+
+        //  chef/retrieveAvailTimeslots
+        router.get('/retrieveAvailTimeslots',async(req,res,next) => {
+            console.log("Retrieve available timeslots by chef Id,req query:",req.query)
+            let query = utils.keyLowerCase(req.query);
+            console.log("hello",req.query.chef_id);
+            /*if (!query.chef_id){
+               return res.json(baseResult.CHEF_ID_NOT_EXIST);
+            }*/
+            try {
+                let result = await chefAvailableTimeSlotService.retrieveAvailTimeslots(1)
+               // result.chef_Id = query.chef_id;
+                return res.json(result);
+            }catch (e){
+                next(e);
+            }
+        })
         return router;
     }
 
