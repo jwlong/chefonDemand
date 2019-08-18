@@ -45,14 +45,15 @@ export default  {
     USER_VERITY_EXPIRED:new baseResult(422,'Verification Code expired.'),
 
     //chef部分
-    // /createChef
     CHEF_NAME_ALREADY_TOKEN:new baseResult(400,"user name already taken."),
     CHEF_MANDATORY_FIELD_EXCEPTION:new baseResult(401,'Chef\'s first name, last name and short description fields are mandatory.'),
     CHEF_USER_ID_NOT_EXIST: new baseResult(400,"user Id does not exist."),
     CHEF_LANG_LIST_EMPTY:new baseResult(401,"language list can not be empty."),
-    CHEF_ID_NOT_EXIST: new baseResult(400,'chef Id does not exist.')
+    CHEF_ID_NOT_EXIST: new baseResult(400,'chef Id does not exist.'),
 
-
+    // /chef/updateChefServiceLocation
+    CHEF_DISTRICT_CODE_NOT_EXIST:new baseResult(401,"district code does not exist."),
+    CHEF_DISTRICT_LIST_EMPTY:new baseResult(401,"district list can not be empty.")
 
 
 };

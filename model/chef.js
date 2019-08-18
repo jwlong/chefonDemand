@@ -1,5 +1,9 @@
 import Sequelize from 'sequelize'
 import BaseModel from './baseModel.js'
+import language from  './chefLanguage'
+import cuisineType from './cuisineType'
+import user from './user'
+import experience from  './chefExperience'
 import moment from 'moment'
 class Chef extends BaseModel {
     constructor () {
@@ -80,7 +84,7 @@ class Chef extends BaseModel {
             tableName: 't_chef',
             timestamps: false,
         });
-        this.model = super.getModel();
+        this.model.hasOne(user['model'],{foreignKey: 'user_id'});
        // this.model.belongsToMany(language['model'],{through:'chef_language',as:'chef_language'})
         //this.model.belongsToMany(language['model'],{as:'langs',through:'chef_language',foreignKey:'chef_id'})
     }

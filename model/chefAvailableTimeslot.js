@@ -1,6 +1,7 @@
 import Sequelize from 'sequelize'
 import BaseModel from './baseModel.js'
 import db from '../config/db.js'
+import chef from './chef'
 import moment from 'moment'
 class ChefAvailableTimeslot extends BaseModel {
     constructor () {
@@ -64,6 +65,7 @@ class ChefAvailableTimeslot extends BaseModel {
         });
 
         this.model = super.getModel();
+        this.model.belongsTo(chef['model'],{foreignKey:'chef_id'})
     }
 }
 module.exports = new ChefAvailableTimeslot()

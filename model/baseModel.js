@@ -17,7 +17,7 @@ class BaseModel{
 				}
             }
 		}
-        console.log(config)
+        //console.log(config)
 		this.model = db.define(tableName, schema,config);
 
 	}

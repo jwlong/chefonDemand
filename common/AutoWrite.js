@@ -33,4 +33,7 @@ module.exports = {
     AutoWritedUser(target,key,desc) {
         target.model = require('../model/user')
     },
+    AutoWritedChefAVLTimeSlot(target,key,desc) {
+        target.model = require('../model/chefAvailableTimeslot')
+    }
 }
