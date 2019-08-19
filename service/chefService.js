@@ -139,8 +139,12 @@ class ChefService extends BaseService{
                   where:{chef_id:chefId},
                   transaction:t
               }).then(chefUser => {
-                  let chefDetail = {};
-                  chefDetail.chef = chefUser;
+                  let tmp = JSON.parse(JSON.stringify(chefUser))
+                  let chefDetail = tmp.t_user;
+                  chefDetail.chef_id = tmp.chef_id;
+                  chefDetail.short_description = tmp.short_desc;
+                  chefDetail.detail_description = tmp.detail_desc;
+
                   return this.getLangCodeList(chefId,t).then(langCodeList =>{
                       chefDetail.language_code_list = langCodeList;
                       return this.getCuisineTypeList(chefId,t).then(cuisineType =>{
