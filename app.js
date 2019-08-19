@@ -37,7 +37,7 @@ app.all('*',function(req,res,next){
 // 路由列表
 app.use('/chef',require('./routes/chefCtrl'))
 app.use('/user',require('./routes/userCtrl'))
-
+app.use('/timeslot',require('./routes/timeslotCtrl'))
 app.use(errorHandler);
 if (!module.parent) {
     app.listen(config.port, function() {

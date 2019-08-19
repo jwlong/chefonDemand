@@ -83,7 +83,8 @@ class ChefDefaultScheule extends BaseModel {
                 allowNull: false
             }
         }, {
-            tableName: 't_chef_default_scheule'
+            tableName: 't_chef_default_scheule',
+            timestamps:false
         });
     }
 }
