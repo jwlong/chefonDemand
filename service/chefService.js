@@ -44,6 +44,36 @@ class ChefService extends BaseService{
         })
 
     }
+    updateChef(attr) {
+        if (!attr.first_name || !attr.last_name || !attr.short_desc ) {
+            let e = new Error();
+            e.code = baseResult.CHEF_MANDATORY_FIELD_EXCEPTION.code;
+            e.msg = baseResult.CHEF_MANDATORY_FIELD_EXCEPTION.msg;
+            throw e;
+        }
+
+        return db.transaction(t => {
+            return this.getModel().findOne({where:{chef_id: attr.chef_id}, transaction: t}).then(existOne => {
+                console.log("existOne: ", existOne);
+
+                if (existOne) {
+                    return userService.getModel().update(attr, {where:{user_id: existOne.user_id}, transaction: t}).then(user => {
+
+                        return this.getModel().update(attr, {where:{chef_id: existOne.chef_id}, transaction: t}).then(chef => {
+                            console.log("chef: ", chef);
+                            return chef;
+                        });
+                    });
+
+                } else {
+                    throw baseResult.CHEF_USER_ID_NOT_EXIST;
+                }
+
+            }).catch(err => {
+                throw  err;
+            })
+        })
+    }
 
     async checkChefIsExist(chefId) {
         if (!chefId) {
