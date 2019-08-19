@@ -35,5 +35,11 @@ module.exports = {
     },
     AutoWritedChefAVLTimeSlot(target,key,desc) {
         target.model = require('../model/chefAvailableTimeslot')
+    },
+    AutoWritedChefUnAVLTimeSlot(target,key,desc) {
+        target.model = require('../model/chefUnavilableTimeslot')
+    },
+    AutoWritedDefaultScheule(target,key,desc) {
+        target.model = require('../model/chefDefaultScheule')
     }
 }

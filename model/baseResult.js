@@ -53,7 +53,21 @@ export default  {
 
     // /chef/updateChefServiceLocation
     CHEF_DISTRICT_CODE_NOT_EXIST:new baseResult(401,"district code does not exist."),
-    CHEF_DISTRICT_LIST_EMPTY:new baseResult(401,"district list can not be empty.")
+    CHEF_DISTRICT_LIST_EMPTY:new baseResult(401,"district list can not be empty."),
 
+
+    // time slot
+    //400
+    // Timeslot List is Empty
+    // 402
+    // Chef Not Found.
+    // 407
+    // Timeslot start datetime can not later than end datetime.
+    /*420
+    Must pick at least one day of the week.*/
+    TIMESLOT_CHEF_ID_NOT_FOUND : new baseResult(402,"Chef Not Found."),
+    TIMESLOT_LIST_EMPTY:new baseResult(400,'Timeslot List is Empty'),
+    TIMESLOT_INVALID_DATETIME:new baseResult(407,"Timeslot start datetime can not later than end datetime."),
+    TIMESLOT_PICK_ERROR:new baseResult(420,'Must pick at least one day of the week.')
 
 };
