@@ -107,30 +107,6 @@ class ChefService extends BaseService{
         return  db.query(sql,{replacements:attr,type:db.QueryTypes.SELECT});
     }
      getChefDetailByChefId(chefId) {
-            let o1,o2,o3,o4;
-
-           /* return this.getModel().findOne({
-                include:[
-                    {model:user['model']}
-                ],
-                where:{chef_id:chefId},
-            }).then(chefUser => {
-                chefDetail.chef =  chefUser.t_user;
-                chefDetail.chef.chef_id = chefUser.chef_id;
-                chefDetail.chef.short_description = chefUser.short_desc;
-                chefDetail.chef.detail_description = chefUser.detail_desc;
-                return this.getExperienceList(chefId).then(expList => {
-                    chefDetail.experience_list = expList;
-                    return this.getCuisineTypeList(chefId).then( cuisineTypeList => {
-                        chefDetail.cuisine_type = cuisineTypeList;
-                        return this.getLangCodeList(chefId).then(langCodeList => {
-                            chefDetail.language_code_list = langCodeList;
-                            console.log(chefDetail);
-                            return chefDetail;
-                        })
-                    })
-                });
-            })*/
            return  db.transaction(t=> {
               return this.getModel().findOne({
                   include:[
