@@ -88,18 +88,9 @@ class ChefService extends BaseService{
         return this.getModel().findOne({where:{chef_id:chefId}})
 
     }
-    getChefUserByChefId(chefId) {
-        return this.getModel().findOne({
-            include:[
-                {model:user['model']}
-            ],
-            where:{chef_id:chefId}
-        })
-    }
     updateChefQualification(attr) {
         return this.baseUpdate(attr,{chef_id:attr.chef_id})
     }
-
 
     findChefByPopularity() {
    /*     var sql = "select * from chef left join "
@@ -116,8 +107,9 @@ class ChefService extends BaseService{
         return  db.query(sql,{replacements:attr,type:db.QueryTypes.SELECT});
     }
      getChefDetailByChefId(chefId) {
-        var chefDetail = {};
-            return this.getModel().findOne({
+            let o1,o2,o3,o4;
+
+           /* return this.getModel().findOne({
                 include:[
                     {model:user['model']}
                 ],
@@ -138,20 +130,49 @@ class ChefService extends BaseService{
                         })
                     })
                 });
-            })
+            })*/
+           return  db.transaction(t=> {
+              return this.getModel().findOne({
+                  include:[
+                      {model:user['model']}
+                  ],
+                  where:{chef_id:chefId},
+                  transaction:t
+              }).then(chefUser => {
+                  let chefDetail = {};
+                  chefDetail.chef = chefUser;
+                  return this.getLangCodeList(chefId,t).then(langCodeList =>{
+                      chefDetail.language_code_list = langCodeList;
+                      return this.getCuisineTypeList(chefId,t).then(cuisineType =>{
+                          chefDetail.cuisine_type = cuisineType;
+                          return this.getExperienceList(chefId,t).then(expList =>{
+                              chefDetail.experience_list = expList;
+                              return chefDetail;
+                          })
+                      })
+                  })
+              });
+          })
+
     }
-     getExperienceList(chefId) {
+    getChefUserByChefId(chefId,trans) {
+        let sql = ` select chef.chef_id,chef.short_desc as 'short_description' ,chef.detail_desc as 'detail_description' ,user.* from t_chef chef left join t_user user on chef.user_id = user.user_id
+where chef.chef_id = :chef_id`;
+        return db.query(sql,{replacements:{chef_id:chefId},type:db.QueryTypes.SELECT,transaction:trans});
+    }
+
+    getExperienceList(chefId,trans) {
        var chefUserSql = "SELECT ce.start_date,ce.end_date,ce.exp_desc as 'experience_description'  FROM t_chef_experience ce  WHERE chef_id= :chef_id";
-        return   db.query(chefUserSql,{replacements:{chef_id:chefId},type:db.QueryTypes.SELECT});
+        return   db.query(chefUserSql,{replacements:{chef_id:chefId},type:db.QueryTypes.SELECT,transaction:trans});
     }
-    getCuisineTypeList(chefId) {
+    getCuisineTypeList(chefId,trans) {
         var cuisineSql =   `SELECT ct.cuisine_type_id FROM t_cuisine_type ct LEFT JOIN t_chef_cuisine cc  ON ct.cuisine_type_id = cc.cuisine_type_id
 WHERE cc.chef_id = :chef_id`;
-        return  db.query(cuisineSql,{replacements:{chef_id:chefId},type:db.QueryTypes.SELECT});
+        return  db.query(cuisineSql,{replacements:{chef_id:chefId},type:db.QueryTypes.SELECT ,transaction:trans});
     }
-    getLangCodeList(chefId) {
+    getLangCodeList(chefId,trans) {
         var langCodeSql = `SELECT lang_code FROM t_chef_language WHERE chef_id =:chef_id`;
-        return  db.query(langCodeSql,{replacements:{chef_id:chefId},type:db.QueryTypes.SELECT});
+        return  db.query(langCodeSql,{replacements:{chef_id:chefId},type:db.QueryTypes.SELECT,transaction:trans});
     }
 }
 module.exports = new ChefService()

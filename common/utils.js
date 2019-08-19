@@ -11,7 +11,7 @@ const utils = {
                     delete object[i];
                 }
                 if (typeof temp === 'object' || Object.prototype.toString.call(temp) === '[object Array]') {
-                    keyLowerCase(temp);
+                    this.keyLowerCase(temp);
                 }
             }
         }

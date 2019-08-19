@@ -41,5 +41,8 @@ module.exports = {
     },
     AutoWritedDefaultScheule(target,key,desc) {
         target.model = require('../model/chefDefaultScheule')
+    },
+    AutoWritedChefExp(target,key,desc) {
+        target.model = require('../model/chefExperience')
     }
 }

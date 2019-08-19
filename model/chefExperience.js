@@ -1,5 +1,6 @@
 import Sequelize from 'sequelize'
 import BaseModel from './baseModel.js'
+import chef from './chef'
 import moment from 'moment'
 
 class ChefExperience extends BaseModel {

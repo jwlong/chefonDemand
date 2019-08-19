@@ -149,6 +149,8 @@ class User extends BaseModel {
                 beforeCreate: user => {
                     const salt = bcrypt.genSaltSync();
                     user.password = bcrypt.hashSync(user.password, salt);
+                    user.update_on = new Date();
+                    user.create_on = new Date();
                 }
             }
         })

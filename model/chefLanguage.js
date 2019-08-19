@@ -1,6 +1,7 @@
 import Sequelize from 'sequelize'
 import BaseModel from './baseModel.js'
 import language from './language'
+import chef from './chef'
 import moment from 'moment'
 class ChefLanguage extends BaseModel {
     constructor () {
@@ -50,7 +51,7 @@ class ChefLanguage extends BaseModel {
             timestamps: false,
         });
         this.model = super.getModel();
-        this.model.hasOne(language['model'],{})
+       // this.model.belongsToMany(chef['model'],{through:'chef_language',as:'t_chef_language',foreignKey:'chef_id'})
        // this.model.sync()
     }
     getChefLangByChefId(chefId) {
