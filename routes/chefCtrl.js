@@ -39,6 +39,21 @@ class ChefController {
             }
            // try{res.json(await chefService.baseCreate(req.body))}catch(err){next(err)}
         })
+        router.post('/updateChef',  async (req, res,next) => {
+            console.log("updateChef...");
+            try {
+
+                req.body.update_by = req.user_id? req.user_id:cfg.robot_id; // 0 表示机器人
+                req.body.update_on = new Date();
+
+                let chef = await chefService.updateChef(req.body)
+                console.log("chef: ", chef);
+                return res.json(baseResult.SUCCESS);
+            }catch (e) {
+                console.warn(e);
+                next(e)
+            }
+        })
 
         //  /chef/updateChefQualification (func5b)
         router.post('/updateChefQualification',async (req,res,next) => {
@@ -50,6 +65,7 @@ class ChefController {
                 console.log("result=>",result)
                 res.json(baseResult.SUCCESS);
             }catch (e) {
+                console.warn(e);
                 next(e);
             }
         })
@@ -81,7 +97,6 @@ class ChefController {
             let attrs = utils.keyLowerCase(req.body);
             try {
                 await  chefService.checkChefIsExist(attrs.chef_id)
-
                 let result = await districtService.updateChefServiceLocation(attrs);
                 res.json(baseResult.SUCCESS);
             }catch (e) {
@@ -118,6 +133,8 @@ class ChefController {
             }
         })
         return router;
+
+
     }
 
 
