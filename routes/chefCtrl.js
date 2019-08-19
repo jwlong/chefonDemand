@@ -109,9 +109,12 @@ class ChefController {
             if (!chef_id) res.json(baseResult.CHEF_ID_NOT_EXIST);
             try {
                let result =  await chefService.getChefDetailByChefId(chef_id);
-               console.log(result);
-
-               res.json(result);
+            /*   let tmp = JSON.parse(JSON.stringify(result));
+               let result1= tmp.chef;
+               result1.language_code_list = tmp.language_code_list;
+               result1.cuisine_type = tmp.cuisine_type;
+               result1.experience_list = tmp.experience_list;*/
+        res.json(result);
             }catch (e) {
                 next(e);
             }
