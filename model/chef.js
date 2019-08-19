@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize'
 import BaseModel from './baseModel.js'
-import language from  './chefLanguage'
-import cuisineType from './cuisineType'
+import chefLanguage from  './chefLanguage'
+import chefCuisine from './chefCuisine'
 import user from './user'
 import experience from  './chefExperience'
 import moment from 'moment'
@@ -84,16 +84,15 @@ class Chef extends BaseModel {
             tableName: 't_chef',
             timestamps: false,
         });
-        this.model.hasOne(user['model'],{foreignKey: 'user_id'});
+        this.model = this.getModel();
+        this.model.belongsTo(user['model'],{foreignKey: 'user_id'});
+      //  this.model.hasMany(chefLanguage['model']);
+       /* this.model.hasMany(experience['model']);
+        this.model.hasMany(chefCuisine['model']);*/
        // this.model.belongsToMany(language['model'],{through:'chef_language',as:'chef_language'})
         //this.model.belongsToMany(language['model'],{as:'langs',through:'chef_language',foreignKey:'chef_id'})
     }
 
-   /* getChefList(attr) {
-        console.log(attr);
-        attr = {chef_id:attr.chef_id,first_name:(attr.first_name)?(attr.first_name): ''};
-        return db.query('select c.first_name,c.last_name from chef  c left join chef_district d on d.chef_id = c.chef_id where c.chef_id= :chef_id and c.first_name = :first_name',{ replacements:attr,type:db.QueryTypes.SELECT});
-    }*/
      getChefList(attr) {
      console.log(attr);
      attr = {chef_id:attr.chef_id,first_name:(attr.first_name)?(attr.first_name): ''};

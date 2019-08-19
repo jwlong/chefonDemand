@@ -11,17 +11,17 @@ class UserService extends BaseService{
         console.log("checkBeforeCreate....")
         if (isValidRobot && attr.robot_ind) {
             //return {code:403,msg:"system does not accept robot."}
-            return baseResult.USER_NOT_ACCEPT_ROBOT;
+            throw baseResult.USER_NOT_ACCEPT_ROBOT;
         }
         if (!attr.first_name || !attr.last_name || !attr.email_address || !attr.contact_no) {
-            return baseResult.USER_MANDATORY_FIELD_EXCEPTION;
+            throw baseResult.USER_MANDATORY_FIELD_EXCEPTION;
         }
 
         var sql = "select count(u.user_id) cnt from  t_user u  where u.user_name = :user_name";
         return db.query(sql,{replacements:{user_name:attr.user_name},type:db.QueryTypes.SELECT}).then(result =>{
             if (result && result[0].cnt >0 ) {
                 //return {code:400,msg:"user name already taken."};
-                return baseResult.USER_NAME_ALREADY_TOKEN;
+                throw baseResult.USER_NAME_ALREADY_TOKEN;
             }else {
                 return null;
             }

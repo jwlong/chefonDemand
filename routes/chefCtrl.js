@@ -9,6 +9,7 @@ import baseResult from '../model/baseResult'
 import chefLanguageService from   '../service/chefLanguageService'
 import chefAvailableTimeSlotService from '../service/chefAvailableTimeSlotService'
 import districtService from '../service/districtService'
+import chefExperienceService from '../service/chefExpService'
 import utils from "../common/utils";
 const router = express.Router()
 var userContext = require('../common/userContext')
@@ -23,10 +24,6 @@ class ChefController {
             try {
                 // 此时不验证是否为robot
                 let result = await userService.checkBeforeCreate(req.body,false)
-                console.log("new result ",result);
-                if(result && result.code) {
-                    return res.json(result);
-                }
                 let user = req.body;
                 user.update_by = req.user_id? req.user_id:cfg.robot_id; // 0 表示机器人
                 user.create_by = req.user_id? req.user_id:cfg.robot_id; // 0 表示机器人
@@ -40,13 +37,15 @@ class ChefController {
            // try{res.json(await chefService.baseCreate(req.body))}catch(err){next(err)}
         })
         router.post('/updateChef',  async (req, res,next) => {
-            console.log("updateChef...");
+            console.log("updateChef...req body=>",req.body);
             try {
 
                 req.body.update_by = req.user_id? req.user_id:cfg.robot_id; // 0 表示机器人
                 req.body.update_on = new Date();
-
-                let chef = await chefService.updateChef(req.body)
+                let attr = utils.keyLowerCase(req.body);
+                attr.short_desc = attr.short_description;
+                attr.detail_desc = attr.detail_description;
+                let chef = await chefService.updateChef(attr)
                 console.log("chef: ", chef);
                 return res.json(baseResult.SUCCESS);
             }catch (e) {
@@ -109,8 +108,10 @@ class ChefController {
             let chef_id = req.headers.chef_Id || req.headers.chef_id;
             if (!chef_id) res.json(baseResult.CHEF_ID_NOT_EXIST);
             try {
-                let result = await chefService.getChefDetailByChefId(chef_id);
-                res.json(result);
+               let result =  await chefService.getChefDetailByChefId(chef_id);
+               console.log(result);
+
+               res.json(result);
             }catch (e) {
                 next(e);
             }
