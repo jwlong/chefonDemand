@@ -7,7 +7,10 @@ import user from '../model/user'
 import language from '../model/language'
 import cuisineType from '../model/cuisineType'
 import experience from '../model/chefExperience'
+import cuisineTypeService from './cuisineTypeService'
+import chefCuisineSerivce from './chefCuisineSerivce'
 import chefExpService from './chefExpService'
+import utils from "../common/utils";
 @AutoWritedChefModel
 class ChefService extends BaseService{
     constructor(){
@@ -53,6 +56,7 @@ class ChefService extends BaseService{
         }
 
         return db.transaction(t => {
+
             return this.getModel().findOne({where:{chef_id: attr.chef_id}, transaction: t}).then(existOne => {
                 console.log("existOne: ", existOne);
 
@@ -61,12 +65,23 @@ class ChefService extends BaseService{
 
                         return this.getModel().update(attr, {where:{chef_id: existOne.chef_id}, transaction: t}).then(chef => {
                             console.log("chef: ", chef);
-                            if (isArray(experience_list) && experience_list.length > 0) {
-                                //chefExpService.getModel().update()
-                                return db.Promise.each(experience_list,exp=>{
-                                    chefExpService.getModel().update(exp, { transaction: t });
-                                });
+                            let promiseArr =  [] ;
+                            let experience_list = attr.experience_list;
+                            let cuisine_type = attr.cuisine_type;
+
+                            if (Array.isArray(experience_list) && experience_list.length > 0) {
+                              experience_list.forEach((exp,index) => {
+                                    console.log("exp=>",exp);
+                                     promiseArr.push(chefExpService.updateChefReferToExperience(existOne,exp,t));
+                                })
                             }
+
+                            if (Array.isArray(cuisine_type) && cuisine_type.length > 0) {
+                                cuisine_type.forEach(type => {
+                                    promiseArr.push(chefCuisineSerivce.updateChefReferToCuisine(type,existOne.chef_id,t))
+                                })
+                            }
+                            return Promise.all(promiseArr);
 
                         });
                     });

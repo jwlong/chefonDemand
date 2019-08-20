@@ -33,7 +33,7 @@ class ChefAvailableTimeSlotService extends BaseService{
                 throw  baseResult.TIMESLOT_CHEF_ID_NOT_FOUND;
             }
         })
-        if (!data.available_timeslot_list || (isArray(data.available_timeslot_list) && data.available_timeslot_list.length === 0) || !isArray(data.available_timeslot_list)) {
+        if (!data.available_timeslot_list || (Array.isArray(data.available_timeslot_list) && data.available_timeslot_list.length === 0) || !Array.isArray(data.available_timeslot_list)) {
             throw  baseResult.TIMESLOT_LIST_EMPTY;
         }
 

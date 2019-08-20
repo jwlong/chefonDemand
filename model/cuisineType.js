@@ -45,7 +45,7 @@ class CuisineType extends BaseModel {
             }
         }, {
             tableName: 't_cuisine_type',
-            timestamp:false
+            timestamps: false
         });
         this.model = super.getModel();
     }

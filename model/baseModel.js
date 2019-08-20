@@ -1,19 +1,18 @@
 import Sequelize from 'sequelize'
 import db from '../config/db.js'
+import utils from "../common/utils";
 const Op = Sequelize.Op
-const  userContext = require('../common/userContext')
 class BaseModel{
 	constructor(tableName, schema,config){
 		if (config && !config.hooks) {
 			config.hooks = {
                 beforeCreate: entity => {
                     // 做些什么
-                    this.setCustomTransfer(entity,'create')
+                    utils.setCustomTransfer(entity,'create')
 
                 },
                 beforeBulkUpdate: entity => {
-                    this.setCustomTransfer(entity,'update')
-
+                   utils.setCustomTransfer(entity,'update')
 				}
             }
 		}
