@@ -45,6 +45,14 @@ class ChefController {
                 let attr = utils.keyLowerCase(req.body);
                 attr.short_desc = attr.short_description;
                 attr.detail_desc = attr.detail_description;
+                if (isArray(attr.experience_list)) {
+                    attr.experience_list.forEach(value => {
+                        if (!value.exp_desc) {
+                            value.exp_desc = value.experience_description
+                        }
+                    });
+                }
+                console.log("attr=>",attr);
                 let chef = await chefService.updateChef(attr)
                 console.log("chef: ", chef);
                 return res.json(baseResult.SUCCESS);
