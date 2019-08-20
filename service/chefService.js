@@ -7,7 +7,7 @@ import user from '../model/user'
 import language from '../model/language'
 import cuisineType from '../model/cuisineType'
 import experience from '../model/chefExperience'
-
+import chefExpService from './chefExpService'
 @AutoWritedChefModel
 class ChefService extends BaseService{
     constructor(){
@@ -61,7 +61,13 @@ class ChefService extends BaseService{
 
                         return this.getModel().update(attr, {where:{chef_id: existOne.chef_id}, transaction: t}).then(chef => {
                             console.log("chef: ", chef);
-                            return chef;
+                            if (isArray(experience_list) && experience_list.length > 0) {
+                                //chefExpService.getModel().update()
+                                return db.Promise.each(experience_list,exp=>{
+                                    chefExpService.getModel().update(exp, { transaction: t });
+                                });
+                            }
+
                         });
                     });
 
@@ -120,7 +126,6 @@ class ChefService extends BaseService{
                   chefDetail.chef_id = tmp.chef_id;
                   chefDetail.short_description = tmp.short_desc;
                   chefDetail.detail_description = tmp.detail_desc;
-
                   return this.getLangCodeList(chefId,t).then(langCodeList =>{
                       chefDetail.language_code_list = langCodeList;
                       return this.getCuisineTypeList(chefId,t).then(cuisineType =>{
