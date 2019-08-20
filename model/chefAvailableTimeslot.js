@@ -61,7 +61,7 @@ class ChefAvailableTimeslot extends BaseModel {
             }
         }, {
             tableName: 't_chef_available_timeslot',
-            timestamp:false
+            timestamps: false
         });
 
         this.model = super.getModel();

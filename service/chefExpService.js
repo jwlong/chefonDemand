@@ -11,7 +11,7 @@ class ChefExperienceService extends BaseService{
     updateChefReferToExperience(singleChef,exp,t) {
        return this.getModel().findAll({where:{chef_id:singleChef.chef_id},transaction:t}).then(expList => {
             if (Array.isArray(expList) && expList.length > 0) {
-                utils.setCustomTransfer(exp,'update');
+               // utils.setCustomTransfer(exp,'update');
                 return this.getModel().update(exp,{where:{chef_id:singleChef.chef_id},transaction:t})
             }else {
                 return this.getModel().max('exp_id',{transaction:t}).then(maxId => {

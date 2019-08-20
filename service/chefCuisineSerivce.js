@@ -9,7 +9,7 @@ class ChefCuisineService extends BaseService{
         super(ChefCuisineService.model)
     }
 
-    updateChefReferToCuisine(type,chefId,t) {
+    updateChefReferToCuisine(chefId,type,t) {
        return cuisineTypeService.getModel().findOne({where:{cuisine_type_id:type.cuisine_type_id},transaction:t}).then(typeDetail => {
             if (typeDetail) {
                 return this.getModel().count({where:{chef_id:chefId,cuisine_type_id:type.cuisine_type_id},transaction:t}).then(cnt => {
@@ -18,7 +18,6 @@ class ChefCuisineService extends BaseService{
                         type = utils.setCustomTransfer(type,'create');
                         return this.getModel().create(type,{transaction:t})
                     }else if (cnt === 1) {
-                        utils.setCustomTransfer(type,'update');
                         return this.getModel().update(type,{where:{chef_id:chefId,cuisine_type_id:type.cuisine_type_id},transaction:t})
                     }
 

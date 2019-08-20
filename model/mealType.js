@@ -41,7 +41,7 @@ class MealType extends BaseModel {
             }
         }, {
             tableName: 't_meal_type',
-            timestamp:false
+            timestamps: false
         });
         this.model = super.getModel();
     };

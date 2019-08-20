@@ -28,6 +28,9 @@ class BaseService{
 		return this.instance.findLikeByFilterOrder(attributes, where, order)
 	}
 	baseUpdate(attributes, where){
+		/*if (attributes) {
+			attributes.update_on = new Date();
+		}*/
 		return this.instance.update(attributes, where)
 	}
 	baseDelete(where){

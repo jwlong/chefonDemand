@@ -6,19 +6,22 @@ class BaseModel{
 	constructor(tableName, schema,config){
 		if (config && !config.hooks) {
 			config.hooks = {
-                beforeCreate: entity => {
+                beforeBulkCreate: (records, {fields}) => {
                     // 做些什么
-                    utils.setCustomTransfer(entity,'create')
+                    console.log("beforeBulkCreate come in")
+					utils.setCustomTransfer(records,'create')
 
                 },
                 beforeBulkUpdate: entity => {
-                   utils.setCustomTransfer(entity,'update')
-				}
+                	console.log("beforeBulkUpdate come in")
+                    utils.setGlobalTransfer(entity,'update')
+
+				},
+
             }
 		}
         //console.log(config)
 		this.model = db.define(tableName, schema,config);
-
 	}
 	// 返回实例化的sequelize模型实例
 	getModel(){
@@ -68,11 +71,9 @@ class BaseModel{
 	/**************************************更新方法**************************************/
 	// 当where为null则批量更新表；当where为条件则条件更新表
 	update(attributes, where){
-		if (attributes) {
-			this.setCustomTransfer(attributes,'update');
-		}
 		return where ? this.model.update(attributes, {where: where}) : this.model.update(attributes, {where:{}})
 	}
+
 	/**************************************删除方法**************************************/
 	// 条件删除
 	delete(where){
@@ -87,25 +88,6 @@ class BaseModel{
 	createBatch(entitys){
 		return this.model.bulkCreate(entitys)
 	}
-	setCustomTransfer(entity,type) {
-		if (entity) {
-            entity.update_on = new Date();
-            if (userContext.userId) {
-                entity.update_by = userContext.userId;
-                if (type === 'create') {
-                    entity.create_on = new Date();
-                    entity.create_by = userContext.userId;
-                }
 
-            }else {
-                entity.update_by = userContext.robot_id;
-                entity.create_by = userContext.robot_id;
-            }
-
-            entity.active_ind = 'A';
-        }
-
-		return entity;
-	}
 }
 module.exports = BaseModel

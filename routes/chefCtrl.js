@@ -39,12 +39,7 @@ class ChefController {
         router.post('/updateChef',  async (req, res,next) => {
             console.log("updateChef...req body=>",req.body);
             try {
-
-                req.body.update_by = req.user_id? req.user_id:cfg.robot_id; // 0 表示机器人
-                req.body.update_on = new Date();
                 let attr = utils.keyLowerCase(req.body);
-                attr.short_desc = attr.short_description;
-                attr.detail_desc = attr.detail_description;
                 if (Array.isArray(attr.experience_list)) {
                     attr.experience_list.forEach(value => {
                         if (!value.exp_desc) {
@@ -61,7 +56,6 @@ class ChefController {
                         }
                     });
                 }
-                console.log("attr=>",attr);
                 let chef = await chefService.updateChef(attr)
                 console.log("chef: ", chef);
                 return res.json(baseResult.SUCCESS);
