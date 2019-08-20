@@ -45,10 +45,19 @@ class ChefController {
                 let attr = utils.keyLowerCase(req.body);
                 attr.short_desc = attr.short_description;
                 attr.detail_desc = attr.detail_description;
-                if (isArray(attr.experience_list)) {
+                if (Array.isArray(attr.experience_list)) {
                     attr.experience_list.forEach(value => {
                         if (!value.exp_desc) {
                             value.exp_desc = value.experience_description
+                        }
+                        if (value.start_date){
+                            value.start_date = new Date(value.start_date);
+                        }
+                        if (value.end_date){
+                            value.end_date = new Date(value.end_date);
+                        }
+                        if (value.start_date.getTime()> value.end_date.getTime()) {
+                            throw 'experience_list date not invalid!';
                         }
                     });
                 }

@@ -55,7 +55,7 @@ class ChefExperience extends BaseModel {
             }
         }, {
             tableName: 't_chef_experience',
-            timestamp:false
+            timestamps: false
         });
         this.model = super.getModel();
     };

@@ -44,5 +44,9 @@ module.exports = {
     },
     AutoWritedChefExp(target,key,desc) {
         target.model = require('../model/chefExperience')
+    },
+    AutoWritedChefCuisine(target,key,desc) {
+        target.model = require('../model/chefCuisine')
     }
+
 }

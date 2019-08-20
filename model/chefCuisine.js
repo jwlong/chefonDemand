@@ -38,7 +38,7 @@ class ChefCuisine extends BaseModel {
             }
         }, {
             tableName: 't_chef_cuisine',
-            timestamp:false
+            timestamps: false
         });
         this.model = super.getModel();
     }
