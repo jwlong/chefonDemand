@@ -49,7 +49,7 @@ class City extends BaseModel {
             }
         }, {
             tableName: 't_city',
-            timestamp:false
+            timestamps: false
         });
         this.model = super.getModel();
     }

@@ -1,12 +1,13 @@
 import BaseService from './baseService.js'
 import {AutoWritedChefAVLTimeSlot} from '../common/AutoWrite.js'
 import baseResult from "../model/baseResult";
-import chefService from  './chefService'
+import chefService from './chefService'
 import db from '../config/db'
+import utils from "../common/utils";
 
 @AutoWritedChefAVLTimeSlot
-class ChefAvailableTimeSlotService extends BaseService{
-    constructor(){
+class ChefAvailableTimeSlotService extends BaseService {
+    constructor() {
         super(ChefAvailableTimeSlotService.model)
     }
 
@@ -28,34 +29,46 @@ class ChefAvailableTimeSlotService extends BaseService{
         if (!data.chef_id) {
             throw baseResult.TIMESLOT_CHEF_ID_NOT_FOUND;
         }
-        chefService.getChefByChefId(data.chef_id).then(_chef => {
-            if (!_chef) {
-                throw  baseResult.TIMESLOT_CHEF_ID_NOT_FOUND;
-            }
-        })
         if (!data.available_timeslot_list || (Array.isArray(data.available_timeslot_list) && data.available_timeslot_list.length === 0) || !Array.isArray(data.available_timeslot_list)) {
             throw  baseResult.TIMESLOT_LIST_EMPTY;
         }
 
         data.available_timeslot_list.forEach(timeslot => {
+            timeslot.start_date = new Date(timeslot.start_date);
+            timeslot.end_date = new Date(timeslot.end_date);
             if (timeslot.start_date.getTime() > timeslot.end_date.getTime()) {
                 throw baseResult.TIMESLOT_INVALID_DATETIME;
             }
         })
-    }
-    retrieveAvailTimeslots(query) {
-       return this.baseFindByFilter(['start_date','end_date','instant_ind','available_meal'],query)
-    }
-
-    createChefAvailableTimeSlots(attr) {
-        this.checkIsLegal(attr);
-
-        let timeslots = [];
-        attr.available_timeslot_list.forEach(timeslot => {
-            timeslot.chef_id = attr.chef_id;
-            timeslots.push(timeslot);
+        return chefService.getChefByChefId(data.chef_id).then(_chef => {
+            if (!_chef) {
+                throw  baseResult.TIMESLOT_CHEF_ID_NOT_FOUND;
+            }
         })
-        return this.baseCreateBatch(timeslots)
+
+    }
+
+    retrieveAvailTimeslots(query) {
+        return this.baseFindByFilter(['start_date', 'end_date', 'instant_ind', 'available_meal'], query)
+    }
+
+    updateChefAvailableTimeSlot(attr) {
+        let promiseArr = [];
+        return db.transaction(t => {
+            let updatedPromise = this.getModel().update({active_ind:'D'},{where:{chef_id:attr.chef_id,active_ind:'A'},transaction:t});
+            promiseArr.push(updatedPromise);
+            attr.available_timeslot_list.forEach(timeslot => {
+                timeslot.chef_id = attr.chef_id;
+                let p = this.getModel().max('timeslot_id', {transaction: t}).then(maxId => {
+                    timeslot.timeslot_id = maxId ? maxId + 1 : 1;
+                    utils.setCustomTransfer(timeslot,'create');
+                    return this.getModel().create(timeslot, {transaction: t});
+                })
+                promiseArr.push(p);
+            })
+            return Promise.all(promiseArr);
+        })
     }
 }
+
 module.exports = new ChefAvailableTimeSlotService()

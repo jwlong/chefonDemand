@@ -37,7 +37,7 @@ class Country extends BaseModel {
             }
         }, {
             tableName: 't_country',
-            timestamp:false
+            timestamps: false
         });
         this.model = super.getModel();
     }

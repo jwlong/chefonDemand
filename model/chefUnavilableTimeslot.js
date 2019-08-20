@@ -55,7 +55,7 @@ class ChefUnavilableTimeslot extends BaseModel {
             }
         }, {
             tableName: 't_chef_unavilable_timeslot',
-            timestamp:false
+            timestamps: false
         });
     };
 }

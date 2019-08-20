@@ -78,7 +78,7 @@ class ChefService extends BaseService{
 
                             if (Array.isArray(cuisine_type) && cuisine_type.length > 0) {
                                 cuisine_type.forEach(type => {
-                                    promiseArr.push(chefCuisineSerivce.updateChefReferToCuisine(type,existOne.chef_id,t))
+                                    promiseArr.push(chefCuisineSerivce.updateChefReferToCuisine(existOne.chef_id,type,t))
                                 })
                             }
                             return Promise.all(promiseArr);
@@ -105,8 +105,8 @@ class ChefService extends BaseService{
            throw (baseResult.CHEF_USER_ID_NOT_EXIST);
        }
     }
-    getChefByChefId (chefId) {
-        return this.getModel().findOne({where:{chef_id:chefId}})
+    getChefByChefId (chefId,trans) {
+        return this.getModel().findOne({where:{chef_id:chefId},transaction:trans})
 
     }
     updateChefQualification(attr) {

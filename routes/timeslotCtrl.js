@@ -6,7 +6,7 @@ import chefDefaultScheuleService from '../service/chefDefaultScheuleService'
 import utils from "../common/utils";
 import baseResult from "../model/baseResult";
 const router = express.Router()
-//访问前缀 /staff
+//访问前缀 /timeslot
 
 class TimeSlotController {
     static initRouter(){
@@ -14,7 +14,8 @@ class TimeSlotController {
         router.post('/updateChefAvailableTimeSlot', async (req, res, next) => {
             try {
                 let data = utils.keyLowerCase(req.body);
-                await  chefAvailableTimeSlotService.createChefAvailableTimeSlots(data);
+                await chefAvailableTimeSlotService.checkIsLegal(data);
+                await  chefAvailableTimeSlotService.updateChefAvailableTimeSlot(data);
                 return res.json(baseResult.SUCCESS);
             }catch (e) {
                 next(e);
@@ -26,7 +27,8 @@ class TimeSlotController {
             //try{res.json(await chefService.baseFindAll())}catch(err){next(err)}
             try{
                 let data = utils.keyLowerCase(req.body);
-                await chefUnAvailableTimeSlotService.createChefUnAvailableTimeSlot(data);
+                await  chefAvailableTimeSlotService.checkIsLegal(data);
+                await chefUnAvailableTimeSlotService.updateChefUnAvailableTimeSlot(data);
                 return res.json(baseResult.SUCCESS);
             }catch(err){next(err)}
         })

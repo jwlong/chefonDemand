@@ -32,11 +32,33 @@ const utils = {
                 entity.update_by = userContext.robot_id;
                 entity.create_by = userContext.robot_id;
             }
-
-            entity.active_ind = 'A';
+            if (!entity.active_ind) {
+                entity.active_ind = 'A';
+            }
         }
-
         return entity;
+    },
+    setGlobalTransfer(entity,actionType) {
+        let fields = entity?entity.fields:[];
+        let attr = entity?entity.attributes:{};
+        fields.push('update_on','update_by');
+        attr.update_on = new Date();
+            if (userContext.userId) {
+                entity.update_by = userContext.userId;
+                if (actionType === 'create') {
+                    fields.push('create_on','create_by');
+                    attr.create_on = new Date();
+                    attr.create_by = userContext.userId;
+                }
+
+            }else {
+                attr.update_by = userContext.robot_id;
+                attr.create_by = userContext.robot_id;
+            }
+            if (!attr.active_ind) {
+                attr.active_ind = 'A';
+            }
     }
+
 }
 export  default utils;

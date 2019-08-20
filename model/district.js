@@ -53,7 +53,7 @@ class District extends BaseModel {
             }
         }, {
             tableName: 't_district',
-            timestamp:false
+            timestamps: false
         });
         this.model = super.getModel();
      /*   this.model.belongsTo(town['model'],{foreignKey:'town_code'})
