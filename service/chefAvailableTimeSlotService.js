@@ -49,7 +49,12 @@ class ChefAvailableTimeSlotService extends BaseService {
     }
 
     retrieveAvailTimeslots(query) {
-        return this.baseFindByFilter(['start_date', 'end_date', 'instant_ind', 'available_meal'], query)
+        return this.baseFindByFilter(['start_date', 'end_date', 'instant_ind', 'available_meal'], query).then(avail_timeslot_list =>{
+            let queryResult =  {};
+            queryResult.chef_id = query.chef_id;
+            queryResult.avail_timeslot_list = avail_timeslot_list;
+            return queryResult;
+        })
     }
 
     updateChefAvailableTimeSlot(attr) {
