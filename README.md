@@ -4,6 +4,7 @@ config 目录 index.js  配置Mysql,以及server 连接信息
 - npm install
 运行服务器 
 - npm start
+/ **npm run dev(开发模式new)** 
 
 user 部分
 
