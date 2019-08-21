@@ -6,17 +6,23 @@ class BaseModel{
 	constructor(tableName, schema,config){
 		if (config && !config.hooks) {
 			config.hooks = {
-                beforeBulkCreate: (records, {fields}) => {
+                beforeCreate: (records, {fields}) => {
                     // 做些什么
-                    console.log("beforeBulkCreate come in")
+                    console.log("beforeCreate come in")
 					utils.setCustomTransfer(records,'create')
 
                 },
+				beforeBulkCreate:(records, {fields}) => {
+                    console.log("beforeBulkCreate come in")
+					console.log(records)
+				},
                 beforeBulkUpdate: entity => {
                 	console.log("beforeBulkUpdate come in")
                     utils.setGlobalTransfer(entity,'update')
 
 				},
+
+
 
             }
 		}
