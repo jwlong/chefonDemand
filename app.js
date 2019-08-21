@@ -1,6 +1,5 @@
 import express from 'express'
 import path from 'path'
-import logger from 'morgan'
 import cookieParser from 'cookie-parser'
 import bodyParser from 'body-parser'
 import multipart from 'connect-multiparty'
@@ -9,11 +8,12 @@ import jwt from 'jsonwebtoken'
 import cfg from './config/index'
 import baseResult from './model/baseResult'
 var userContext = require('./common/userContext')
+import {apiRequestLogger} from './config/logger'
 
 //配置express中间件
 const app = express()
 app.set('json spaces', 2)
-app.use(logger('dev'))
+//app.use(logger('dev'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(multipart())
@@ -21,7 +21,7 @@ app.use(compression())
 app.use(cookieParser())
 app.use('/public', express.static('public'))
 
-
+app.use(apiRequestLogger);
 //关于auth
 // 全局拦截配置CROS
 app.all('*',function(req,res,next){
@@ -35,6 +35,7 @@ app.all('*',function(req,res,next){
 },authenticateRequest)
 
 // 路由列表
+
 app.use('/chef',require('./routes/chefCtrl'))
 app.use('/user',require('./routes/userCtrl'))
 app.use('/timeslot',require('./routes/timeslotCtrl'))
