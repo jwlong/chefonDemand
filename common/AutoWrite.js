@@ -47,6 +47,9 @@ module.exports = {
     },
     AutoWritedChefCuisine(target,key,desc) {
         target.model = require('../model/chefCuisine')
-    }
+    },
+    AutoWritedChefLocation(target,key,desc) {
+        target.model = require('../model/chefServiceLocation')
+    },
 
 }

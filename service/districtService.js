@@ -1,7 +1,11 @@
 import BaseService from './baseService.js'
 import {AutoWritedDistrict} from '../common/AutoWrite.js'
 import baseResult from '../model/baseResult'
+import chefLocationService from './chefLocationService';
+
+
 import db from '../config/db'
+import utils from "../common/utils";
 @AutoWritedDistrict
 class DistrictService extends BaseService{
     constructor(){
@@ -12,16 +16,30 @@ class DistrictService extends BaseService{
             throw baseResult.CHEF_DISTRICT_LIST_EMPTY
         }
         //batch update
-       db.transaction(t=>{
+       return db.transaction(t=>{
+           let promiseArr = [];
             attrs.location_list.forEach(districtObj => {
-                return this.getModel().findOne(districtObj.district_code,{transaction:t}).then(_district =>{
+
+                let p= this.getModel().findOne({where:{district_code:districtObj.district_code},transaction:t}).then(_district =>{
 
                     if(!_district) throw baseResult.CHEF_DISTRICT_CODE_NOT_EXIST;
+                    //insert t_chef_service_location
+                    let handlerObj = {chef:attrs.chef_id,district:districtObj.district_code};
 
-                    return this.getModel().update({active_ind:_district.active_ind},
-                        {where: {district_code:_district.district_code},transaction:t});
+                   return chefLocationService.getModel().findOne({where:handlerObj}).then( chefLocation => {
+                        if (chefLocation) {
+                            return chefLocationService.getModel().update({active_ind:districtObj.active_ind},{where:{chef:attrs.chef_id,district:districtObj.district_code},transaction:t})
+                        }else{
+                            handlerObj.active_ind = districtObj.active_ind;
+                            utils.setCustomTransfer(handlerObj,'create');
+                            return chefLocationService.getModel().create(handlerObj,{transaction:t})
+                        }
+                    })
                 })
+
+                promiseArr.push(p);
             })
+           return Promise.all(promiseArr);
         })
     }
 }

@@ -21,9 +21,6 @@ class BaseModel{
                     utils.setGlobalTransfer(entity,'update')
 
 				},
-
-
-
             }
 		}
         //console.log(config)
