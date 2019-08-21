@@ -136,11 +136,13 @@ class ChefService extends BaseService{
                   where:{chef_id:chefId},
                   transaction:t
               }).then(chefUser => {
-                  let tmp = JSON.parse(JSON.stringify(chefUser))
+                 /* let tmp = JSON.parse(JSON.stringify(chefUser))
                   let chefDetail = tmp.t_user;
                   chefDetail.chef_id = tmp.chef_id;
                   chefDetail.short_description = tmp.short_desc;
-                  chefDetail.detail_description = tmp.detail_desc;
+                  chefDetail.detail_description = tmp.detail_desc;*/
+                  let chefDetail = {};
+                  chefDetail.chefUser = chefUser;
                   return this.getLangCodeList(chefId,t).then(langCodeList =>{
                       chefDetail.language_code_list = langCodeList;
                       return this.getCuisineTypeList(chefId,t).then(cuisineType =>{
@@ -157,21 +159,21 @@ class ChefService extends BaseService{
     }
     getChefUserByChefId(chefId,trans) {
         let sql = ` select chef.chef_id,chef.short_desc as 'short_description' ,chef.detail_desc as 'detail_description' ,user.* from t_chef chef left join t_user user on chef.user_id = user.user_id
-where chef.chef_id = :chef_id`;
+where chef.chef_id = :chef_id and chef.active_id = 'A'`;
         return db.query(sql,{replacements:{chef_id:chefId},type:db.QueryTypes.SELECT,transaction:trans});
     }
 
     getExperienceList(chefId,trans) {
-       var chefUserSql = "SELECT ce.start_date,ce.end_date,ce.exp_desc as 'experience_description'  FROM t_chef_experience ce  WHERE chef_id= :chef_id";
+       var chefUserSql = "SELECT ce.start_date,ce.end_date,ce.exp_desc as 'experience_description'  FROM t_chef_experience ce  WHERE chef_id= :chef_id and ce.active_ind = 'A' ";
         return   db.query(chefUserSql,{replacements:{chef_id:chefId},type:db.QueryTypes.SELECT,transaction:trans});
     }
     getCuisineTypeList(chefId,trans) {
         var cuisineSql =   `SELECT ct.cuisine_type_id FROM t_cuisine_type ct LEFT JOIN t_chef_cuisine cc  ON ct.cuisine_type_id = cc.cuisine_type_id
-WHERE cc.chef_id = :chef_id`;
+WHERE cc.chef_id = :chef_id and ct.active_ind = 'A' `;
         return  db.query(cuisineSql,{replacements:{chef_id:chefId},type:db.QueryTypes.SELECT ,transaction:trans});
     }
     getLangCodeList(chefId,trans) {
-        var langCodeSql = `SELECT lang_code FROM t_chef_language WHERE chef_id =:chef_id`;
+        var langCodeSql = `SELECT lang_code FROM t_chef_language WHERE chef_id =:chef_id and active_ind ='A' `;
         return  db.query(langCodeSql,{replacements:{chef_id:chefId},type:db.QueryTypes.SELECT,transaction:trans});
     }
 }
