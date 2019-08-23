@@ -20,6 +20,9 @@ class UserController {
                try {
                    let user = req.body;
                    try {
+                       if (!user.username || !user.password) {
+                           throw baseResult.USER_INVALID_NAME_PASSWD;
+                       }
                        user.user_id = await  userService.nextId('user_id');
                        user.update_by = req.user_id || cfg.robot_id;
                        user.ipv4_address = user.IPv4_address || user.ipv4_address;
@@ -45,13 +48,14 @@ class UserController {
                 console.log(req.query);
                 let userLoginParam = utils.keyLowerCase(req.query);
                 userLoginParam.user_name = userLoginParam.username || userLoginParam.user_name;
-                if (!userLoginParam.ipv4_address) {
-                    return res.json(baseResult.USER_IPV4_ERROR);
-                }
-                if (!userLoginParam.username || !userLoginParam.password) {
-                    return res.json(baseResult.USER_INVALID_NAME_PASSWD)
-                }
+
                 try {
+                    if (!userLoginParam.ipv4_address) {
+                        throw  baseResult.USER_IPV4_ERROR
+                    }
+                    if (!userLoginParam.username || !userLoginParam.password) {
+                        throw baseResult.USER_INVALID_NAME_PASSWD;
+                    }
                     let result = await  userService.loginHandler(userLoginParam)
                     if (result) {
                         const tokenInfo = {
@@ -75,6 +79,9 @@ class UserController {
                     let userForUpdated = req.body;
                     userForUpdated.ipv4_address = userForUpdated.IPv4_address;
                     userForUpdated.sms_notify_ind = userForUpdated.SMS_notify_ind;
+                    if (!userForUpdated.user_name || !userForUpdated.password) {
+                        throw  baseResult.USER_INVALID_NAME_PASSWD;
+                    }
                     if (!userForUpdated.first_name || !userForUpdated.last_name || !userForUpdated.email_address || !userForUpdated.contact_no) {
                         throw baseResult.USER_MANDATORY_FIELD_EXCEPTION;
                     }

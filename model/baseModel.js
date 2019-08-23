@@ -4,7 +4,7 @@ import utils from "../common/utils";
 const Op = Sequelize.Op
 class BaseModel{
 	constructor(tableName, schema,config){
-		if (config && !config.hooks) {
+	/*	if (config && !config.hooks) {
 			config.hooks = {
                 beforeCreate: (records, {fields}) => {
                     // 做些什么
@@ -22,7 +22,7 @@ class BaseModel{
 
 				},
             }
-		}
+		}*/
         //console.log(config)
 		this.model = db.define(tableName, schema,config);
 	}

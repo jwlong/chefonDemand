@@ -22,7 +22,7 @@ class ChefUnAvailableTimeSlotService extends BaseService{
                 timeslot.chef_id = attr.chef_id;
                 let p = this.nextId('timeslot_id', {transaction: t}).then(nextId => {
                     timeslot.timeslot_id = nextId+index;
-                    return this.getModel().create(timeslot, {transaction: t});
+                    return this.baseCreate(timeslot, {transaction: t});
                 })
                 promiseArr.push(p);
             })

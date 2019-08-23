@@ -24,18 +24,16 @@ class ChefService extends BaseService{
         let chef = {};
         chef = user;
         return db.transaction(t => {
-            return userService.getModel().max('user_id',{transaction: t}).then(maxId => {
-                console.log("in request user_id : ", maxId+1);
-                user.user_id = maxId+1;
-                user.active_ind = 'A'; // 初始为0，表示不激活
+            return userService.nextId('user_id',{transaction: t}).then(nextId => {
+                user.user_id = nextId;
                 // getModel是获取实例model.调用的是Sequelize 自身提供的方法操作数据库的方法
-                return userService.getModel().create(user, {transaction: t}).then(createdUser => {
+                return userService.baseCreate(user, {transaction: t}).then(createdUser => {
                     //add chef
                     chef.user_id = createdUser.user_id;
                     // throw new Error("error occour!");
-                    return this.getModel().max('chef_id',{transaction: t}).then(maxId => {
-                        chef.chef_id = maxId+1;
-                      return  this.getModel().create(chef,{transaction: t}).then(chef => {
+                    return this.nextId('chef_id',{transaction: t}).then(nextId => {
+                        chef.chef_id = nextId;
+                      return  this.baseCreate(chef,{transaction: t}).then(chef => {
                             return chef;
                         })
                     });
@@ -63,7 +61,7 @@ class ChefService extends BaseService{
                 if (existOne) {
                     return userService.baseUpdate(attr, {where:{user_id: existOne.user_id}, transaction: t}).then(user => {
 
-                        return this.getModel().update(attr, {where:{chef_id: existOne.chef_id}, transaction: t}).then(chef => {
+                        return this.baseUpdate(attr, {where:{chef_id: existOne.chef_id}, transaction: t}).then(chef => {
                             console.log("chef: ", chef);
                             let promiseArr =  [] ;
                             let experience_list = attr.experience_list;

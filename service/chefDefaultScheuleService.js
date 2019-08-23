@@ -2,7 +2,7 @@ import BaseService from './baseService.js'
 import {AutoWritedDefaultScheule} from '../common/AutoWrite.js'
 import db from '../config/db.js'
 import baseResult from "../model/baseResult";
-import chefService from './chefService'
+import chefAvailableTimeSlotService from './chefAvailableTimeSlotService'
 @AutoWritedDefaultScheule
 class ChefDefaultScheuleService extends BaseService{
     constructor(){
@@ -17,11 +17,22 @@ class ChefDefaultScheuleService extends BaseService{
             throw baseResult.TIMESLOT_PICK_ERROR;
         }
         return db.transaction(t => {
-            return this.getModel().findOne({where:{chef_id:data.chef_id},transaction:t}).then(_chef => {
-                if (!_chef)
-                    throw baseResult.TIMESLOT_CHEF_ID_NOT_FOUND;
+            // 查找是否有有效的timeslot
+            return chefAvailableTimeSlotService.getModel().count({where:{chef_id:data.chef_id,active_ind:'A'},transaction:t}).then(chefAVLcnt => {
+                if (!chefAVLcnt || chefAVLcnt === 0){
+                    throw baseResult.TIMESLOT_LIST_EMPTY;
+                }
+                return this.getModel().count({where:{chef_id:data.chef_id,active_ind:'A'}}).then(cnt => {
+                    if (!cnt && cnt === 0) {
+                        return this.nextId('chef_default_scheule_id').then(nextId => {
+                            data.chef_default_scheule_id = nextId;
+                            return this.baseCreate(data);
+                        })
+                    }else {
+                        return this.baseUpdate(data,{where:{chef_id:data.chef_id},transaction: t})
+                    }
+                })
                 console.log("data=>",data)
-                return this.getModel().update(data,{where:{chef_id:data.chef_id},transaction: t})
             }).catch(e => {
                 throw  e;
             })
