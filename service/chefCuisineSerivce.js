@@ -15,12 +15,10 @@ class ChefCuisineService extends BaseService{
                 return this.getModel().count({where:{chef_id:chefId,cuisine_type_id:type.cuisine_type_id},transaction:t}).then(cnt => {
                     type.chef_id = chefId;
                     if (!cnt || cnt === 0 ) {
-                        type = utils.setCustomTransfer(type,'create');
-                        return this.getModel().create(type,{transaction:t})
+                        return this.baseCreate(type,{transaction:t})
                     }else if (cnt === 1) {
-                        return this.getModel().update(type,{where:{chef_id:chefId,cuisine_type_id:type.cuisine_type_id},transaction:t})
+                        return this.baseUpdate(type,{where:{chef_id:chefId,cuisine_type_id:type.cuisine_type_id},transaction:t})
                     }
-
                 });
             } else {
                 throw 'cuisine_type not exist! cuisine_type_id: '+type.cuisine_type_id;

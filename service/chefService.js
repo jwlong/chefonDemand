@@ -61,7 +61,7 @@ class ChefService extends BaseService{
                 console.log("existOne: ", existOne);
 
                 if (existOne) {
-                    return userService.getModel().update(attr, {where:{user_id: existOne.user_id}, transaction: t}).then(user => {
+                    return userService.baseUpdate(attr, {where:{user_id: existOne.user_id}, transaction: t}).then(user => {
 
                         return this.getModel().update(attr, {where:{chef_id: existOne.chef_id}, transaction: t}).then(chef => {
                             console.log("chef: ", chef);
@@ -72,7 +72,7 @@ class ChefService extends BaseService{
                             if (Array.isArray(experience_list) && experience_list.length > 0) {
                               experience_list.forEach((exp,index) => {
                                     console.log("exp=>",exp);
-                                     promiseArr.push(chefExpService.updateChefReferToExperience(existOne,exp,t));
+                                     promiseArr.push(chefExpService.updateChefReferToExperience(existOne,exp,t,index));
                                 })
                             }
 
@@ -110,7 +110,7 @@ class ChefService extends BaseService{
 
     }
     updateChefQualification(attr) {
-        return this.baseUpdate(attr,{chef_id:attr.chef_id})
+        return this.baseUpdate(attr,{where:{chef_id:attr.chef_id}})
     }
 
     findChefByPopularity() {

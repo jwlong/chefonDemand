@@ -38,7 +38,7 @@ class TimeSlotController {
             console.log("updateChefDefaultTimeSlot,request body:",req.body);
             try{
                 let data = utils.keyLowerCase(req.body);
-                await  chefDefaultScheuleService.checkDefaultScheule(data)
+                await  chefDefaultScheuleService.updateChefDefaultTimeSlot(data)
                 return res.json(baseResult.SUCCESS);
             }catch(err){next(err)}
         })

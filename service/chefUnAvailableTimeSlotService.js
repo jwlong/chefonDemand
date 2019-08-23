@@ -16,13 +16,12 @@ class ChefUnAvailableTimeSlotService extends BaseService{
     updateChefUnAvailableTimeSlot(attr) {
         let promiseArr = [];
         return db.transaction(t => {
-            let updatedPromise = this.getModel().update({active_ind:'D'},{where:{chef_id:attr.chef_id,active_ind:'A'},transaction:t});
+            let updatedPromise = this.baseUpdate({active_ind:'D'},{where:{chef_id:attr.chef_id,active_ind:'A'},transaction:t});
             promiseArr.push(updatedPromise);
-            attr.available_timeslot_list.forEach(timeslot => {
+            attr.available_timeslot_list.forEach((timeslot,index) => {
                 timeslot.chef_id = attr.chef_id;
-                let p = this.getModel().max('timeslot_id', {transaction: t}).then(maxId => {
-                    timeslot.timeslot_id = maxId ? maxId + 1 : 1;
-                    utils.setCustomTransfer(timeslot,'create');
+                let p = this.nextId('timeslot_id', {transaction: t}).then(nextId => {
+                    timeslot.timeslot_id = nextId+index;
                     return this.getModel().create(timeslot, {transaction: t});
                 })
                 promiseArr.push(p);

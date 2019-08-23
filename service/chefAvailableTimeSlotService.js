@@ -49,7 +49,7 @@ class ChefAvailableTimeSlotService extends BaseService {
     }
 
     retrieveAvailTimeslots(query) {
-        return this.baseFindByFilter(['start_date', 'end_date', 'instant_ind', 'available_meal'], query).then(avail_timeslot_list =>{
+        return this.baseFindByFilter(['start_date', 'end_date', 'instant_ind', 'available_meal'], {chef_id:query.chef_id,active_ind:'A'}).then(avail_timeslot_list =>{
             let queryResult =  {};
             queryResult.chef_id = query.chef_id;
             queryResult.avail_timeslot_list = avail_timeslot_list;
@@ -60,17 +60,19 @@ class ChefAvailableTimeSlotService extends BaseService {
     updateChefAvailableTimeSlot(attr) {
         let promiseArr = [];
         return db.transaction(t => {
-            let updatedPromise = this.getModel().update({active_ind:'D'},{where:{chef_id:attr.chef_id,active_ind:'A'},transaction:t});
+            let updatedPromise = this.baseUpdate({active_ind:'D'},{where:{chef_id:attr.chef_id,active_ind:'A'},transaction:t});
             promiseArr.push(updatedPromise);
-            attr.available_timeslot_list.forEach(timeslot => {
+            let idTmp = {};
+            attr.available_timeslot_list.forEach((timeslot,index) => {
                 timeslot.chef_id = attr.chef_id;
-                let p = this.getModel().max('timeslot_id', {transaction: t}).then(maxId => {
-                    timeslot.timeslot_id = maxId ? maxId + 1 : 1;
-                    utils.setCustomTransfer(timeslot,'create');
-                    return this.getModel().create(timeslot, {transaction: t});
+                let p = this.nextId('timeslot_id',{transaction:t}).then(nextId => {
+                    timeslot.timeslot_id = nextId+index;
+                    console.log(timeslot.timeslot_id)
+                    return this.baseCreate(timeslot,{transaction:t});
                 })
                 promiseArr.push(p);
             })
+
             return Promise.all(promiseArr);
         })
     }

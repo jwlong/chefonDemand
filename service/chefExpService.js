@@ -8,20 +8,24 @@ class ChefExperienceService extends BaseService{
         super(ChefExperienceService.model)
     }
 
-    updateChefReferToExperience(singleChef,exp,t) {
-       return this.getModel().findAll({where:{chef_id:singleChef.chef_id},transaction:t}).then(expList => {
-            if (Array.isArray(expList) && expList.length > 0) {
-               // utils.setCustomTransfer(exp,'update');
-                return this.getModel().update(exp,{where:{chef_id:singleChef.chef_id},transaction:t})
+    updateChefReferToExperience(singleChef,exp,t,index) {
+        exp.chef_id = singleChef.chef_id;
+       return this.getModel().count({where:{chef_id:singleChef.chef_id},transaction:t}).then(expCnt => {
+            if (expCnt > 0) {
+                //mark ref chef_id exp as 'D' and insert new record to exp_list_table
+                 return this.baseUpdate({active_ind:'D'},{where:{chef_id:singleChef.chef_id},transaction:t}).then(updatedCnt => {
+                    return this.insertChefExpList(exp,t,index);
+                 })
             }else {
-                return this.getModel().max('exp_id',{transaction:t}).then(maxId => {
-                    exp.exp_id = maxId?maxId+1:1;
-                    exp.chef_id = singleChef.chef_id;
-                    utils.setCustomTransfer(exp,'create');
-                    return this.getModel().create(exp, { transaction: t });
-                })
-
+                return this.insertChefExpList(exp,t,index);
             }
+        })
+    }
+
+    insertChefExpList(exp,trans,index) {
+        return this.nextId('exp_id',{transaction:trans}).then(nextId => {
+            exp.exp_id = nextId+index;
+            return this.baseCreate(exp,{transaction:trans});
         })
     }
 }

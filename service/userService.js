@@ -2,11 +2,16 @@ import BaseService from './baseService.js'
 import {AutoWritedUser} from '../common/AutoWrite.js'
 import db from "../config/db";
 import baseResult from '../model/baseResult'
+import accessTokenService from "./accessTokenService";
+import cfg from "../config";
+import uuid from 'uuid';
 @AutoWritedUser
 class UserService extends BaseService{
     constructor(){
         super(UserService.model)
     }
+
+
     checkBeforeCreate(attr,isValidRobot) {
         console.log("checkBeforeCreate....")
         if (isValidRobot && attr.robot_ind) {
@@ -41,6 +46,30 @@ class UserService extends BaseService{
     validPassword(encodedPassword, password) {
         console.log("result passwd:",UserService.model.isPassword(encodedPassword, password));
         return UserService.model.isPassword(encodedPassword, password);
+    }
+
+    loginHandler(userLoginParam) {
+        return db.transaction(t=> {
+           return this.getModel().findOne({where:{user_name:userLoginParam.user_name},transaction:t}).then(user => {
+                if (user && this.validPassword(user.password,userLoginParam.password)) {
+
+                    return accessTokenService.nextId('token_id',{transaction:t}).then(nextId => {
+                        let uniqueString = uuid.v1();
+                        let tokenData = {};
+                        tokenData.token_id = nextId;
+                        tokenData.user_id = user.user_id;
+                        tokenData.token_string = uniqueString;
+                        tokenData.ipv4_address = userLoginParam.ipv4_address;
+                        console.log("will insert into access_token_record:",tokenData);
+                        return accessTokenService.baseCreate(tokenData,{transaction:t})
+                    });
+                } else {
+                    throw baseResult.USER_INVALID_NAME_PASSWD;
+                }
+            })
+        })
+
+
     }
 }
 module.exports = new UserService()

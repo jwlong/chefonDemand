@@ -11,6 +11,13 @@ class DistrictService extends BaseService{
     constructor(){
         super(DistrictService.model)
     }
+
+    /**
+     * 更新chef_service_location
+     * 如果chef_id下已经存在了传过来的district_code则更新，没有的话就插入
+     * @param attrs
+     * @returns Promise
+     */
     updateChefServiceLocation(attrs) {
         if (!attrs.location_list  || (attrs.location_list && attrs.location_list.length == 0) ){
             throw baseResult.CHEF_DISTRICT_LIST_EMPTY
@@ -28,11 +35,10 @@ class DistrictService extends BaseService{
 
                    return chefLocationService.getModel().findOne({where:handlerObj}).then( chefLocation => {
                         if (chefLocation) {
-                            return chefLocationService.getModel().update({active_ind:districtObj.active_ind},{where:{chef:attrs.chef_id,district:districtObj.district_code},transaction:t})
+                            return chefLocationService.baseUpdate({active_ind:districtObj.active_ind},{where:{chef:attrs.chef_id,district:districtObj.district_code},transaction:t})
                         }else{
                             handlerObj.active_ind = districtObj.active_ind;
-                            utils.setCustomTransfer(handlerObj,'create');
-                            return chefLocationService.getModel().create(handlerObj,{transaction:t})
+                            return chefLocationService.baseCreate(handlerObj,{transaction:t})
                         }
                     })
                 })

@@ -2,15 +2,10 @@ class BaseService{
 	constructor(instance){
 		this.instance = instance
 	}
-	max (key) {
-        let maxId = this.instance.max(key);
-        if (!maxId) {
-        	maxId = 0;
-		}
-		return maxId;
-	}
-	async getNextId(key) {
-		return (await this.max(key))+1;
+	nextId(key,options) {
+		return this.instance.max(key,options).then(maxId => {
+			return maxId? maxId+1:1;
+		})
 	}
 	baseFindAll(attributes){
 		return this.instance.findAll(attributes)
@@ -27,17 +22,17 @@ class BaseService{
 	baseFindLikeByFilterOrder(attributes, where, order){
 		return this.instance.findLikeByFilterOrder(attributes, where, order)
 	}
-	baseUpdate(attributes, where){
+	baseUpdate(attributes, options){
 		/*if (attributes) {
 			attributes.update_on = new Date();
 		}*/
-		return this.instance.update(attributes, where)
+		return this.instance.update(attributes, options)
 	}
-	baseDelete(where){
-		return this.instance.delete(where)
+	baseDelete(where,options){
+		return this.instance.delete(where,options)
 	}
-	baseCreate(entity){
-		return this.instance.create(entity)
+	baseCreate(entity,options){
+		return this.instance.create(entity,options)
 	}
 	baseCreateBatch(entitys){
 		return this.instance.createBatch(entitys)

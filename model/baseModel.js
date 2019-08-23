@@ -31,9 +31,9 @@ class BaseModel{
 		return this.model
 	}
 
-    max(key) {
+    max(key,options) {
 		//let nextId = 0;
-		return this.model.max(key);
+		return this.model.max(key,options);
 	}
 	// schema 公共属性
 	schemaPostProcessor(schema) {
@@ -72,20 +72,21 @@ class BaseModel{
 		return attributes ? this.model.findAll({attributes: attributes, where: whereOps, order: orderOps}) : this.model.findAll({where: whereOps, order: orderOps})
 	}
 	/**************************************更新方法**************************************/
-	// 当where为null则批量更新表；当where为条件则条件更新表
-	update(attributes, where){
-		return where ? this.model.update(attributes, {where: where}) : this.model.update(attributes, {where:{}})
+	update(attributes, options){
+		utils.setCustomTransfer(attributes,'update');
+		return this.model.update(attributes,options)
 	}
 
 	/**************************************删除方法**************************************/
 	// 条件删除
-	delete(where){
-		return this.model.destroy({where: where})
+	delete(where,options){
+		return this.model.destroy({where: where,options})
 	}
 	/**************************************插入方法**************************************/
 	// 插入单个实体
-	create(entity){
-		return this.model.create(entity)
+	create(entity,options){
+		utils.setCustomTransfer(entity,'create')
+		return this.model.create(entity,options)
 	}
 	// 批量插入实体集
 	createBatch(entitys){

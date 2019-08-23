@@ -8,7 +8,7 @@ class ChefDefaultScheuleService extends BaseService{
     constructor(){
         super(ChefDefaultScheuleService.model)
     }
-    checkDefaultScheule(data) {
+    updateChefDefaultTimeSlot(data) {
         if (!data.chef_id) {
             throw baseResult.TIMESLOT_CHEF_ID_NOT_FOUND;
         }
