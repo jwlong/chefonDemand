@@ -20,7 +20,7 @@ class UserController {
                try {
                    let user = req.body;
                    try {
-                       if (!user.username || !user.password) {
+                       if (!user.user_name || !user.password) {
                            throw baseResult.USER_INVALID_NAME_PASSWD;
                        }
                        user.user_id = await  userService.nextId('user_id');
