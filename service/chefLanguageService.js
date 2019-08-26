@@ -41,7 +41,7 @@ class ChefLanguageService extends BaseService{
                    let p = this.getModel().count({where:{chef_id:chefLang.chef_id,lang_code:chefLang.lang_code},transaction:t}).then(cnt => {
 
                         if (cnt >0) {
-                           return this.baseUpdate({active_ind:chefLang.active_ind},{where:{chef_id:chefLang.chef_id,lang_code:chefLang.lang_code,active_ind:'A'},transaction:t});
+                           return this.baseUpdate({active_ind:chefLang.active_ind},{where:{chef_id:chefLang.chef_id,lang_code:chefLang.lang_code},transaction:t});
                         } else {
                             console.log(",======>",chefLang);
                             return this.baseCreate(chefLang,{transaction:t});
