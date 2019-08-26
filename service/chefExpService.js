@@ -12,8 +12,8 @@ class ChefExperienceService extends BaseService{
         exp.chef_id = singleChef.chef_id;
        return this.getModel().count({where:{chef_id:singleChef.chef_id},transaction:t}).then(expCnt => {
             if (expCnt > 0) {
-                //mark ref chef_id exp as 'D' and insert new record to exp_list_table
-                 return this.baseUpdate({active_ind:'D'},{where:{chef_id:singleChef.chef_id},transaction:t}).then(updatedCnt => {
+                //mark ref chef_id exp as 'R' and insert new record to exp_list_table
+                 return this.baseUpdate({active_ind:'R'},{where:{chef_id:singleChef.chef_id},transaction:t}).then(updatedCnt => {
                     return this.insertChefExpList(exp,t,index);
                  })
             }else {

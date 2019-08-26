@@ -22,24 +22,29 @@ class ChefDefaultScheuleService extends BaseService{
                 if (!chefAVLcnt || chefAVLcnt === 0){
                     throw baseResult.TIMESLOT_LIST_EMPTY;
                 }
-                return this.getModel().count({where:{chef_id:data.chef_id,active_ind:'A'}}).then(cnt => {
+                return this.getModel().count({where:{chef_id:data.chef_id,active_ind:'A'},transaction:t}).then(cnt => {
                     if (!cnt && cnt === 0) {
-                        return this.nextId('chef_default_scheule_id').then(nextId => {
-                            data.chef_default_scheule_id = nextId;
-                            return this.baseCreate(data);
-                        })
+                        return this.insertActiveRecord(data,t);
                     }else {
-                        return this.baseUpdate(data,{where:{chef_id:data.chef_id},transaction: t})
+                        return this.baseUpdate({active_ind:'R'},{where:{chef_id:data.chef_id},transaction: t}).then(updatedCnt => {
+                            return this.insertActiveRecord(data,t);
+                        })
                     }
                 })
-                console.log("data=>",data)
             }).catch(e => {
                 throw  e;
             })
         })
     }
 
+    insertActiveRecord(data,trans) {
+        return this.nextId('chef_default_scheule_id',{transaction:trans}).then(nextId => {
+            data.chef_default_scheule_id =nextId;
+            data.active_ind = 'A';
+            return this.baseCreate(data,{transaction:trans});
+        })
 
+    }
 
     mapToDb(data) {
         let result = {};

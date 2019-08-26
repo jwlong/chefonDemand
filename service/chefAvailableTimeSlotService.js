@@ -60,7 +60,7 @@ class ChefAvailableTimeSlotService extends BaseService {
     updateChefAvailableTimeSlot(attr) {
         let promiseArr = [];
         return db.transaction(t => {
-            let updatedPromise = this.baseUpdate({active_ind:'D'},{where:{chef_id:attr.chef_id,active_ind:'A'},transaction:t});
+            let updatedPromise = this.baseUpdate({active_ind:'R'},{where:{chef_id:attr.chef_id,active_ind:'A'},transaction:t});
             promiseArr.push(updatedPromise);
             let idTmp = {};
             attr.available_timeslot_list.forEach((timeslot,index) => {
