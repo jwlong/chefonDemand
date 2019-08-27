@@ -4,13 +4,8 @@ import db from '../config/db.js'
 import userService from './userService'
 import baseResult from "../model/baseResult"
 import user from '../model/user'
-import language from '../model/language'
-import cuisineType from '../model/cuisineType'
-import experience from '../model/chefExperience'
-import cuisineTypeService from './cuisineTypeService'
 import chefCuisineSerivce from './chefCuisineSerivce'
 import chefExpService from './chefExpService'
-import utils from "../common/utils";
 @AutoWritedChefModel
 class ChefService extends BaseService{
     constructor(){
