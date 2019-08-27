@@ -40,9 +40,9 @@ class ChefLanguageService extends BaseService{
             let lang_codes = [];
             attr.language_list.forEach(chefLang => {
                 if (chefLang) {
-                    lang_codes.push(chefLang.lang_code);
                     chefLang.chef_id = attr.chef_id;
                     chefLang.lang_code = chefLang.lang_code || chefLang.language_code;
+                    lang_codes.push(chefLang.lang_code);
                     //utils.setCustomTransfer(chefLang,'create');
                    let p = this.getModel().count({where:{chef_id:chefLang.chef_id,lang_code:chefLang.lang_code},transaction:t}).then(cnt => {
 
@@ -57,7 +57,7 @@ class ChefLanguageService extends BaseService{
                 }
             })
             if (lang_codes.length > 0) {
-                let p2 = this.baseUpdate({active_ind:activeIndStatus.INACTIVE},{where:{chef_id:attr.chef_id,lang_code:{[Op.notIn]:lang_codes}},transaction:t})
+                let p2 = this.baseUpdate({active_ind:activeIndStatus.INACTIVE},{where:{chef_id:attr.chef_id,active_ind:activeIndStatus.ACTIVE,lang_code:{[Op.notIn]:lang_codes}},transaction:t})
                 promiseArr.push(p2);
             }
             return Promise.all(promiseArr);

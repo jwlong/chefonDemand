@@ -79,7 +79,7 @@ class ChefService extends BaseService{
                                     cuisineTypeIds.push(type.cuisine_type_id);
                                     promiseArr.push(chefCuisineSerivce.updateChefReferToCuisine(existOne.chef_id,type,t))
                                 })
-                                let inactivePromise =  chefCuisineSerivce.baseUpdate({active_ind:activeIndStatus.INACTIVE},{where:{chef_id:attr.chef_id,cuisine_type_id:{[Op.notIn]:cuisineTypeIds}},transaction:t})
+                                let inactivePromise =  chefCuisineSerivce.baseUpdate({active_ind:activeIndStatus.INACTIVE},{where:{chef_id:attr.chef_id,active_ind:activeIndStatus.ACTIVE,cuisine_type_id:{[Op.notIn]:cuisineTypeIds}},transaction:t})
                                 promiseArr.push(inactivePromise);
                             }
                             return Promise.all(promiseArr);

@@ -48,7 +48,7 @@ class DistrictService extends BaseService{
             })
            // inactive  the record of  not in update list
            if (district_codes.length > 0) {
-               let inactivePromise = chefLocationService.baseUpdate({active_ind:activeIndStatus.INACTIVE},{where:{chef:attrs.chef_id,district:{[Op.notIn]:district_codes}},transaction:t})
+               let inactivePromise = chefLocationService.baseUpdate({active_ind:activeIndStatus.INACTIVE},{where:{chef:attrs.chef_id,active_ind:activeIndStatus.ACTIVE,district:{[Op.notIn]:district_codes}},transaction:t})
                promiseArr.push(inactivePromise);
            }
            return Promise.all(promiseArr);
