@@ -161,9 +161,6 @@ describe("Routes: user Login", () => {
                     "cuisine_type": [
                         {
                             "cuisine_type_id": "7"
-                        },
-                        {
-                            "cuisine_type_id": "3"
                         }
                     ],
                     "verified_chef_ind": true,

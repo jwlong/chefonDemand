@@ -6,6 +6,10 @@ import baseResult from "../model/baseResult"
 import user from '../model/user'
 import chefCuisineSerivce from './chefCuisineSerivce'
 import chefExpService from './chefExpService'
+import activeIndStatus from "../model/activeIndStatus";
+import Sequelize from 'sequelize'
+const Op = Sequelize.Op
+
 @AutoWritedChefModel
 class ChefService extends BaseService{
     constructor(){
@@ -70,9 +74,13 @@ class ChefService extends BaseService{
                             }
 
                             if (Array.isArray(cuisine_type) && cuisine_type.length > 0) {
+                                let cuisineTypeIds = [];
                                 cuisine_type.forEach(type => {
+                                    cuisineTypeIds.push(type.cuisine_type_id);
                                     promiseArr.push(chefCuisineSerivce.updateChefReferToCuisine(existOne.chef_id,type,t))
                                 })
+                                let inactivePromise =  chefCuisineSerivce.baseUpdate({active_ind:activeIndStatus.INACTIVE},{where:{chef_id:attr.chef_id,cuisine_type_id:{[Op.notIn]:cuisineTypeIds}},transaction:t})
+                                promiseArr.push(inactivePromise);
                             }
                             return Promise.all(promiseArr);
 

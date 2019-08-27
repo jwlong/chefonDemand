@@ -2,10 +2,11 @@ import BaseService from './baseService.js'
 import {AutoWritedDistrict} from '../common/AutoWrite.js'
 import baseResult from '../model/baseResult'
 import chefLocationService from './chefLocationService';
-
-
 import db from '../config/db'
 import utils from "../common/utils";
+import activeIndStatus from "../model/activeIndStatus";
+import Sequelize from 'sequelize'
+const Op = Sequelize.Op
 @AutoWritedDistrict
 class DistrictService extends BaseService{
     constructor(){
@@ -25,8 +26,9 @@ class DistrictService extends BaseService{
         //batch update
        return db.transaction(t=>{
            let promiseArr = [];
-            attrs.location_list.forEach(districtObj => {
-
+           let district_codes = [];
+           attrs.location_list.forEach(districtObj => {
+                district_codes.push(districtObj.district_code);
                 let p= this.getModel().findOne({where:{district_code:districtObj.district_code},transaction:t}).then(_district =>{
 
                     if(!_district) throw baseResult.CHEF_DISTRICT_CODE_NOT_EXIST;
@@ -42,9 +44,13 @@ class DistrictService extends BaseService{
                         }
                     })
                 })
-
                 promiseArr.push(p);
             })
+           // inactive  the record of  not in update list
+           if (district_codes.length > 0) {
+               let inactivePromise = chefLocationService.baseUpdate({active_ind:activeIndStatus.INACTIVE},{where:{chef:attrs.chef_id,district:{[Op.notIn]:district_codes}},transaction:t})
+               promiseArr.push(inactivePromise);
+           }
            return Promise.all(promiseArr);
         })
     }

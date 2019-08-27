@@ -4,6 +4,10 @@ import chefService from './chefService'
 import baseResult from "../model/baseResult";
 import utils from "../common/utils";
 import db from '../config/db'
+import Sequelize from 'sequelize'
+import activeIndStatus from "../model/activeIndStatus";
+const Op = Sequelize.Op
+
 @AutoWritedChefLanguage
 class ChefLanguageService extends BaseService{
     constructor(){
@@ -33,8 +37,10 @@ class ChefLanguageService extends BaseService{
 
         return db.transaction(t=> {
             let promiseArr = [];
+            let lang_codes = [];
             attr.language_list.forEach(chefLang => {
                 if (chefLang) {
+                    lang_codes.push(chefLang.lang_code);
                     chefLang.chef_id = attr.chef_id;
                     chefLang.lang_code = chefLang.lang_code || chefLang.language_code;
                     //utils.setCustomTransfer(chefLang,'create');
@@ -50,6 +56,10 @@ class ChefLanguageService extends BaseService{
                     promiseArr.push(p);
                 }
             })
+            if (lang_codes.length > 0) {
+                let p2 = this.baseUpdate({active_ind:activeIndStatus.INACTIVE},{where:{chef_id:attr.chef_id,lang_code:{[Op.notIn]:lang_codes}},transaction:t})
+                promiseArr.push(p2);
+            }
             return Promise.all(promiseArr);
         })
 
