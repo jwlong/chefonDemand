@@ -72,10 +72,6 @@ class Chef extends BaseModel {
                 type: Sequelize.INTEGER(11),
                 allowNull: false
             },
-            photo_url: {
-                type: Sequelize.STRING(300),
-                allowNull: true
-            },
             active_ind: {
                 type: Sequelize.STRING(1),
                 allowNull: false

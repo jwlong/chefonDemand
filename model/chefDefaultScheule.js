@@ -4,7 +4,7 @@ import moment from 'moment'
 
 class ChefDefaultScheule extends BaseModel {
     constructor() {
-        super('t_chef_default_scheule', {
+        super('t_chef_default_schedule', {
             chef_default_scheule_id: {
                 type: Sequelize.INTEGER(11),
                 allowNull: false,
@@ -83,7 +83,7 @@ class ChefDefaultScheule extends BaseModel {
                 allowNull: false
             }
         }, {
-            tableName: 't_chef_default_scheule',
+            tableName: 't_chef_default_schedule',
             timestamps:false
         });
     }

@@ -4,5 +4,13 @@
     <file url="file://D:/self/私活/table_20190828/Tables1/Tables_1.sql" dialect="MySQL" />
     <file url="file://D:/self/私活/table_20190828/Tables1/Tables_2.sql" dialect="MySQL" />
     <file url="file://D:/self/私活/table_20190828/Tables1/Tables_3.sql" dialect="MySQL" />
+    <file url="file://D:/self/私活/table_20190828/data1/City.sql" dialect="MySQL" />
+    <file url="file://D:/self/私活/table_20190828/data1/Country.sql" dialect="MySQL" />
+    <file url="file://D:/self/私活/table_20190828/data1/Cuisine_Type.sql" dialect="MySQL" />
+    <file url="file://D:/self/私活/table_20190828/data1/District.sql" dialect="MySQL" />
+    <file url="file://D:/self/私活/table_20190828/data1/Language.sql" dialect="MySQL" />
+    <file url="file://D:/self/私活/table_20190828/data1/Province.sql" dialect="MySQL" />
+    <file url="file://D:/self/私活/table_20190828/data1/Sale_Tax.sql" dialect="MySQL" />
+    <file url="file://D:/self/私活/table_20190828/data1/Test_Data.sql" dialect="MySQL" />
   </component>
 </project>

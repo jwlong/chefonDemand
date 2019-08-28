@@ -13,8 +13,8 @@ describe("Routes: user Login", () => {
                 })
                 .expect(200)
                 .end((err, res) => {
-                    expect(res.body.access_status).to.eql("0");
-                    token = res.body.access_token;
+                    //expect(res.body).to.eql("0");
+                    token = res.body.token_string;
                     done(err);
                 });
         });
@@ -33,7 +33,7 @@ describe("Routes: user Login", () => {
                     "last_name": "1",
                     "email_address": "user@example.com",
                     "contact_no": "1",
-                    "SMS_notify_ind": true,
+                    "sms_notify_ind": true,
                     "birthday": "2019-08-21",
                     "address_1": "add1",
                     "address_2": "addr2",
@@ -41,7 +41,7 @@ describe("Routes: user Login", () => {
                     "accept_marketing_ind": true,
                     "accept_terms_ind": true,
                     "robot_ind": false,
-                    "IPv4_address": "198.51.100.42"
+                    "ipv4_address": "198.51.100.42"
                 })
                 .expect(200)
                 .end((err, res) => {
@@ -64,13 +64,13 @@ describe("Routes: user Login", () => {
                     "last_name": "1",
                     "email_address": "user@example2.com",
                     "contact_no": "112",
-                    "SMS_notify_ind": true,
+                    "sms_notify_ind": true,
                     "birthday": "2019-08-13",
                     "address_1": "add4",
                     "address_2": "addr5",
                     "address_3": "addr6",
                     "accept_marketing_ind": true,
-                    "IPv4_address": "198.51.100.44",
+                    "ipv4_address": "198.51.100.44",
                     "verified_email": true,
                     "verified_contact_no": true,
                     "active_ind": "A"
@@ -97,7 +97,7 @@ describe("Routes: user Login", () => {
                     "last_name": "cc",
                     "email_address": "use2r@example.com",
                     "contact_no": "11",
-                    "SMS_notify_ind": true,
+                    "sms_notify_ind": true,
                     "birthday": "2019-08-14",
                     "address_1": "add1",
                     "address_2": "addr2",
@@ -105,7 +105,7 @@ describe("Routes: user Login", () => {
                     "accept_marketing_ind": true,
                     "accept_terms_ind": true,
                     "robot_ind": true,
-                    "IPv4_address": "198.51.100.42",
+                    "ipv4_address": "198.51.100.42",
                     "photo_url": "http://xxx.jpg"
                 })
                 .expect(200)
@@ -121,7 +121,7 @@ describe("Routes: user Login", () => {
             request.post("/chef/updateChef")
                 .set("access_token",`${token}`)
                 .send({
-                    "chef_Id": 200003,
+                    "chef_Id": 1,
                     "password": "123456",
                     "salutation": "string",
                     "first_name": "ScottM2",
@@ -129,7 +129,7 @@ describe("Routes: user Login", () => {
                     "last_name": "string",
                     "email_address": "user@example.com",
                     "contact_no": "string",
-                    "SMS_notify_ind": true,
+                    "sms_notify_ind": true,
                     "birthday": "2019-08-19",
                     "short_desc": "asdf",
                     "detail_description": "asdfa",
@@ -137,7 +137,7 @@ describe("Routes: user Login", () => {
                     "address_2": "string",
                     "address_3": "string",
                     "accept_marketing_ind": true,
-                    "IPv4_address": "198.51.100.42",
+                    "ipv4_address": "198.51.100.42",
                     "verified_email": true,
                     "verified_contact_no": true,
                     "Active_Ind": true,
@@ -178,10 +178,10 @@ describe("Routes: user Login", () => {
     describe("GET /chef/getChefDetailByChefId", () => {
         it("returns getChefDetailByChefId", done => {
             request.get("/chef/getChefDetailByChefId")
-                .set("chef_id",200003)
+                .set("chef_id",1)
                 .expect(200)
                 .end((err, res) => {
-                    expect(res.body.chefUser.chef_id).to.eql(200003);
+                    expect(res.body.chefUser.chef_id).to.eql(1);
                     done(err);
                 });
         });
@@ -191,10 +191,10 @@ describe("Routes: user Login", () => {
     describe("GET /chef/getChefDetailByChefId", () => {
         it("returns getChefDetailByChefId", done => {
             request.get("/chef/getChefDetailByChefId")
-                .set("chef_id",200003)
+                .set("chef_id",1)
                 .expect(200)
                 .end((err, res) => {
-                    expect(res.body.chefUser.chef_id).to.eql(200003);
+                    expect(res.body.chefUser.chef_id).to.eql(1);
                     done(err);
                 });
         });
@@ -204,11 +204,11 @@ describe("Routes: user Login", () => {
     describe("GET /chef/retrieveAvailTimeslots", () => {
         it("returns retrieveAvailTimeslots result", done => {
             request.get("/chef/retrieveAvailTimeslots")
-                .query({chef_id:200003})
+                .query({chef_id:1})
                 .set("access_token",`${token}`)
                 .expect(200)
                 .end((err, res) => {
-                    expect(res.body.chef_id).to.eql('200003');
+                    expect(res.body.chef_id).to.eql('1');
                     done(err);
                 });
         });
@@ -219,14 +219,14 @@ describe("Routes: user Login", () => {
             request.post("/chef/setupChefLanguage")
                 .set("access_token",`${token}`)
                 .send({
-                    "chef_id": 200003,
+                    "chef_id": 1,
                     "language_list": [
                         {
-                            "language_code": "bo",
+                            "lang_code": "bo",
                             "active_ind": "D"
                         },
                         {
-                            "language_code": "ja",
+                            "lang_code": "ja",
                             "active_ind": "A"
                         }
 
@@ -247,7 +247,7 @@ describe("Routes: user Login", () => {
             request.post("/chef/updateChefServiceLocation")
                 .set("access_token",`${token}`)
                 .send({
-                    "chef_Id": 200003,
+                    "chef_Id": 1,
                     "location_list": [
                         {
                             "district_code": "NO-MA",
@@ -272,7 +272,7 @@ describe("Routes: user Login", () => {
             request.post("/chef/updateChefServiceLocation")
                 .set("access_token",`${token}`)
                 .send({
-                    "chef_Id": 200003,
+                    "chef_Id": 1,
                     "location_list": [
                         {
                             "district_code": "NO-MA",
@@ -298,7 +298,7 @@ describe("Routes: user Login", () => {
             request.post("/chef/updateChefQualification")
                 .set("access_token",`${token}`)
                 .send({
-                    "chef_Id": 200001,
+                    "chef_Id": 1,
                     "verified_chef_ind": true,
                     "food_safety_certified_ind": false,
                     "payment_protection_ind": true
@@ -316,7 +316,7 @@ describe("Routes: user Login", () => {
             request.post("/timeslot/updateChefAvailableTimeSlot")
                 .set("access_token",`${token}`)
                 .send({
-                    "chef_Id": 200002,
+                    "chef_Id": 1,
                     "available_timeslot_list": [
                         {
                             "start_date": "2019-08-19T01:11:53.863Z",
@@ -345,7 +345,7 @@ describe("Routes: user Login", () => {
             request.post("/timeslot/updateChefUnAvailableTimeSlot")
                 .set("access_token",`${token}`)
                 .send({
-                    "chef_Id": 200001,
+                    "chef_Id": 1,
                     "available_timeslot_list": [
                         {
                             "start_date": "2019-01-19T04:11:25.377Z",
@@ -380,7 +380,7 @@ describe("Routes: user Login", () => {
             request.post("/timeslot/updateChefDefaultTimeSlot")
                 .set("access_token",`${token}`)
                 .send({
-                    "chef_Id": 200002,
+                    "chef_id": 1,
                     "mon": false,
                     "tue": true,
                     "wed": false,
