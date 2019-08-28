@@ -45,7 +45,7 @@ class User extends BaseModel {
                 type: Sequelize.STRING(15),
                 allowNull: true
             },
-            SMS_notify_ind: {
+            sms_notify_ind: {
                 type: Sequelize.BOOLEAN,
                 allowNull: true,
                 defaultValue: '0'
@@ -82,7 +82,7 @@ class User extends BaseModel {
                 defaultValue: false,
             },
 
-            IPv4_address: {
+            ipv4_address: {
                 type: Sequelize.STRING(15),
                 allowNull: false
             },
