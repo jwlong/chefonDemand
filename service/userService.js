@@ -4,6 +4,7 @@ import db from "../config/db";
 import baseResult from '../model/baseResult'
 import accessTokenService from "./accessTokenService";
 import cfg from "../config";
+import moment from "moment"
 import uuid from 'uuid';
 @AutoWritedUser
 class UserService extends BaseService{
@@ -54,11 +55,12 @@ class UserService extends BaseService{
                 if (user && this.validPassword(user.password,userLoginParam.password)) {
 
                     return accessTokenService.nextId('token_id',{transaction:t}).then(nextId => {
-                        let uniqueString = uuid.v1();
                         let tokenData = {};
                         tokenData.token_id = nextId;
                         tokenData.user_id = user.user_id;
-                        tokenData.token_string = uniqueString;
+                        tokenData.token_string = uuid.v1();
+                        tokenData.refresh_token = uuid.v1();
+                        tokenData.valid_until = moment().add(cfg.valid_util_day, 'days');
                         tokenData.ipv4_address = userLoginParam.ipv4_address;
                         console.log("will insert into access_token_record:",tokenData);
                         return accessTokenService.baseCreate(tokenData,{transaction:t})

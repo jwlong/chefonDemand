@@ -41,7 +41,14 @@ class UserController {
                 next(err);
             }
         })
-
+        /**
+         * return eg :
+         * {
+              "valid_until": "2019-08-28T06:21:39.527Z",
+              "token_string": "string",
+              "refresh_token": "string"
+            }
+         */
         router.get('/userLogin',async(req, res,next) => {
             console.log("Login param:=>",req.query);
             if (req.query) {
@@ -53,14 +60,15 @@ class UserController {
                     if (!userLoginParam.ipv4_address) {
                         throw  baseResult.USER_IPV4_ERROR
                     }
-                    if (!userLoginParam.username || !userLoginParam.password) {
+                    if (!userLoginParam.user_name || !userLoginParam.password) {
                         throw baseResult.USER_INVALID_NAME_PASSWD;
                     }
                     let result = await  userService.loginHandler(userLoginParam)
                     if (result) {
                         const tokenInfo = {
-                            access_status: '0',
-                            access_token: jwt.sign({id: result.user_id}, cfg.jwtSecret, {expiresIn: cfg.expiresIn}),
+                            valid_until: result.valid_until,
+                            token_string:result.token_string,
+                            refresh_token: result.refresh_token
                         };
                         return res.json(tokenInfo);
                     }

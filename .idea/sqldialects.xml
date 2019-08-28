@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
-    <file url="file://H:/私活/Tables/Tables_1.sql" dialect="MySQL" />
-    <file url="file://H:/私活/Tables/tables_2.sql" dialect="MySQL" />
-    <file url="file://H:/私活/Tables/tables_3.sql" dialect="MySQL" />
+    <file url="file://D:/self/私活/table_20190828/Tables1/Tables_1.sql" dialect="MySQL" />
+    <file url="file://D:/self/私活/table_20190828/Tables1/Tables_2.sql" dialect="MySQL" />
+    <file url="file://D:/self/私活/table_20190828/Tables1/Tables_3.sql" dialect="MySQL" />
   </component>
 </project>

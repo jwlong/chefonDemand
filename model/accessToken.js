@@ -30,6 +30,10 @@ class AccessToken extends BaseModel {
                 type: Sequelize.BOOLEAN,
                 allowNull: true
             },
+            refresh_token: {
+                type: Sequelize.STRING(100),
+                allowNull: false
+            },
             create_on: {
                 type: Sequelize.DATE,
                 allowNull: false,

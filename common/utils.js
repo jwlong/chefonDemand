@@ -1,3 +1,6 @@
+import baseResult from "../model/baseResult";
+import accessTokenService from "../service/accessTokenService";
+import moment from 'moment'
 const  userContext = require('../common/userContext')
 const utils = {
     keyLowerCase(object) {
@@ -58,7 +61,24 @@ const utils = {
             if (!attr.active_ind) {
                 attr.active_ind = 'A';
             }
+    },
+    validToken(tokenString,req) {
+        return accessTokenService.getModel().findOne({where:{token_string:tokenString}}).then(accessToken => {
+            console.log("access token =>",accessToken);
+            if (accessToken) {// access token exist
+                if (moment(accessToken.valid_until).isBefore(moment())){
+                    throw baseResult.USER_VERITY_EXPIRED;
+                }
+                userContext.userId = accessToken.user_id;
+                req.user_id = userContext.userId;
+            }else {
+                throw baseResult.USER_VERITY_INVALID;
+            }
+
+        })
     }
+
+
 
 }
 export  default utils;

@@ -9,6 +9,7 @@ import cfg from './config/index'
 import baseResult from './model/baseResult'
 var userContext = require('./common/userContext')
 import {apiRequestLogger} from './config/logger'
+import utils from "./common/utils";
 
 //配置express中间件
 const app = express()
@@ -51,7 +52,7 @@ function errorHandler(err, req, res, next) {
 	res.json({error: err})
 }
 
-function authenticateRequest(req, res, next) {
+async function  authenticateRequest(req, res, next) {
     console.log(req.url);
     var token = req.body.access_token || req.query.access_token || req.headers.access_token || req.headers['x-access-token'] ;
     let isExcludeValidUrl = cfg.WHITE_LIST_URL.some(url =>{
@@ -59,25 +60,12 @@ function authenticateRequest(req, res, next) {
     });
 
     if (token) {
-        jwt.verify(token, cfg.jwtSecret, function (err, decoded) {
-            if (err) {
-                if (isExcludeValidUrl) return next();
-
-                if (err.name === 'TokenExpiredError') {
-                    //return res.status(422).json(err);
-                    return res.json(baseResult.USER_VERITY_EXPIRED);
-                } else {
-                    return res.json(baseResult.USER_VERITY_INVALID);
-                    //return res.status(421).json(err);
-                }
-            } else {
-                // 如果没问题就把解码后的信息保存到请求中，供后面的路由使用
-                req.user_id = decoded.id;
-                console.log(req.user_id);
-                userContext.userId =req.user_id;
-                next()
-            }
-        });
+        try {
+            await  utils.validToken(token,req);
+            next();
+        }catch (e) {
+            next(e);
+        }
         // Verification Code is invalid.
     } else {
         if (isExcludeValidUrl) return next();
