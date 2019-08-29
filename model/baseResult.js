@@ -68,6 +68,11 @@ export default  {
     TIMESLOT_CHEF_ID_NOT_FOUND : new baseResult(402,"Chef Not Found."),
     TIMESLOT_LIST_EMPTY:new baseResult(400,'Timeslot List is Empty'),
     TIMESLOT_INVALID_DATETIME:new baseResult(407,"Timeslot start datetime can not later than end datetime."),
-    TIMESLOT_PICK_ERROR:new baseResult(420,'Must pick at least one day of the week.')
+    TIMESLOT_PICK_ERROR:new baseResult(420,'Must pick at least one day of the week.'),
+
+
+
+    // 未定义错误
+    PASSWD_NOT_BE_EMPTY:new baseResult(999,"password can not be empty!")
 
 };

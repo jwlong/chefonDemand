@@ -60,7 +60,7 @@ class UserService extends BaseService{
                         tokenData.user_id = user.user_id;
                         tokenData.token_string = uuid.v1();
                         tokenData.refresh_token = uuid.v1();
-                        tokenData.valid_until = moment().add(cfg.valid_util_day, 'days');
+                        tokenData.valid_until = moment().add(cfg.expiresMinutes, 'minutes');
                         tokenData.ipv4_address = userLoginParam.ipv4_address;
                         console.log("will insert into access_token_record:",tokenData);
                         return accessTokenService.baseCreate(tokenData,{transaction:t})

@@ -56,6 +56,10 @@ class ChefController {
                         }
                     });
                 }
+                if (!attr.password) {
+                    throw baseResult.PASSWD_NOT_BE_EMPTY;
+                }
+
                 let chef = await chefService.updateChef(attr)
                 console.log("chef: ", chef);
                 return res.json(baseResult.SUCCESS);

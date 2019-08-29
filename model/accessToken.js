@@ -20,7 +20,7 @@ class AccessToken extends BaseModel {
             },
             valid_until: {
                 type: Sequelize.DATE,
-                allowNull: true
+                allowNull: true,
             },
             ipv4_address: {
                 type: Sequelize.STRING(100),
@@ -38,9 +38,6 @@ class AccessToken extends BaseModel {
                 type: Sequelize.DATE,
                 allowNull: false,
                 defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-                get() {
-                    return moment(this.getDataValue('Create_On')).format('DD/MM/YYYY HH:mm:ss');
-                }
             },
             create_by: {
                 type: Sequelize.INTEGER(11),

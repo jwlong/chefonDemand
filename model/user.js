@@ -157,8 +157,10 @@ class User extends BaseModel {
                     user.create_on = new Date();
                 },
                 beforeBulkUpdate:user =>{
-                    const salt = bcrypt.genSaltSync();
-                    user.attributes.password = bcrypt.hashSync(user.attributes.password, salt);
+                    if (user.attributes.password) {
+                        const salt = bcrypt.genSaltSync();
+                        user.attributes.password = bcrypt.hashSync(user.attributes.password, salt);
+                    }
                 }
             }
         })
