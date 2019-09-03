@@ -9,28 +9,10 @@ export let DailyRotateFileTransport = (fileName) => {
         datePattern: 'YYYY-MM-DD-HH',
         // maxSize: '20m',
         maxFiles: '7d',
+        colorize: false,
         timestamp: () => new Date().format('yyyy-MM-dd HH:mm:ss.S')
     })
 }
-
-export let pageRequestLogger = expressWinston.logger({
-    transports: [
-        DailyRotateFileTransport('page-request')
-    ],
-    meta: true, // optional: control whether you want to log the meta data about the request (default to true)
-    msg: 'HTTP {{req.method}} {{req.url}}', // optional: customize the default logging message. E.g. "{{res.statusCode}} {{req.method}} {{res.responseTime}}ms {{req.url}}"
-    expressFormat: true, // Use the default Express/morgan request formatting. Enabling this will override any msg if true. Will only output colors with colorize set to true
-    colorize: false, // Color the text and status code, using the Express/morgan color palette (text: gray, status: default green, 3XX cyan, 4XX yellow, 5XX red).
-    ignoreRoute: function (req, res) {
-        // 只打印页面请求信息
-        let notPageRequest = false
-        let ignoreArr = ['/api', '.js', '.css', '.png', '.jpg', '.gif']
-        ignoreArr.forEach(item => {
-            if (req.url.indexOf(item) > -1) notPageRequest = true
-        })
-        return notPageRequest
-    } // optional: allows to skip some log messages based on request and/or response
-})
 
 export let apiRequestLogger = (req, res, next) => {
     let send = res.send
