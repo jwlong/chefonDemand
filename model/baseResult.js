@@ -57,14 +57,6 @@ export default  {
 
 
     // time slot
-    //400
-    // Timeslot List is Empty
-    // 402
-    // Chef Not Found.
-    // 407
-    // Timeslot start datetime can not later than end datetime.
-    /*420
-    Must pick at least one day of the week.*/
     TIMESLOT_CHEF_ID_NOT_FOUND : new baseResult(402,"Chef Not Found."),
     TIMESLOT_LIST_EMPTY:new baseResult(400,'Timeslot List is Empty'),
     TIMESLOT_INVALID_DATETIME:new baseResult(407,"Timeslot start datetime can not later than end datetime."),
@@ -73,6 +65,6 @@ export default  {
 
 
     // 未定义错误
-    PASSWD_NOT_BE_EMPTY:new baseResult(999,"password can not be empty!")
-
+    PASSWD_NOT_BE_EMPTY:new baseResult(999,"password can not be empty!"),
+    CHEF_EXP_LIST_FILED_INVALID: new baseResult(998,"in experience_list ,start_date,exp_desc are mandatory!")
 };

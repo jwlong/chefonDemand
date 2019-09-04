@@ -9,7 +9,7 @@ import baseResult from '../model/baseResult'
 import chefLanguageService from   '../service/chefLanguageService'
 import chefAvailableTimeSlotService from '../service/chefAvailableTimeSlotService'
 import districtService from '../service/districtService'
-import chefExperienceService from '../service/chefExpService'
+import moment from 'moment'
 import utils from "../common/utils";
 const router = express.Router()
 var userContext = require('../common/userContext')
@@ -45,14 +45,13 @@ class ChefController {
                         if (!value.exp_desc) {
                             value.exp_desc = value.experience_description
                         }
-                        if (value.start_date){
-                            value.start_date = new Date(value.start_date);
+                        if (!value.exp_desc || !value.start_date) {
+                            throw baseResult.CHEF_EXP_LIST_FILED_INVALID;
                         }
-                        if (value.end_date){
-                            value.end_date = new Date(value.end_date);
-                        }
-                        if (value.start_date.getTime()> value.end_date.getTime()) {
-                            throw 'experience_list date not invalid!';
+                        if (value.start_date && value.end_date){
+                            if (moment(value.end_date).isBefore(moment(value.start_date))) {
+                                throw 'experience_list end_date is before start_date';
+                            }
                         }
                     });
                 }
