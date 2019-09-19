@@ -63,8 +63,13 @@ export default  {
     TIMESLOT_PICK_ERROR:new baseResult(420,'Must pick at least one day of the week.'),
 
 
+    //menu部分
+    MENU_ID_NOT_EXIST:new baseResult(400,'menu Id does not exist.'),
+
 
     // 未定义错误
     PASSWD_NOT_BE_EMPTY:new baseResult(999,"password can not be empty!"),
-    CHEF_EXP_LIST_FILED_INVALID: new baseResult(998,"in experience_list ,start_date,exp_desc are mandatory!")
+    CHEF_EXP_LIST_FILED_INVALID: new baseResult(998,"in experience_list ,start_date,exp_desc are mandatory!"),
+
+
 };

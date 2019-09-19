@@ -1,6 +1,6 @@
 /* jshint indent: 2 */
 
-module.exports = function(sequelize, Sequelize) {
+module.exports = function(sequelize, DataTypes) {
   return sequelize.define('t_meal_type', {
     meal_type_id: {
       type: Sequelize.INTEGER(11),

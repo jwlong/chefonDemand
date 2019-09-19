@@ -1,6 +1,6 @@
 /* jshint indent: 2 */
 
-module.exports = function(sequelize, Sequelize) {
+module.exports = function(sequelize, DataTypes) {
   return sequelize.define('t_district', {
     district_code: {
       type: Sequelize.STRING(5),

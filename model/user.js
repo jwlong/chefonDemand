@@ -1,6 +1,5 @@
 import Sequelize from 'Sequelize'
 import BaseModel from './baseModel.js'
-import moment from 'moment'
 import bcrypt from "bcrypt"
 
 class User extends BaseModel {

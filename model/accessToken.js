@@ -42,6 +42,10 @@ class AccessToken extends BaseModel {
             create_by: {
                 type: Sequelize.INTEGER(11),
                 allowNull: false
+            },
+            active_ind: {
+                type: Sequelize.STRING(1),
+                allowNull: false
             }
         }, {
             tableName: 't_access_token',

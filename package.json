@@ -5,7 +5,8 @@
   "scripts": {
     "start": "babel-node bin/www",
     "dev": "nodemon bin/www --watch *.*  --exec babel-node",
-    "test": "mocha test/**/*.js"
+    "test": "mocha test/**/tests.js",
+    "testMenu": "mocha test/**/menu*.js"
   },
   "dependencies": {
     "babel-plugin-transform-decorators-legacy": "^1.3.4",

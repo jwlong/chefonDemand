@@ -149,7 +149,7 @@ describe("Routes: user Login", () => {
                         },
                         {
                             "start_date": "2019-01-16T08:00:26.815Z",
-                            "end_date": "2019-12-19T08:00:26.815Z",
+                            "end_date": "2019-01-14T08:00:26.815Z",
                             "experience_description": "ep122"
                         },
                         {

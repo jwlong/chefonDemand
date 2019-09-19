@@ -51,5 +51,12 @@ module.exports = {
     AutoWritedChefLocation(target,key,desc) {
         target.model = require('../model/chefServiceLocation')
     },
+    //menu new add
+    AutoWritedMenuItem(target,key,desc) {
+        target.model = require('../model/menuItem')
+    },
+    AutoWritedMenuItemOption(target,key,desc) {
+        target.model = require('../model/menuItemOption')
+    },
 
 }

@@ -1,6 +1,6 @@
 /* jshint indent: 2 */
 
-module.exports = function(sequelize, Sequelize) {
+module.exports = function(sequelize, DataTypes) {
   return sequelize.define('t_user', {
     user_id: {
       type: Sequelize.INTEGER(11),
@@ -79,6 +79,10 @@ module.exports = function(sequelize, Sequelize) {
     ipv4_address: {
       type: Sequelize.STRING(15),
       allowNull: false
+    },
+    photo_url: {
+      type: Sequelize.STRING(200),
+      allowNull: true
     },
     verified_email: {
       type: Sequelize.BOOLEAN,

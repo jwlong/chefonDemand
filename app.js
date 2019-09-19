@@ -40,6 +40,7 @@ app.all('*',function(req,res,next){
 app.use('/chef',require('./routes/chefCtrl'))
 app.use('/user',require('./routes/userCtrl'))
 app.use('/timeslot',require('./routes/timeslotCtrl'))
+app.use('/menu',require('./routes/menuCtrl'))
 app.use(errorHandler);
 if (!module.parent) {
     app.listen(config.port, function() {

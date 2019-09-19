@@ -1,12 +1,11 @@
 /* jshint indent: 2 */
 
-module.exports = function(sequelize, Sequelize) {
+module.exports = function(sequelize, DataTypes) {
   return sequelize.define('t_access_token', {
     token_id: {
       type: Sequelize.INTEGER(11),
       allowNull: false,
-      primaryKey: true,
-      autoIncrement: true
+      primaryKey: true
     },
     user_id: {
       type: Sequelize.INTEGER(11),
@@ -34,6 +33,11 @@ module.exports = function(sequelize, Sequelize) {
       type: Sequelize.BOOLEAN,
       allowNull: true
     },
+    refresh_token: {
+      type: Sequelize.STRING(100),
+      allowNull: false,
+      unique: true
+    },
     create_on: {
       type: Sequelize.DATE,
       allowNull: false,
@@ -41,6 +45,10 @@ module.exports = function(sequelize, Sequelize) {
     },
     create_by: {
       type: Sequelize.INTEGER(11),
+      allowNull: false
+    },
+    active_ind: {
+      type: Sequelize.STRING(1),
       allowNull: false
     }
   }, {
