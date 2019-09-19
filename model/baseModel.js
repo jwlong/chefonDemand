@@ -30,7 +30,9 @@ class BaseModel{
 	getModel(){
 		return this.model
 	}
-
+	getOne(options) {
+		return this.model.findOne(options);
+	}
     max(key,options) {
 		//let nextId = 0;
 		return this.model.max(key,options);

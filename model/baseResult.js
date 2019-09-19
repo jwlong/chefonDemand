@@ -65,6 +65,9 @@ export default  {
 
     //menu部分
     MENU_ID_NOT_EXIST:new baseResult(400,'menu Id does not exist.'),
+    MENU_ONLY_CHEF_CAN_CREATE_MENU:new baseResult(402,'Only chef can create menu.'),
+    MENU_NAME_AND_DESC_REQUIRED:new baseResult(401,'Menu name, description, are mandatory,'),
+    MENU_NAME_EXISTS:new baseResult(400,'Menu name already taken for the chef.'),
 
 
     // 未定义错误

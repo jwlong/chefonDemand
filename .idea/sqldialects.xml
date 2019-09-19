@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
+    <file url="file://D:/self/私活/20190918/Tables2/Tables_1.sql" dialect="MySQL" />
+    <file url="file://D:/self/私活/20190918/Tables2/Tables_2.sql" dialect="MySQL" />
+    <file url="file://D:/self/私活/20190918/Tables2/Tables_3.sql" dialect="MySQL" />
+    <file url="file://D:/self/私活/20190918/Tables2/Tables_4a.sql" dialect="MySQL" />
+    <file url="file://D:/self/私活/20190918/data2/City.sql" dialect="MySQL" />
+    <file url="file://D:/self/私活/20190918/data2/Country.sql" dialect="MySQL" />
+    <file url="file://D:/self/私活/20190918/data2/Cuisine_Type.sql" dialect="MySQL" />
+    <file url="file://D:/self/私活/20190918/data2/Currency.sql" dialect="MySQL" />
+    <file url="file://D:/self/私活/20190918/data2/District.sql" dialect="MySQL" />
+    <file url="file://D:/self/私活/20190918/data2/Font.sql" dialect="MySQL" />
+    <file url="file://D:/self/私活/20190918/data2/Language.sql" dialect="MySQL" />
+    <file url="file://D:/self/私活/20190918/data2/Province.sql" dialect="MySQL" />
+    <file url="file://D:/self/私活/20190918/data2/Sale_Tax.sql" dialect="MySQL" />
+    <file url="file://D:/self/私活/20190918/data2/Test_Data.sql" dialect="MySQL" />
+    <file url="file://D:/self/私活/20190918/data2/Test_Data2.sql" dialect="MySQL" />
     <file url="file://D:/self/私活/table_20190828/Tables1/Tables_1.sql" dialect="MySQL" />
     <file url="file://D:/self/私活/table_20190828/Tables1/Tables_2.sql" dialect="MySQL" />
     <file url="file://D:/self/私活/table_20190828/Tables1/Tables_3.sql" dialect="MySQL" />

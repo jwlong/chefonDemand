@@ -1,6 +1,6 @@
 const CreateMenuRequest= {
-    "menu_name": "string",
-    "menu_desc": "string",
+    "menu_name": "",
+    "menu_desc": "",
     "public_ind": 1
 }
 export default CreateMenuRequest;

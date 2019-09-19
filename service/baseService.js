@@ -7,6 +7,17 @@ class BaseService{
 			return maxId? maxId+1:1;
 		})
 	}
+
+    /**
+	 * options.attributes
+	 * options.where
+	 * options.transaction
+     * @param options
+     * @returns {*}
+     */
+	getOne(options) {
+		return this.instance.getOne(options)
+	}
 	baseFindAll(attributes){
 		return this.instance.findAll(attributes)
 	}

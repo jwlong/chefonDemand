@@ -18,16 +18,22 @@ class ChefService extends BaseService{
     getChefList(attr) {
         return ChefService.model.getChefList(attr)
     }
+
     isChefWithUserId(userId) {
-      return  this.getModel().findOne({where:{user_id:userId,active_ind:activeIndStatus.ACTIVE}}).then(existOne => {
+      return  this.getChefByUserId(userId).then(result => {
+          return result? true:false;
+      })
+    }
+
+    getChefByUserId(userId) {
+        return this.getModel().findOne({where:{user_id:userId,active_ind:activeIndStatus.ACTIVE}}).then(existOne => {
             if (existOne) {
-                return true;
+                return existOne;
             }else {
-                return false;
+                return null;
             }
         })
     }
-
     processCreateChef(user) {
         let chef = {};
         chef = user;
