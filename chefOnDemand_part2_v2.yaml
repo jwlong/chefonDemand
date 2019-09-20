@@ -1,0 +1,2592 @@
+swagger: "2.0"
+info:
+  description: "This is Chef On Demand server."
+  version: "0.0.1"
+  title: "Chef On Demand"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "eric.mok@tecfuz.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "tecfuz"
+basePath: "/v1"
+tags:
+- name: "chef"
+  description: "Access to Chef operations"
+- name: "timeslot"
+  description: "Access to Timeslot operations"
+- name: "user"
+  description: "Access to User operations"
+- name: "menu"
+  description: "Access to Menu operations"
+  
+schemes:
+- "https"
+
+paths:
+  /chef/createChef:
+    post:
+      tags:
+      - "chef"
+      summary: "(Func4) Creates a new chef user"
+      description: "Creates a new chef user account to manage his orders"
+      operationId: "createChef"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Create chef"
+        required: true
+        schema:
+          $ref: "#/definitions/CreateChefRequest"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "user name already taken."
+        401:
+          description: "Chef's first name, last name and short description fields are mandatory."
+
+  /chef/updateChef:
+    post:
+      tags:
+      - "chef"
+      summary: "(Func5) Update chef user account's information"
+      description: "update chef user account's information by chef or by verification methods"
+      operationId: "updateChef"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Update chef info"
+        required: true
+        schema:
+          $ref: "#/definitions/UpdateChefRequest"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "user Id does not exist."
+        401:
+          description: "Chef's first name, last name and short description fields are mandatory."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+
+  /chef/updateChefQualification:
+    post:
+      tags:
+      - "chef"
+      summary: "(Func5b) Update chef user qualification information"
+      description: "update chef user qualification information by chef or by verification methods"
+      operationId: "updateChefQualification"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Update chef qualification info"
+        required: true
+        schema:
+          $ref: "#/definitions/UpdateChefQualificationRequest"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "user Id does not exist."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+
+
+  /chef/setupChefLanguage:
+    post:
+      tags:
+      - "chef"
+      summary: "(Func6) Update Language list for chef user account"
+      description: "update chef user account's language list by chef"
+      operationId: "updateChefLanguageList"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Update chef language list info"
+        required: true
+        schema:
+          $ref: "#/definitions/UpdateChefLanguageListRequest"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "user Id does not exist."
+        401:
+          description: "language list can not be empty."
+        402:
+          description: "One of the language in input list is invalid."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+
+  /chef/updateChefServiceLocation:
+    post:
+      tags:
+      - "chef"
+      summary: "(Func8) Update Service Locations for chef user account"
+      description: "update chef user account's service locations by chef"
+      operationId: "updateChefLocationList"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Update chef location list info"
+        required: true
+        schema:
+          $ref: "#/definitions/UpdateChefLocationListRequest"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "chef Id does not exist."
+        401:
+          description: "district code does not exist."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+ 
+          
+  /chef/getChefDetailByChefId:
+    get:
+      tags:
+      - "chef"
+      summary: "(Func5a) Return chef detail by Chef Id"
+      description: "Return chef detail by Chef Id"
+      operationId: "getChefDetailByChefId"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "chef_id"
+        in: "header"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+              $ref: "#/definitions/ChefDetail"
+        400:
+          description: "chef Id does not exist."
+
+
+  /user/userLogin:
+    get:
+      tags:
+      - "user"
+      summary: "(Func2) Logs user into the system"
+      description: "login user"
+      operationId: "userLogin"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "user_name"
+        in: "query"
+        description: "The user name for login"
+        required: true
+        type: "string"
+      - name: "password"
+        in: "query"
+        description: "The password for login in clear text"
+        required: true
+        type: "string"
+        format: "password"
+      - name: "ipv4_address"
+        in: "query"
+        description: "The user's IPv4 address"
+        required: true
+        type: "string"
+        format: "ipv4"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+              $ref: "#/definitions/LoginSuccess"
+        400:
+          description: "Invalid username/password supplied"
+        401:
+          description: "ipv4_address must be supplied"
+
+  /user/createUser:
+    post:
+      tags:
+      - "user"
+      summary: "(Func1) Creates a new user"
+      description: "Creates a new user account to manage his orders"
+      operationId: "createUser"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Create user"
+        required: true
+        schema:
+          $ref: "#/definitions/CreateUserRequest"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "user name already taken."
+        401:
+          description: "user first name, last name, email address and contact no. fields are mandatory."
+        402:
+          description: "user must accept terms and conditions."
+        403:
+          description: "system does not accept robot."
+
+  /user/updateUser:
+    post:
+      tags:
+      - "user"
+      summary: "(Func3) Update user account's basic information"
+      description: "update user account's basic information by user or by verification methods"
+      operationId: "updateUser"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Update user info"
+        required: true
+        schema:
+          $ref: "#/definitions/UpdateUserRequest"
+      responses:
+        200:
+          description: "successful operation"
+        401:
+          description: "user first name, last name, email address and contact no. fields are mandatory."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+
+  /user/refreshAccessToken:
+    post:
+      tags:
+      - "user"
+      summary: "(Func52) Refresh Access Token"
+      description: "The Refresh Token grant type is used by clients to exchange a refresh token for an access token when the access token has expired. Once refreshed, the old token in t_access_token will be expired and set active_ind=I. When parameters are valid, then create a new record in t_access_token with new token_id, generate a new UUID for token_string, assign a new hour from current timestamp for valid_until, set for_order=null, ipv4_address=client's IP address, set refresh_token=null"
+      operationId: "refreshAccessToken"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "user_name"
+        in: "query"
+        description: "The user name for login"
+        required: true
+        type: "string"
+      - name: "password"
+        in: "query"
+        description: "The password for login in clear text"
+        required: true
+        type: "string"
+        format: "password"
+      - name: "ipv4_address"
+        in: "query"
+        description: "The user's IPv4 address for reference"
+        required: true
+        type: "string"
+        format: "ipv4"
+      - name: "grant_type"
+        in: "query"
+        description: "Grant type must equals refresh_token in order to proceed"
+        required: true
+        type: "string"
+      - name: "refresh_token"
+        in: "query"
+        description: "Refresh Token obtained from userLogin"
+        type: "string"
+        required: true
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+              $ref: "#/definitions/RefreshAccessSuccess"
+        400:
+          description: "Invalid username/password supplied"
+        401:
+          description: "ipv4_address must be supplied"
+        402:
+          description: "refresh_token must be supplied"
+          
+  /timeslot/updateChefAvailableTimeSlot:
+    post:
+      tags:
+      - "timeslot"
+      summary: "(Func9) Update available timeslots for chef with chef Id"
+      description: "Chef select available timeslots"
+      operationId: "updateAvailableTimeslots"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Creates available timeslots by chef Id"
+        required: true
+        schema:
+          $ref: "#/definitions/UpdateAvailableTimeslotsByChef"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ConfirmUpdateAvailablelTimeslots"
+        400:
+          description: "Timeslot List is Empty"
+        402:
+          description: "Chef Not Found."
+        407:
+          description: "Timeslot start datetime can not later than end datetime."
+        408:
+          description: "Timeslot start datetime can not backdate (earlier than today)."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+
+  /timeslot/updateChefUnAvailableTimeSlot:
+    post:
+      tags:
+      - "timeslot"
+      summary: "(Func10) Update un-available timeslots for chef with chef Id"
+      description: "Chef select un-available timeslots"
+      operationId: "updateUnAvailableTimeslots"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Creates un-available timeslots by chef Id"
+        required: true
+        schema:
+          $ref: "#/definitions/UpdateUnAvailableTimeslotsByChef"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ConfirmUpdateUnAvailablelTimeslots"
+        400:
+          description: "Timeslot List is Empty"
+        402:
+          description: "Chef Not Found."
+        407:
+          description: "Timeslot start datetime can not later than end datetime."
+        408:
+          description: "Timeslot start datetime can not backdate (earlier than today)."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+          
+  /chef/retrieveAvailTimeslots:
+    get:
+      tags:
+      - "chef"
+      summary: "(Func11) Retrieve available timeslots by chef Id"
+      description: "Return available timeslots by chef Id"
+      operationId: "retrieveAvailTimeslots"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - name: "chef_id"
+        in: "query"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+              $ref: "#/definitions/ReturnAvailTimeslots"
+        400:
+          description: "chef Id does not exist."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+
+
+
+  /timeslot/updateChefDefaultTimeSlot:
+    post:
+      tags:
+      - "timeslot"
+      summary: "(Func7) update Default Timeslot for Chef (if chef has no default timeslot, this becomes create a default timeslot)"
+      description: "Chef setup default available timeslots"
+      operationId: "setupDefaultTimeslots"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Setup default timeslots by chef Id"
+        required: true
+        schema:
+          $ref: "#/definitions/UpdateDefaultTimeslotsByChef"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ConfirmTimeslotsCreation"
+        400:
+          description: "Timeslot List is Empty"
+        402:
+          description: "Chef Not Found."
+        407:
+          description: "Timeslot start datetime can not later than end datetime."
+        420:
+          description: "Must pick at least one day of the week."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+
+  /menu/createMenuNameByChefId:
+    post:
+      tags:
+      - "menu"
+      summary: "(Func13) Create a new menu name by a chef, default not public"
+      description: "<p>Only chef can create a new non-public menu with name and description belong to requester chef Id.</p>
+        <p>tables involve: { t_chef_menu, t_access_token, t_chef } </p>
+        <p>logic: retrieve user_id from t_access_token, then get chef_id from t_chef by user_id</p>
+        <p>if user_id not found in t_chef, then return error code 402</p>
+        <p>Produce a new record for t_chef_menu with chef_id, new menu_id, menu_name, menu_desc, public_ind=0, 
+        set seq_no = (max seq_no + 1) of t_chef_menu for same chef_id, set applied_meal default to 3 (both lunch and dinner), unit_price default to 0.0000, instant_ind default to 1, min_pers default to 1, 
+          event_duration_hr default to 2.00, chef_arrive_prior_hr default to 1, act_ind=1, the rest of the fields set to null. create_on, update_on default to today's date, create_by, update_by default to chef's user_id
+        
+      "
+      operationId: "createMenu"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Create menu"
+        required: true
+        schema:
+          $ref: "#/definitions/CreateMenuRequest"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "Menu name already taken for the chef."
+        401:
+          description: "Menu name, description, are mandatory."
+        402:
+          description: "Only chef can create menu."
+          
+  /menu/getMenuByMenuId:
+    get:
+      tags:
+      - "menu"
+      summary: "(Func14) Get active (public / non-public) menu with headings, sections, and dishes by chef Id"
+      description: "<p>Return menu with headings, sections, and dishes in json format</p>
+        <p>tables involve: { t_chef_menu, t_access_token, t_chef, t_menu_item, t_menu_item_option } </p>
+        <p>logic: retrieve user_id from t_access_token, then get chef_id from t_chef by user_id</p>
+        <p>- if token's user_id is a chef, then both public and non-public menu can be returned.</p>
+        <p>- if token's user_id is a not chef, but a user, then he can only access to public menu.</p>
+        <p>- if no token (anonymous user) is supplied, then he can only access to public menu.</p>
+        <p>- if menu id does not exist, then return error code 400</p>
+      "
+      operationId: "getMenuByMenuId"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: false
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - name: "menu_id"
+        in: "header"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+              $ref: "#/definitions/ReturnMenu"
+        400:
+          description: "menu Id does not exist."
+
+  /menu/getMenuServingDetailByMenuId:
+    get:
+      tags:
+      - "menu"
+      summary: "(Func21) Get menu serving details"
+      description: "Return menu serving details by Menu Id
+        <p>logic: retrieve user_id from t_access_token, then get chef_id from t_chef by user_id</p>
+        <p>- if token's user_id is a chef, then both public and non-public menu can be returned.</p>
+        <p>- if token's user_id is a not chef, but a user, then he can only access to chef's public menu.</p>
+        <p>- if no token (anonymous user) is supplied, then he can only access to chef's public menu.</p>"
+      operationId: "getMenuServingDetailByMenuId"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: false
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - name: "menu_id"
+        in: "header"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+              $ref: "#/definitions/MenuServingDetail"
+        400:
+          description: "menu Id does not exist."
+        401:
+          description: "menu_id field is mandatory."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+
+
+  /menu/getMenuKitchenRequirementItems:
+    get:
+      tags:
+      - "menu"
+      summary: "(Func23) Get Menu Kitchen Requirement Items"
+      description: "Return menu Kitchen Requirement Items to populate drop down list options in Menu Settings
+        <p>table involve: { t_kitchen_req_item } </p>
+        <p>logic: any user can access this function. </p>"
+      operationId: "getMenuKitchenRequirementItems"
+      produces:
+      - "application/json"
+
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+              $ref: "#/definitions/MenuKitchenRequirementItems"
+        400:
+          description: "menu Id does not exist."
+        401:
+          description: "menu_id field is mandatory."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+          
+  /menu/getMenuKitchenRequirementByMenuId:
+    get:
+      tags:
+      - "menu"
+      summary: "(Func24) Get menu's Kitchen Requirement details"
+      description: "Return menu's Kitchen Requirement details by Menu Id
+      <p>table involve: { t_menu_kitchen_req, t_kitchen_req_item } </p>
+        <p>logic: retrieve user_id from t_access_token, then get chef_id from t_chef by user_id</p>
+        <p>- if token's user_id is a chef, then both public and non-public menu can be accessed.</p>
+        <p>- if token's user_id is a not chef, but a user, then he can only access to chef's public menu.</p>
+        <p>- if no token (anonymous user) is supplied, then he can only access to chef's public menu.</p>"
+      operationId: "getMenuKitchenRequirementByMenuId"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: false
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - name: "menu_id"
+        in: "header"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+              $ref: "#/definitions/MenuKitchenRequirementDetail"
+        400:
+          description: "menu Id does not exist."
+        401:
+          description: "menu_id field is mandatory."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+
+
+
+  /menu/getMenuChefNoteByMenuId:
+    get:
+      tags:
+      - "menu"
+      summary: "(Func26) Get menu's Chef Note details"
+      description: "Return menu's Chef Note details by Menu Id
+      <p>table involve: { t_menu_chef_note } </p>
+        <p>logic: retrieve user_id from t_access_token, then get chef_id from t_chef by user_id</p>
+        <p>- if token's user_id is a chef, then both public and non-public menu can be accessed.</p>
+        <p>- if token's user_id is a not chef, but a user, then he can only access to chef's public menu.</p>
+        <p>- if no token (anonymous user) is supplied, then he can only access to chef's public menu.</p>"
+      operationId: "getMenuChefNoteByMenuId"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: false
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - name: "menu_id"
+        in: "header"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+              $ref: "#/definitions/MenuChefNoteDetail"
+        400:
+          description: "menu Id does not exist."
+        401:
+          description: "menu_id field is mandatory."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+          
+
+  /menu/getMenuIncludeItems:
+    get:
+      tags:
+      - "menu"
+      summary: "(Func28) Get Menu Include Items"
+      description: "Return menu Include Items to populate drop down list options in Menu Settings
+        <p>table involve: { t_include_item } </p>
+        <p>logic: any user can access this function. </p>"
+      operationId: "getMenuIncludeItems"
+      produces:
+      - "application/json"
+
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+              $ref: "#/definitions/MenuIncludeItems"
+        400:
+          description: "menu Id does not exist."
+        401:
+          description: "menu_id field is mandatory."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+
+  /menu/getMenuIncludeItemsByMenuId:
+    get:
+      tags:
+      - "menu"
+      summary: "(Func29) Get menu's Include Item details"
+      description: "Return menu's Include Item details by Menu Id
+      <p>table involve: { t_menu_include } </p>
+        <p>logic: retrieve user_id from t_access_token, then get chef_id from t_chef by user_id</p>
+        <p>- if token's user_id is a chef, then both public and non-public menu can be accessed.</p>
+        <p>- if token's user_id is a not chef, but a user, then he can only access to chef's public menu.</p>
+        <p>- if no token (anonymous user) is supplied, then he can only access to chef's public menu.</p>"
+      operationId: "getMenuIncludeItemsByMenuId"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: false
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - name: "menu_id"
+        in: "header"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+              $ref: "#/definitions/MenuIncludeItemDetail"
+        400:
+          description: "menu Id does not exist."
+        401:
+          description: "menu_id field is mandatory."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+
+
+  /menu/getMenuAboutByMenuId:
+    get:
+      tags:
+      - "menu"
+      summary: "(Func31) Get Menu About"
+      description: "Return menu About by Menu Id
+        <p>logic: retrieve user_id from t_access_token, then get chef_id from t_chef by user_id</p>
+        <p>- if token's user_id is a chef, then both public and non-public menu can be returned.</p>
+        <p>- if token's user_id is a not chef, but a user, then he can only access to chef's public menu.</p>
+        <p>- if no token (anonymous user) is supplied, then he can only access to chef's public menu.</p>"
+      operationId: "getMenuAboutByMenuId"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: false
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - name: "menu_id"
+        in: "header"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+              $ref: "#/definitions/MenuAbout"
+        400:
+          description: "menu Id does not exist."
+        401:
+          description: "menu_id field is mandatory."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+
+
+
+  /menu/getMenuPhotosByMenuId:
+    get:
+      tags:
+      - "menu"
+      summary: "(Func37) Get menu's Photo URLs"
+      description: "Return menu's Photo URLs by Menu Id
+      <p>table involve: { t_access_token, t_chef, t_user, t_menu_photo } </p>
+        <p>logic: retrieve user_id from t_access_token, then get chef_id from t_chef by user_id</p>
+        <p>- if token's user_id is a chef, then both public and non-public menu can be accessed.</p>
+        <p>- if token's user_id is a not chef, but a user, then he can only access to chef's public menu.</p>
+        <p>- if no token (anonymous user) is supplied, then he can only access to chef's public menu.</p>"
+      operationId: "getMenuPhotosByMenuId"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: false
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - name: "menu_id"
+        in: "header"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+              $ref: "#/definitions/MenuPhotoList"
+        400:
+          description: "menu Id does not exist."
+        401:
+          description: "menu_id field is mandatory."
+        402:
+          description: "User Id does not exist."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+
+  /menu/getMenuBookingRequirement:
+    get:
+      tags:
+      - "menu"
+      summary: "(Func38) Get Menu Chef's booking requirements for instant booking"
+      description: "Return menu's booking requirements for instant booking by Menu Id
+      <p>table involve: { t_access_token, t_chef, user_id, t_menu_booking_requirement } </p>
+        <p>logic: retrieve user_id from t_access_token, then get chef_id from t_chef by user_id</p>
+        <p>- if token's user_id is a chef, then both public and non-public menu can be accessed.</p>
+        <p>- if token's user_id is a not chef, but a user, then he can only access to chef's public menu.</p>
+        <p>- if no token (anonymous user) is supplied, then he can only access to chef's public menu.</p>
+        Return booking requirements that match menu_id in t_menu_booking_requirement
+        "
+      operationId: "getMenuBookingRequirementsByMenuId"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: false
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - name: "menu_id"
+        in: "header"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+              $ref: "#/definitions/MenuBookingRequirements"
+        400:
+          description: "menu Id does not exist."
+        401:
+          description: "menu_id field is mandatory."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+
+  /menu/getAvailableCuisineTypes:
+    get:
+      tags:
+      - "menu"
+      summary: "(Func39) Get available cuisine types from all active menus"
+      description: "Return available cuisine types from all active menus
+        <p>table involve: { t_chef_menu, t_menu_cuisine, t_cuisine_type } </p>
+        <p>logic: any user can access this function. </p>
+        retrieve all distinct cuisine_type from t_menu_cuisine those menu_id is active in t_chef_menu records.
+        "
+      operationId: "getMenuAvailCuisineTypes"
+      produces:
+      - "application/json"
+
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+              $ref: "#/definitions/MenuAvailableCuisineTypes"
+
+          
+  /menu/cloneMenuByMenuId:
+    post:
+      tags:
+      - "menu"
+      summary: "(Func40) Chef clone his menu"
+      description: "<p>Clone menu with menu_id by chef Id.</p> 
+      <p>tables involve: { t_chef_menu, t_access_token, t_chef, t_menu_item, t_menu_item_option, t_menu_cuisine, t_menu_kitchen_req, t_menu_include, t_menu_chef_note, t_menu_booking_rule, t_menu_booking_requirement, t_menu_extra_charge, t_menu_photo, t_message } </p>
+      <p>logic: retrieve user_id from t_access_token, then get chef_id from t_chef by user_id</p>
+      <p>if user_id not found in t_chef, then return error code 402</p>
+      <p>if menu_id not found in t_chef_menu, then return error code 400</p>
+      <p>if menu_id not found in t_chef_menu with chef_id, meaning the menu does not belong to chef, then return error code 403</p>
+      <p>case#1 menu_id is public menu (public_ind=1)</p>
+      Clone this menu as non-public directly. Duplicate a record of t_chef_menu, and all its related records (t_menu_item, t_menu_item_option, t_menu_cuisine, t_menu_kitchen_req, t_menu_include, t_menu_chef_note, t_menu_booking_rule, t_menu_booking_requirement, t_menu_extra_charge, t_menu_photo), then link them together. The cloned t_chef_menu record will assign a new menu_id, parent_menu_id = null, create_on, update_on default to today's date, create_by, update_by default to chef's user_id. Copy the rest of the fields as is.
+      <p>case#2 menu_id is non-public menu (public_ind=0)</p>
+      same as case#1.
+
+      <p>What happens to old public menu: </p>
+      Do not touch. 
+      
+      It is possible for chef to clone his inactive menus. 
+"
+      operationId: "cloneMenu"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - name: "menu_id"
+        in: "header"
+        required: true
+        type: "number"
+        format: "int64"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "menu Id does not exist."
+        401:
+          description: "access_token, content_type, menu_id, menu json fields are mandatory."
+        402:
+          description: "Only chef can clone menu."
+        403:
+          description: "menu Id does not belong to chef."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+
+
+  /menu/getMenuCancelPolicy:
+    get:
+      tags:
+      - "menu"
+      summary: "(Func42) Get Menu Cancellation policy"
+      description: "Return menu's Cancellation policy by Menu Id
+      <p>table involve: { t_access_token, t_chef, user_id, t_chef_menu } </p>
+        <p>logic: retrieve user_id from t_access_token, then get chef_id from t_chef by user_id</p>
+        <p>- if token's user_id is a chef, then both public and non-public menu can be accessed.</p>
+        <p>- if token's user_id is a not chef, but a user, then he can only access to chef's public menu.</p>
+        <p>- if no token (anonymous user) is supplied, then he can only access to chef's public menu.</p>
+        Return booking requirements that match menu_id in t_menu_booking_requirement
+        "
+      operationId: "getMenuCancelPolicyByMenuId"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: false
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - name: "menu_id"
+        in: "header"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+              $ref: "#/definitions/MenuCancelPolicy"
+        400:
+          description: "menu Id does not exist."
+        401:
+          description: "menu_id field is mandatory."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+
+
+  /menu/getChefMenuSections:
+    get:
+      tags:
+      - "menu"
+      summary: "(Func44) Get a list of Chef's custom course headings"
+      description: "Return menu's custom course heading sections by Chef Id
+      <p>table involve: { t_access_token, t_chef, t_user, t_menu_section } </p>
+      <p>logic: retrieve user_id from t_access_token, then get chef_id from t_chef by user_id</p>
+      <p>if user_id not found in t_chef, then return error code 402</p>
+        "
+      operationId: "getMenuSectionsByChefId"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+              $ref: "#/definitions/MenuSectionList"
+        400:
+          description: "menu Id does not exist."
+        401:
+          description: "menu_id field is mandatory."
+        402:
+          description: "Only chef can perform this operation."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+
+  /menu/addChefMenuSection:
+    post:
+      tags:
+      - "menu"
+      summary: "(Func45) add one to chef's custom course heading sections"
+      description: "<p>Only chef can add a new custom course heading section by chef_id</p>
+        <p>tables involve: { t_access_token, t_chef, t_user, t_menu_section } </p>
+        <p>logic: retrieve user_id from t_access_token, then get chef_id from t_chef by user_id</p>
+        <p>if user_id is not found in t_chef, then return error code 402</p>
+        <p>if menu_section_name is found in t_menu_section with chef_id before adding, then return error code 401</p>
+        <p>if chef_id is active: (active_ind=A) </p>
+        Produce a new record for t_menu_section with chef_id, new menu_section_id, menu_section_name, menu_section_desc, create_on, update_on default to today's date, create_by, update_by default to chef's user_id, set active_ind = A (active)
+        <p>if menu_id is not active: (active_ind=not A) </p>
+        return error code 403
+      "
+      operationId: "addMenuSection"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Add menu section"
+        required: true
+        schema:
+          $ref: "#/definitions/AddMenuSectionRequest"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "Chef Id does not exist."
+        401:
+          description: "Menu heading section name already exist."
+        402:
+          description: "Only chef can add new menu section."
+        403:
+          description: "Can only add menu section for active chef."
+
+  /menu/editChefMenuSection:
+    post:
+      tags:
+      - "menu"
+      summary: "(Func46) edit a chef's custom course heading section"
+      description: "<p>Only chef can edit his custom course heading section by menu_section_id</p>
+        <p>tables involve: { t_access_token, t_chef, t_user, t_menu_section } </p>
+        <p>logic: retrieve user_id from t_access_token, then get chef_id from t_chef by user_id</p>
+        <p>if user_id is not found in t_chef, then return error code 402</p>
+        <p>if input menu_section_name is found in t_menu_section with chef_id before editing, then return error code 401</p>
+        <p>if input menu_section_id does not belong to chef_id, then return error code 404</p>
+        <p>if chef_id is active: (active_ind=A) </p>
+        Replace menu_section_name, menu_section_desc in t_menu_section with input menu_section_id,  menu_section_name, menu_section_desc, create_on, update_on default to today's date, create_by, update_by default to chef's user_id, set active_ind = A (active)
+        <p>if chef_id is not active: (active_ind=not A) </p>
+        return error code 403
+      "
+      operationId: "editMenuSection"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Edit menu section"
+        required: true
+        schema:
+          $ref: "#/definitions/EditMenuSectionRequest"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "menu_section_id does not exist."
+        401:
+          description: "Menu heading section name already exist."
+        402:
+          description: "Only chef can add new menu section."
+        403:
+          description: "Can only add menu section for active chef."
+        404:
+          description: "the menu_section_id does not belong to chef."
+
+  /menu/removeChefMenuSection:
+    post:
+      tags:
+      - "menu"
+      summary: "(Func47) remove one chef's custom course heading section"
+      description: "<p>Only chef can remove his custom course heading section by menu_section_id</p>
+        <p>tables involve: { t_access_token, t_chef, t_user, t_menu_section } </p>
+        <p>logic: retrieve user_id from t_access_token, then get chef_id from t_chef by user_id</p>
+        <p>if user_id is not found in t_chef, then return error code 402</p>
+        <p>if menu_section_id is not found in t_menu_section before remove, then return error code 401</p>
+        <p>if input menu_section_id does not belong to chef_id, then return error code 404</p>
+        <p>if chef_id is active: (active_ind=A) </p>
+        For t_menu_section record with menu_section_id, set active_ind = I (in-active)
+        <p>if menu_id is not active: (active_ind=not A) </p>
+        return error code 403
+      "
+      operationId: "removeMenuSection"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Remove menu section"
+        required: true
+        schema:
+          $ref: "#/definitions/RemoveMenuSectionRequest"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "Chef Id does not exist."
+        401:
+          description: "menu_section_id does not exist."
+        402:
+          description: "Only chef can add new menu section."
+        403:
+          description: "Can only add menu section for active chef."
+        404:
+          description: "the menu_section_id does not belong to chef."
+          
+  /menu/getChefMenuFoodItems:
+    get:
+      tags:
+      - "menu"
+      summary: "(Func48) Get a list of Chef's custom food items"
+      description: "Return active menu's custom food items by Chef Id
+      <p>table involve: { t_access_token, t_chef, t_user, t_food_item } </p>
+      <p>logic: retrieve user_id from t_access_token, then get chef_id from t_chef by user_id</p>
+      <p>if user_id not found in t_chef, then return error code 402</p>
+        "
+      operationId: "getMenuFoodItemsByChefId"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+              $ref: "#/definitions/MenuFoodItemList"
+        400:
+          description: "menu Id does not exist."
+        401:
+          description: "menu_id field is mandatory."
+        402:
+          description: "Only chef can perform this operation."
+        421:
+          description: "Verification Code is invalid."
+        422:
+          description: "Verification Code expired."
+
+  /menu/addChefMenuFoodItem:
+    post:
+      tags:
+      - "menu"
+      summary: "(Func49) add one to chef's custom food items"
+      description: "<p>Only chef can add a new custom food item by chef_id</p>
+        <p>tables involve: { t_access_token, t_chef, t_user, t_food_item } </p>
+        <p>logic: retrieve user_id from t_access_token, then get chef_id from t_chef by user_id</p>
+        <p>if user_id is not found in t_chef, then return error code 402</p>
+        <p>if food_item_name is found in t_food_item with chef_id before adding, then return error code 401</p>
+        <p>if chef_id is active: (active_ind=A) </p>
+        Produce a new record for t_food_item with chef_id, new food_item_id, food_item_name, food_item_desc, photo_url, create_on, update_on default to today's date, create_by, update_by default to chef's user_id, set active_ind = A (active)
+        <p>if menu_id is not active: (active_ind=not A) </p>
+        return error code 403
+      "
+      operationId: "addMenuFoodItem"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Add menu food item"
+        required: true
+        schema:
+          $ref: "#/definitions/AddMenuFoodItemRequest"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "Chef Id does not exist."
+        401:
+          description: "Menu food item name already exist."
+        402:
+          description: "Only chef can add new menu food item."
+        403:
+          description: "Can only add menu food item for active chef."
+
+  /menu/editChefMenuFoodItem:
+    post:
+      tags:
+      - "menu"
+      summary: "(Func50) edit a chef's custom food item"
+      description: "<p>Only chef can edit his custom food item by food_item_id</p>
+        <p>tables involve: { t_access_token, t_chef, t_user, t_food_item } </p>
+        <p>logic: retrieve user_id from t_access_token, then get chef_id from t_chef by user_id</p>
+        <p>if user_id is not found in t_chef, then return error code 402</p>
+        <p>if input food_item_name is found in t_food_item with chef_id before editing, then return error code 401</p>
+        <p>if input food_item_id does not belong to chef_id, then return error code 404</p>
+        <p>if chef_id is active: (active_ind=A) </p>
+        Replace food_item_name, food_item_desc, photo_url in t_food_item with input food_item_id,  food_item_name, food_item_desc, photo_url, create_on, update_on default to today's date, create_by, update_by default to chef's user_id, set active_ind = A (active)
+        <p>if chef_id is not active: (active_ind=not A) </p>
+        return error code 403
+      "
+      operationId: "editMenuFoodItem"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Edit menu food item"
+        required: true
+        schema:
+          $ref: "#/definitions/EditMenuFoodItemRequest"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "food_item_id does not exist."
+        401:
+          description: "Menu food item name already exist."
+        402:
+          description: "Only chef can add new menu food item."
+        403:
+          description: "Can only add menu food item for active chef."
+        404:
+          description: "the food_item_id does not belong to chef."
+
+  /menu/removeChefMenuFoodItem:
+    post:
+      tags:
+      - "menu"
+      summary: "(Func51) remove one chef's custom food item"
+      description: "<p>Only chef can remove his custom food item by food_item_id</p>
+        <p>tables involve: { t_access_token, t_chef, t_user, t_food_item } </p>
+        <p>logic: retrieve user_id from t_access_token, then get chef_id from t_chef by user_id</p>
+        <p>if user_id is not found in t_chef, then return error code 402</p>
+        <p>if food_item_id is not found in t_food_item before remove, then return error code 401</p>
+        <p>if input food_item_id does not belong to chef_id, then return error code 404</p>
+        <p>if chef_id is active: (active_ind=A) </p>
+        For t_food_item record with food_item_id, set active_ind = I (in-active)
+        <p>if menu_id is not active: (active_ind=not A) </p>
+        return error code 403
+      "
+      operationId: "removeMenuFoodItem"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "access_token"
+        type: "string"
+        required: true
+      - in: "header"
+        name: "content-type"
+        type: "string"
+        default:
+          "application/json"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Remove menu food item"
+        required: true
+        schema:
+          $ref: "#/definitions/RemoveMenuFoodItemRequest"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "Chef Id does not exist."
+        401:
+          description: "food_item_id does not exist."
+        402:
+          description: "Only chef can add new menu food item."
+        403:
+          description: "Can only add menu food item for active chef."
+        404:
+          description: "the food_item_id does not belong to chef."
+          
+definitions:
+
+
+
+  ChefDetail:
+    type: "object"
+    properties:
+      chef_id:
+        type: "number"
+        format: "int64"
+      user_Id: 
+        type: "number"
+        format: "int64"
+      password: 
+        type: "string"
+        format: "password"
+      salutation: 
+        type: "string"
+      first_name: 
+        type: "string"
+      middle_name: 
+        type: "string"
+      last_name: 
+        type: "string"
+      email_address: 
+        type: "string"
+        format: "email"
+      contact_no: 
+        type: "string"
+      sms_notify_ind:
+        type: "boolean"
+      birthday: 
+        type: "string"
+        format: "date"
+      short_desc: 
+        type: "string"
+      detail_desc: 
+        type: "string"
+      address_1: 
+        type: "string"
+      address_2: 
+        type: "string"
+      address_3: 
+        type: "string"
+      accept_marketing_ind: 
+        type: "boolean"
+      ipv4_address: 
+        type: "string"
+        format: "ipv4"
+      verified_email:
+        type: "boolean"
+      verified_contact_no:
+        type: "boolean"
+      active_ind:
+        type: "string"
+        description:
+          "* `D` - delete
+          * `A` - active
+          * `P` - pending
+          * `O` - obsolete
+          * `R` - replaced"
+        default: "A"
+        enum:
+          - "D"
+          - "A"
+          - "P"
+          - "O"
+          - "R"
+      experience_list:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            start_date:
+              type: "string"
+              format: "date-time"
+            end_date:
+              type: "string"
+              format: "date-time"
+            exp_desc:
+              type: "string"
+          required:
+            - start_date
+            - exp_desc
+      cuisine_type:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            cuisine_type_id:
+              type: "string"
+      verified_chef_ind: 
+        type: "boolean"
+      food_safety_certified_ind: 
+        type: "boolean"
+      payment_protection_ind: 
+        type: "boolean"
+      lang_code_list:
+        type: "array"
+        items: 
+          type: "string"
+    xml:
+      name: "ChefDetail"
+
+      
+  LoginSuccess:
+    type: "object"
+    properties:
+      valid_until:
+        type: "string"
+        format: "date-time"
+      token_string:
+        type: "string"
+      refresh_token:
+        type: "string"
+    xml:
+      name: "LoginSuccess"
+
+  RefreshAccessSuccess:
+    type: "object"
+    properties:
+      valid_until:
+        type: "string"
+        format: "date-time"
+      token_string:
+        type: "string"
+      token_type:
+        type: "string"
+        description: 
+          "* `Bearer` - for front end to check, if does not match, reject this response and refresh token fails"
+        default: "Bearer"
+    xml:
+      name: "RefreshAccessSuccess"
+      
+  UpdateAvailableTimeslotsByChef:
+    type: "object"
+    properties:
+      chef_id:
+        type: "number"
+        format: "int64"
+      available_timeslot_list:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            start_date:
+              type: "string"
+              format: "date-time"
+            end_date:
+              type: "string"
+              format: "date-time"
+            instant_ind:
+              default: "true"
+              type: "boolean"
+            available_meal:
+              type: "number"
+              description: 
+                "* `1` - Lunch
+                * `2` - Dinner
+                * `3` - both Lunch & Dinner"
+              default: 3
+              enum:
+                - 1
+                - 2
+                - 3
+    xml:
+      name: "UpdateAvailableTimeslotsByChef"
+
+  UpdateUnAvailableTimeslotsByChef:
+    type: "object"
+    properties:
+      chef_id:
+        type: "number"
+        format: "int64"
+      available_timeslot_list:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            start_date:
+              type: "string"
+              format: "date-time"
+            end_date:
+              type: "string"
+              format: "date-time"
+            instant_ind:
+              default: "true"
+              type: "boolean"
+            available_meal:
+              type: "string"
+              description: 
+                "* `1` - Lunch
+                * `2` - Dinner
+                * `3` - both Lunch & Dinner"
+              default: "3"
+              enum:
+                - "1"
+                - "2"
+                - "3"
+    xml:
+      name: "UpdateUnAvailableTimeslotsByChef"
+      
+
+  ConfirmTimeslotsCreation:
+    type: "object"
+    properties:
+      ack_code:
+        type: "string"
+        description: "acknowledge code 0 is return upon successful creation of timeslot"
+    xml:
+      name: "ConfirmTimeslotsCreation"
+
+  ConfirmUpdateAvailablelTimeslots:
+    type: "object"
+    properties:
+      ack_code:
+        type: "string"
+        description: "acknowledge code 0 is return upon successful update of available timeslot"
+    xml:
+      name: "ConfirmUpdateAvailablelTimeslots"
+
+  ConfirmUpdateUnAvailablelTimeslots:
+    type: "object"
+    properties:
+      ack_code:
+        type: "string"
+        description: "acknowledge code 0 is return upon successful update of un-available timeslot"
+    xml:
+      name: "ConfirmUpdateUnAvailablelTimeslots"
+      
+
+  ReturnAvailTimeslots:
+    type: "object"
+    properties:
+      chef_id:
+        type: "number"
+        format: "int64"
+      avail_timeslot_list:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            start_date:
+              type: "string"
+              format: "date-time"
+            end_date:
+              type: "string"
+              format: "date-time"
+            instant_ind:
+              default: "true"
+              type: "boolean"
+            available_meal:
+              type: "number"
+              description: 
+                "* `1` - Lunch
+                * `2` - Dinner
+                * `3` - both Lunch & Dinner"
+              enum:
+                - 1
+                - 2
+                - 3
+    xml:
+      name: "ReturnAvailTimeslots"
+
+  UpdateDefaultTimeslotsByChef:
+    type: "object"
+    properties:
+      chef_id:
+        type: "number"
+        format: "int64"
+      mon:
+        type: "boolean"
+      tue:
+        type: "boolean"
+      wed:
+        type: "boolean"
+      thu:
+        type: "boolean"
+      fri:
+        type: "boolean"
+      sat:
+        type: "boolean"
+      sun:
+        type: "boolean"
+      holiday:
+        type: "boolean"
+      instant_ind:
+        default: "true"
+        type: "boolean"
+      apply_meal:
+        type: "string"
+        description: 
+          "* `1` - Lunch
+          * `2` - Dinner
+          * `3` - both Lunch & Dinner"
+        default: "3"
+        enum:
+          - "1"
+          - "2"
+          - "3"
+    xml:
+      name: "UpdateDefaultTimeslotsByChef"
+      
+  CreateUserRequest:
+    type: "object"
+    properties:
+      user_name: 
+        type: "string"
+      password: 
+        type: "string"
+        format: "password"
+      salutation: 
+        type: "string"
+      first_name: 
+        type: "string"
+      middle_name: 
+        type: "string"
+      last_name: 
+        type: "string"
+      email_address: 
+        type: "string"
+        format: "email"
+      contact_no: 
+        type: "string"
+      sms_notify_ind:
+        type: "boolean"
+      birthday: 
+        type: "string"
+        format: "date"
+      address_1: 
+        type: "string"
+      address_2: 
+        type: "string"
+      address_3: 
+        type: "string"
+      accept_marketing_ind: 
+        type: "boolean"
+      accept_terms_ind: 
+        type: "boolean"
+      robot_ind: 
+        type: "boolean"
+      ipv4_address: 
+        type: "string"
+        format: "ipv4"
+      photo_url: 
+        type: "string"
+    xml:
+      name: "CreateUserRequest"
+      
+  UpdateUserRequest:
+    type: "object"
+    properties:
+      user_name: 
+        type: "string"
+      password: 
+        type: "string"
+        format: "password"
+      salutation: 
+        type: "string"
+      first_name: 
+        type: "string"
+      middle_name: 
+        type: "string"
+      last_name: 
+        type: "string"
+      email_address: 
+        type: "string"
+        format: "email"
+      contact_no: 
+        type: "string"
+      sms_notify_ind:
+        type: "boolean"
+      birthday: 
+        type: "string"
+        format: "date"
+      address_1: 
+        type: "string"
+      address_2: 
+        type: "string"
+      address_3: 
+        type: "string"
+      accept_marketing_ind: 
+        type: "boolean"
+      ipv4_address: 
+        type: "string"
+        format: "ipv4"
+      verified_email:
+        type: "boolean"
+      verified_contact_no:
+        type: "boolean"
+      active_ind:
+        type: "string"
+        description:
+          "* `D` - delete
+          * `A` - active
+          * `P` - pending
+          * `O` - obsolete
+          * `R` - replaced"
+        default: "A"
+        enum:
+          - "D"
+          - "A"
+          - "P"
+          - "O"
+          - "R"
+    xml:
+      name: "UpdateUserRequest"
+      
+
+  CreateChefRequest:
+    type: "object"
+    properties:
+      user_name: 
+        type: "string"
+      password: 
+        type: "string"
+        format: "password"
+      salutation: 
+        type: "string"
+      first_name: 
+        type: "string"
+      middle_name: 
+        type: "string"
+      last_name: 
+        type: "string"
+      email_address: 
+        type: "string"
+        format: "email"
+      contact_no: 
+        type: "string"
+      sms_notify_ind:
+        type: "boolean"
+      birthday: 
+        type: "string"
+        format: "date"
+      address_1: 
+        type: "string"
+      address_2: 
+        type: "string"
+      address_3: 
+        type: "string"
+      accept_marketing_ind: 
+        type: "boolean"
+      accept_terms_ind: 
+        type: "boolean"
+      robot_ind: 
+        type: "boolean"
+      ipv4_address: 
+        type: "string"
+        format: "ipv4"
+      photo_url:
+        type: "string"
+    xml:
+      name: "CreateChefRequest"
+
+  UpdateChefRequest:
+    type: "object"
+    properties:
+      chef_id: 
+        type: "number"
+        format: "int64"
+      password: 
+        type: "string"
+        format: "password"
+      salutation: 
+        type: "string"
+      first_name: 
+        type: "string"
+      middle_name: 
+        type: "string"
+      last_name: 
+        type: "string"
+      email_address: 
+        type: "string"
+        format: "email"
+      contact_no: 
+        type: "string"
+      sms_notify_ind:
+        type: "boolean"
+      birthday: 
+        type: "string"
+        format: "date"
+      short_desc: 
+        type: "string"
+      detail_desc: 
+        type: "string"
+      address_1: 
+        type: "string"
+      address_2: 
+        type: "string"
+      address_3: 
+        type: "string"
+      accept_marketing_ind: 
+        type: "boolean"
+      ipv4_address: 
+        type: "string"
+        format: "ipv4"
+      verified_email:
+        type: "boolean"
+      verified_contact_no:
+        type: "boolean"
+      active_ind:
+        type: "string"
+        description:
+          "* `D` - delete
+          * `A` - active
+          * `P` - pending
+          * `O` - obsolete
+          * `R` - replaced"
+        default: "A"
+        enum:
+          - "D"
+          - "A"
+          - "P"
+          - "O"
+          - "R"
+      experience_list:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            start_date:
+              type: "string"
+              format: "date-time"
+            end_date:
+              type: "string"
+              format: "date-time"
+            exp_desc:
+              type: "string"
+          required:
+            - start_date
+            - exp_desc
+      cuisine_type:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            cuisine_type_id:
+              type: "string"
+      verified_chef_ind: 
+        type: "boolean"
+      food_safety_certified_ind: 
+        type: "boolean"
+      payment_protection_ind: 
+        type: "boolean"
+    xml:
+      name: "UpdateChefRequest"
+
+  UpdateChefQualificationRequest:
+    type: "object"
+    properties:
+      chef_id: 
+        type: "number"
+        format: "int64"
+      verified_chef_ind: 
+        type: "boolean"
+      food_safety_certified_ind: 
+        type: "boolean"
+      payment_protection_ind: 
+        type: "boolean"
+    xml:
+      name: "UpdateChefQualificationRequest"
+      
+  UpdateChefLanguageListRequest:
+    type: "object"
+    properties:
+      chef_id: 
+        type: "number"
+        format: "int64"
+      language_list:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            lang_code:
+              type: "string"
+            active_ind:
+              type: "string"
+              description:
+                "* `D` - delete
+                * `A` - active
+                * `P` - pending
+                * `O` - obsolete
+                * `R` - replaced"
+              default: "A"
+              enum:
+                - "D"
+                - "A"
+                - "P"
+                - "O"
+                - "R"
+    xml:
+      name: "UpdateChefLanguageListRequest"
+      
+  UpdateChefLocationListRequest:
+    type: "object"
+    properties:
+      chef_id: 
+        type: "number"
+        format: "int64"
+      location_list:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            district_code:
+              type: "string"
+            active_ind:
+              type: "string"
+              description:
+                "* `D` - delete
+                * `A` - active
+                * `P` - pending
+                * `O` - obsolete
+                * `R` - replaced"
+              default: "A"
+              enum:
+                - "D"
+                - "A"
+                - "P"
+                - "O"
+                - "R"
+    xml:
+      name: "UpdateChefLocationListRequest"
+      
+  CreateMenuRequest:
+    type: "object"
+    properties:
+      menu_name: 
+        type: "string"
+      menu_desc: 
+        type: "string"
+      public_ind:
+        type: "integer"
+        description:
+          "* 1 - public
+          * 0 - non-public"
+        default: 0
+        enum:
+          - 1
+          - 0
+    xml:
+      name: "CreateMenuRequest"
+
+  ReturnMenu:
+    type: "object"
+    properties:
+      chef_id:
+        type: "number"
+        format: "int64"
+      menu_id:
+        type: "number"
+        format: "int64"
+      menu_name:
+        type: "string"
+      menu_code:
+        type: "string"      
+      menu_desc:
+        type: "string"
+      public_ind:
+        type: "boolean"
+      menu_item_list:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            menu_item_id: 
+              type: "number"
+              format: "int64"
+            seq_no:
+              type: "integer"
+            item_type_id:
+              type: "integer"
+              description: 
+                "* `1` - course heading section
+                * `2` - host pick option
+                * `3` - guest pick option
+                * `4` - chef pick option
+                * `5` - including"
+              default: 1
+              enum:
+                - 1
+                - 2
+                - 3
+                - 4
+                - 5
+            max_choice:
+              type: "integer"
+              default: 1
+            note:
+              type: "string"
+            optional:
+              type: "boolean"
+              default: false
+            menu_item_option_list:
+              type: "array"
+              items:
+                type: "object"
+                properties:
+                  option_id:
+                    type: "string"
+                    format: "date-time"
+                  seq_no:
+                    type: "integer"
+                  opt_txt:
+                    type: "string"
+                  opt_desc:
+                    type: "string"
+                  unit_price:
+                    type: "number"
+                    format: "float"
+                  currency_code:
+                    type: "string"
+    xml:
+      name: "ReturnMenu"
+      
+
+   
+      
+  ReturnActiveChefsByFilter:
+    type: "object"
+    properties:
+      total_pages:
+        type: "number"
+      page_no:
+        type: "number"
+      chef_list:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            chef_id:
+              type: "number"
+              format: "int64"
+            first_name:
+              type: "string"
+            last_name:
+              type: "string"      
+            middle_name:
+              type: "string"
+            short_desc:
+              type: "string"
+            min_unit_price:
+              type: "number"
+              format: "float"
+            menu_rating:
+              type: "integer"
+            chef_photo_url:
+              type: "string"
+            menu_logo_url:
+              type: "string"
+    xml:
+      name: "ReturnActiveChefsByFilter"
+   
+      
+      
+  MenuServingDetail:
+    type: "object"
+    properties:
+      menu_id:
+        type: "number"
+        format: "int64"
+      applied_meal: 
+        type: "number"
+        description: 
+          "* `1` - Lunch
+          * `2` - Dinner
+          * `3` - both Lunch & Dinner"
+        enum:
+          - 1
+          - 2
+          - 3
+      min_pers: 
+        type: "number"
+      max_pers: 
+        type: "number"
+      event_duration_hr: 
+        type: "number"
+        format: "float"
+      chef_arrive_prior_hr: 
+        type: "number"
+        format: "float"
+      child_menu_note: 
+        type: "string"
+    xml:
+      name: "MenuServingDetail"
+      
+      
+  MenuKitchenRequirementItems:
+    type: "object"
+    properties:
+      kitchen_req_items:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            kitchen_req_item_id:
+              type: "number"
+              format: "int64"
+            item_name:
+              type: "string"
+            item_desc:
+              type: "string"
+    xml:
+      name: "MenuKitchenRequirementItems"
+
+  MenuKitchenRequirementDetail:
+    type: "object"
+    properties:
+      menu_id:
+        type: "number"
+        format: "int64"
+      kitchen_req_items:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            kitchen_req_item_id:
+              type: "number"
+              format: "int64"
+            item_name:
+              type: "string"
+            item_desc:
+              type: "string"
+            qty:
+              type: "number"
+    xml:
+      name: "MenuKitchenRequirementDetail"
+      
+
+  MenuChefNoteDetail:
+    type: "object"
+    properties:
+      menu_id:
+        type: "number"
+        format: "int64"
+      menu_chef_note_list:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            menu_chef_note_id:
+              type: "number"
+              format: "int64"
+            menu_chef_note:
+              type: "string"
+    xml:
+      name: "MenuKitchenRequirementDetail"
+      
+      
+  MenuIncludeItems:
+    type: "object"
+    properties:
+      include_items:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            include_item_id:
+              type: "number"
+              format: "int64"
+            item_name:
+              type: "string"
+            item_desc:
+              type: "string"
+    xml:
+      name: "MenuIncludeItems"
+      
+  MenuIncludeItemDetail:
+    type: "object"
+    properties:
+      menu_id:
+        type: "number"
+        format: "int64"
+      include_items:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            include_item_id:
+              type: "number"
+              format: "int64"
+            item_name:
+              type: "string"
+            item_desc:
+              type: "string"
+            qty:
+              type: "number"
+    xml:
+      name: "MenuIncludeItemDetail"
+      
+      
+  MenuAbout:
+    type: "object"
+    properties:
+      menu_id:
+        type: "number"
+        format: "int64"
+      about: 
+        type: "string"
+    xml:
+      name: "MenuAbout"
+
+
+
+
+      
+  MenuPhotoList:
+    type: "object"
+    properties:
+      menu_id:
+        type: "number"
+        format: "int64"
+      photo_list:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            photo_url:
+              type: "string"
+            photo_desc:
+              type: "string"
+            seq_no:
+              type: "string"
+    xml:
+      name: "MenuPhotoList"
+      
+  MenuBookingRequirements:
+    type: "object"
+    properties:
+      menu_id:
+        type: "number"
+        format: "int64"
+      booking_Req_list:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            booking_requirement_id:
+              type: "number"
+              format: "int64"
+            booking_requirement_desc:
+              type: "string"
+    xml:
+      name: "MenuBookingRequirements"
+      
+  MenuAvailableCuisineTypes:
+    type: "object"
+    properties:
+      avail_cuisine_types:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            cuisine_type_id:
+              type: "number"
+              format: "int64"
+            cuisine_type_name:
+              type: "string"
+            description:
+              type: "string"
+    xml:
+      name: "MenuAvailableCuisineTypes"
+      
+  MenuCancelPolicy:
+    type: "object"
+    properties:
+      menu_id:
+        type: "number"
+        format: "int64"
+      cancel_policy: 
+        type: "string"
+    xml:
+      name: "MenuCancelPolicy"
+
+
+      
+  MenuSectionList:
+    type: "object"
+    properties:
+      chef_id:
+        type: "number"
+        format: "int64"
+      section_list:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            menu_section_id:
+              type: "number"
+              format: "int64"
+            menu_section_name:
+              type: "string"
+            menu_section_desc:
+              type: "string"
+    xml:
+      name: "MenuSectionList"
+      
+  AddMenuSectionRequest:
+    type: "object"
+    properties:
+      chef_id: 
+        type: "number"
+        format: "int64"
+      menu_section_name:
+        type: "string"
+      menu_section_desc:
+        type: "string"
+    xml:
+      name: "AddMenuSectionRequest"
+
+  EditMenuSectionRequest:
+    type: "object"
+    properties:
+      chef_id: 
+        type: "number"
+        format: "int64"
+      menu_section_id:
+        type: "number"
+        format: "int64"
+      menu_section_name:
+        type: "string"
+      menu_section_desc:
+        type: "string"
+    xml:
+      name: "EditMenuSectionRequest"
+
+  RemoveMenuSectionRequest:
+    type: "object"
+    properties:
+      menu_section_id:
+        type: "number"
+        format: "int64"
+    xml:
+      name: "RemoveMenuSectionRequest"
+      
+  MenuFoodItemList:
+    type: "object"
+    properties:
+      chef_id:
+        type: "number"
+        format: "int64"
+      foodItem_list:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            food_item_id:
+              type: "number"
+              format: "int64"
+            food_item_name:
+              type: "string"
+            food_item_desc:
+              type: "string"
+            photo_url:
+              type: "string"
+    xml:
+      name: "MenuFoodItemList"
+      
+  AddMenuFoodItemRequest:
+    type: "object"
+    properties:
+      chef_id: 
+        type: "number"
+        format: "int64"
+      food_item_name:
+        type: "string"
+      food_item_desc:
+        type: "string"
+      photo_url:
+        type: "string"
+    xml:
+      name: "AddMenuFoodItemRequest"
+
+  EditMenuFoodItemRequest:
+    type: "object"
+    properties:
+      chef_id: 
+        type: "number"
+        format: "int64"
+      food_item_id:
+        type: "number"
+        format: "int64"
+      food_item_name:
+        type: "string"
+      food_item_desc:
+        type: "string"
+      photo_url:
+        type: "string"
+    xml:
+      name: "EditMenuFoodItemRequest"
+
+  RemoveMenuFoodItemRequest:
+    type: "object"
+    properties:
+      food_item_id:
+        type: "number"
+        format: "int64"
+    xml:
+      name: "RemoveMenuFoodItemRequest"
+      

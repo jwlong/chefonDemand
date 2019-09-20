@@ -5,7 +5,7 @@ import chefService from './chefService'
 import activeIndStatus from "../model/activeIndStatus";
 import menuItemService from './menuItemService'
 import menuItemOptionService from './menuItemOptionService'
-import baseResult from "../model/baseResult";
+import moment from 'moment'
 
 @AutoWritedChefMenu
 class ChefMenuService extends BaseService{
@@ -22,14 +22,18 @@ class ChefMenuService extends BaseService{
         attr.min_pers = 1;
         attr.event_duration_hr = 2.00;
         attr.chef_arrive_prior_hr = 1;
-        attr.act_ind = 1;
+        attr.act_ind = activeIndStatus.ACTIVE;
+        attr.menu_code =  attr.chef_id+moment().format('YYYYMMDDHHmmSSSS')
     }
     createMenuNameByChefId(attr) {
         this.preparedChefMenu(attr);
         return db.transaction(t=> {
            return this.nextId('menu_id',{transaction:t}).then(nextId => {
                 attr.menu_id = nextId;
-                return this.baseCreate(attr,{transaction:t})
+               return this.nextId('seq_no',{transaction:t}).then(nextSeqNo => {
+                    attr.seq_no = nextSeqNo;
+                    return this.baseCreate(attr,{transaction:t})
+                })
             })
         })
     }

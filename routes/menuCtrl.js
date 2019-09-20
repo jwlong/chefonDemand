@@ -14,7 +14,8 @@ class MenuController {
         /***************menu 业务***************/
         router.post('/createMenuNameByChefId',  async(req, res,next) => {
             try {
-                let chef = await chefService.isChefWithUserId(req.user_id)
+                let chef = await chefService.getChefByUserId(req.user_id)
+                console.log("chef====>",chef);
                 if (!chef) {
                     throw baseResult.MENU_ONLY_CHEF_CAN_CREATE_MENU;
                 }
@@ -45,7 +46,29 @@ class MenuController {
                 next(e)
             }
         })
+
+        //(Func14a) Chef update his menu
+        router.post('/updateMenuByChefId',async(req,res,next) =>{
+            try {
+
+            }catch (e) {
+                next(e);
+            }
+        })
+
+        //(Func16) Get active (public / non-public) menu info for listing by chef Id
+        ///menu/getMenuListByChefId
+        router.get('/getMenuListByChefId',async(req,res,next) =>{
+            try {
+
+            }catch (e) {
+                next(e);
+            }
+        })
         return router;
+
+
+
     }
 
 }
