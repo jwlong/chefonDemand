@@ -64,5 +64,12 @@ module.exports = {
     AutoWritedKitchenReqItem(target,key,desc) {
         target.model = require('../model/kitchenReqItem')
     },
+    AutoWritedMenuChefNote(target,key,desc) {
+        target.model = require('../model/menuChefNote')
+    },
+    AutoWritedIncludeItem(target,key,desc) {
+        target.model = require('../model/includeItem')
+    },
+
 
 }

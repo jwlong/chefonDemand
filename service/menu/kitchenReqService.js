@@ -7,9 +7,9 @@ import db from '../../config/db';
 import baseResult from "../../model/baseResult";
 const Op = Sequelize.Op
 @AutoWritedKitchenReq
-class KitchenReqItemService extends BaseService{
+class KitchenReqService extends BaseService{
     constructor(){
-        super(KitchenReqItemService.model)
+        super(KitchenReqService.model)
     }
     getMenuKitchenRequirementByMenuId(criteria) {
        return chefMenuService.getMenuWithoutItemsByCriteria(criteria).then(menu => {
@@ -33,4 +33,4 @@ class KitchenReqItemService extends BaseService{
     }
 }
 
-module.exports = new KitchenReqItemService()
+module.exports = new KitchenReqService()

@@ -6,6 +6,7 @@ import activeIndStatus from "../model/activeIndStatus";
 import menuItemService from './menu/menuItemService'
 import menuItemOptionService from './menu/menuItemOptionService'
 import moment from 'moment'
+import baseResult from "../model/baseResult";
 
 @AutoWritedChefMenu
 class ChefMenuService extends BaseService{
@@ -99,6 +100,26 @@ class ChefMenuService extends BaseService{
     getMenuServingDetailByMenuId(criteria) {
         let fileds = ['menu_id','applied_meal','min_pers','max_pers','event_duration_hr','chef_arrive_prior_hr','child_menu_note'];
         return this.getOne({attributes:fileds,where:criteria});
+    }
+
+    /**
+     * check user_id ,menu_id是否合法，合法返回menu_id下的menu数据
+     * @param user_id
+     * @param menu_id
+     * @returns {PromiseLike<T> | Promise<T>}
+     */
+    checkUserIdAndMenuId(user_id, menu_id) {
+        if (!menu_id) {
+            throw baseResult.MENU_ID_FILED_MANDATORY;
+        }
+       return chefService.preparedMenuQueryCriteria(req.user_id,menu_id).then( criteria => {
+                return this.getMenuWithoutItemsByCriteria(criteria).then(menu => {
+                    if (!menu) throw baseResult.MENU_ID_NOT_EXIST;
+                    else
+                        return menu;
+                });
+            }
+        );
     }
 }
 module.exports = new ChefMenuService()

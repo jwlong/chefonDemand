@@ -8,6 +8,8 @@ import chefService from "../service/chefService";
 import activeIndStatus from "../model/activeIndStatus";
 import kitchenReqItemService from '../service/menu/kitchenReqItemService'
 import kitchenReqService from '../service/menu/kitchenReqService'
+import menuChefNoteService from '../service/menu/menuChefNoteService'
+import includeItemService from  '../service/menu/includeItemService'
 const router = express.Router()
 // 请求前缀为/menu
 class MenuController {
@@ -113,6 +115,27 @@ class MenuController {
                 next(e);
             }
         })
+        // /menu/getMenuChefNoteByMenuId
+        router.get('/getMenuChefNoteByMenuId',async(req,res,next) => {
+            try {
+                let menu_id = req.query.menu_id;
+                await chefMenuService.checkUserIdAndMenuId(req.user_id,menu_id);
+                res.json(await menuChefNoteService.getMenuChefNoteByMenuId(menu_id));
+            }catch (e) {
+                next(e);
+            }
+        })
+
+
+        ///menu/getMenuIncludeItems
+        router.get('/getMenuIncludeItems',async(req,res,next) => {
+            try {
+                res.json(await includeItemService.getMenuIncludeItems());
+            }catch (e) {
+                next(e);
+            }
+        })
+
         return router;
 
 

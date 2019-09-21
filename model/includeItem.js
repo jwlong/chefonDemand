@@ -43,9 +43,10 @@ class IncludeItem extends BaseModel {
                 allowNull: false
             }
         }, {
-            tableName: 't_include_item'
+            tableName: 't_include_item',
             timestamps: false
         });
+        this.model = this.getModel();
     }
 };
 module.exports = new IncludeItem();
