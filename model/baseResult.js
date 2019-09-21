@@ -68,7 +68,7 @@ export default  {
     MENU_ONLY_CHEF_CAN_CREATE_MENU:new baseResult(402,'Only chef can create menu.'),
     MENU_NAME_AND_DESC_REQUIRED:new baseResult(401,'Menu name, description, are mandatory,'),
     MENU_NAME_EXISTS:new baseResult(400,'Menu name already taken for the chef.'),
-
+    MENU_CHEF_ID_NOT_EXISTS: new baseResult(400, 'chef Id does not exist.'),
 
     // 未定义错误
     PASSWD_NOT_BE_EMPTY:new baseResult(999,"password can not be empty!"),

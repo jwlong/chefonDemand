@@ -54,5 +54,27 @@ class ChefMenuService extends BaseService{
             })
         });
     }
+
+    /**
+     * "chef_id": 0,
+     "menu_id": 0,
+     "menu_name": "string",
+     "menu_code": "string",
+     "menu_desc": "string",
+     "public_ind": true,
+     "seq_no": 0,
+     "menu_rating": 0,
+     "num_of_review": 0,
+     "min_pers": 0,
+     "max_pers": 0,
+     "menu_logo_url": "string",
+     "unit_price": 0,
+     * @param chef_id
+     */
+    getMenuListByChefId(chef_id) {
+        this.baseFindByFilter(['chef_id','menu_id','menu_name','menu_code','public_ind','seq_no','menu_rating','num_of_review','min_pers','max_pers','menu_logo_url','unit_price'],{chef_id:chef_id}).then(menuList => {
+
+        })
+    }
 }
 module.exports = new ChefMenuService()

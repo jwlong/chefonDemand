@@ -36,7 +36,7 @@ class MenuController {
                     throw baseResult.MENU_ID_NOT_EXIST
                 }
                 let criteria = {menu_id:query.menu_id,act_ind:activeIndStatus.ACTIVE}
-                if (!userId  || (userId && !await chefService.isChefWithUserId(userId))) {
+                if (await chefService.isOnlyCanAccessPublic(userId)) {
                     criteria.public_ind = 1;
                 }
                 let result = await  chefMenuService.getMenuByMenuId(criteria);
@@ -50,7 +50,6 @@ class MenuController {
         //(Func14a) Chef update his menu
         router.post('/updateMenuByChefId',async(req,res,next) =>{
             try {
-
             }catch (e) {
                 next(e);
             }
@@ -60,6 +59,26 @@ class MenuController {
         ///menu/getMenuListByChefId
         router.get('/getMenuListByChefId',async(req,res,next) =>{
             try {
+                let chef_id = req.body.chef_id;
+                if (!chef_id || (chef_id && !await chefService.getChefByChefId(chef_id))) {
+                    throw baseResult.MENU_CHEF_ID_NOT_EXISTS;
+                }
+               await chefMenuService.getMenuListByChefId(chef_id);
+
+            }catch (e) {
+                next(e);
+            }
+        })
+
+        /*
+        /menu/getMenuServingDetailByMenuId
+        */
+        router.get('/getMenuServingDetailByMenuId',async(req,res,next) => {
+            try {
+                let menu_id = req.query.menu_id;
+                if (!menu_id) {
+                    throw baseResult.MENU_ID_NOT_EXIST;
+                }
 
             }catch (e) {
                 next(e);

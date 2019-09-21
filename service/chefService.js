@@ -24,6 +24,14 @@ class ChefService extends BaseService{
           return result? true:false;
       })
     }
+    isOnlyCanAccessPublic(userId) {
+        if (!userId) {
+            return true
+        }
+        return this.getChefByChefId(userId).then(result => {
+            return !result;
+        })
+    }
 
     getChefByUserId(userId) {
         return this.getModel().findOne({where:{user_id:userId,active_ind:activeIndStatus.ACTIVE}}).then(existOne => {
