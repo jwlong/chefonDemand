@@ -1,5 +1,5 @@
-import BaseService from './baseService.js'
-import {AutoWritedMenuItem} from '../common/AutoWrite.js'
+import BaseService from '../baseService.js'
+import {AutoWritedMenuItem} from '../../common/AutoWrite.js'
 
 @AutoWritedMenuItem
 class MenuItemService extends BaseService{

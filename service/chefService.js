@@ -28,7 +28,7 @@ class ChefService extends BaseService{
         if (!userId) {
             return true
         }
-        return this.getChefByChefId(userId).then(result => {
+        return this.getChefByUserId(userId).then(result => {
             return !result;
         })
     }
@@ -200,5 +200,21 @@ WHERE cc.chef_id = :chef_id and ct.active_ind = 'A' `;
         var langCodeSql = `SELECT lang_code FROM t_chef_language WHERE chef_id =:chef_id and active_ind ='A' `;
         return  db.query(langCodeSql,{replacements:{chef_id:chefId},type:db.QueryTypes.SELECT,transaction:trans});
     }
+
+    preparedMenuQueryCriteria(user_id,menu_id) {
+        let criteria = {menu_id:menu_id,act_ind:activeIndStatus.ACTIVE};
+        if (!user_id) {
+            criteria.public_ind = 1;
+            return criteria;
+        }
+       return this.getChefByUserId(user_id).then(result => {
+            if (result) {
+                criteria.public_ind = 1;
+            }
+            return criteria;
+        })
+
+    }
+
 }
 module.exports = new ChefService()

@@ -1,7 +1,6 @@
 import Sequelize from 'sequelize'
 import BaseModel from './baseModel.js'
 import moment from 'moment'
-
 class KitchenReqItem extends BaseModel {
     constructor() {
         super('t_kitchen_req_item', {
@@ -46,6 +45,7 @@ class KitchenReqItem extends BaseModel {
             tableName: 't_kitchen_req_item',
             timestamps: false
         });
+        this.model = this.getModel();
     }
 };
 module.exports = new  KitchenReqItem()

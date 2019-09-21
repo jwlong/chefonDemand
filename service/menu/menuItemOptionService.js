@@ -1,6 +1,6 @@
-import BaseService from './baseService.js'
-import {AutoWritedMenuItemOption} from '../common/AutoWrite.js'
-import activeIndStatus from "../model/activeIndStatus";
+import BaseService from '../baseService.js'
+import {AutoWritedMenuItemOption} from '../../common/AutoWrite.js'
+import activeIndStatus from "../../model/activeIndStatus";
 
 @AutoWritedMenuItemOption
 class MenuItemOptionService extends BaseService{

@@ -6,7 +6,8 @@ import baseResult from "../model/baseResult";
 import chefMenuService from '../service/chefMenuService'
 import chefService from "../service/chefService";
 import activeIndStatus from "../model/activeIndStatus";
-
+import kitchenReqItemService from '../service/menu/kitchenReqItemService'
+import kitchenReqService from '../service/menu/kitchenReqService'
 const router = express.Router()
 // 请求前缀为/menu
 class MenuController {
@@ -77,14 +78,43 @@ class MenuController {
             try {
                 let menu_id = req.query.menu_id;
                 if (!menu_id) {
-                    throw baseResult.MENU_ID_NOT_EXIST;
+                    throw baseResult.MENU_ID_FILED_MANDATORY;
                 }
+                let criteria = {menu_id:menu_id,act_ind:activeIndStatus.ACTIVE}
+                if (await chefService.isOnlyCanAccessPublic(req.user_id)) {
+                    criteria.public_ind = 1;
+                }
+              let result = await chefMenuService.getMenuServingDetailByMenuId(criteria)
+                res.json(result);
+            }catch (e) {
+                next(e);
+            }
+        })
 
+        // /menu/getMenuKitchenRequirementItems,,Get Menu Kitchen Requirement Items
+        router.get('/getMenuKitchenRequirementItems',async(req,res,next) => {
+            try {
+                res.json(await kitchenReqItemService.getMenuKitchenRequirementItems());
+            }catch (e) {
+                next(e);
+            }
+        })
+
+        //  /menu/getMenuKitchenRequirementByMenuId  (Func24) Get menu's Kitchen Requirement detail
+        router.get('/getMenuKitchenRequirementByMenuId',async(req,res,next) => {
+            try {
+                let menu_id = req.query.menu_id;
+                if (!menu_id) {
+                    throw baseResult.MENU_ID_FILED_MANDATORY;
+                }
+                let criteria = await chefService.preparedMenuQueryCriteria(req.user_id,menu_id);
+                res.json(await kitchenReqService.getMenuKitchenRequirementByMenuId(criteria));
             }catch (e) {
                 next(e);
             }
         })
         return router;
+
 
 
 

@@ -78,6 +78,18 @@ const utils = {
 
         })
     },
+
+    getObjFileds(obj) {
+        let fields = null;
+        if (obj) {
+            fields = [];
+            for (var f in obj) {
+                fields.push(f);
+            }
+        }
+        console.log(fields)
+        return fields;
+    },
     deepCopy(obj, cache) {
         if (cache === void 0) cache = [];
 

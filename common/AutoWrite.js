@@ -58,5 +58,11 @@ module.exports = {
     AutoWritedMenuItemOption(target,key,desc) {
         target.model = require('../model/menuItemOption')
     },
+    AutoWritedKitchenReq(target,key,desc) {
+        target.model = require('../model/menuKitchenReq')
+    },
+    AutoWritedKitchenReqItem(target,key,desc) {
+        target.model = require('../model/kitchenReqItem')
+    },
 
 }

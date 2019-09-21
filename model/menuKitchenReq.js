@@ -1,5 +1,6 @@
 import Sequelize from 'sequelize'
 import BaseModel from './baseModel.js'
+import kitchenReqItem from './kitchenReqItem'
 class MenuKitchenReq extends BaseModel {
     constructor() {
         super('t_menu_kitchen_req', {
@@ -48,6 +49,8 @@ class MenuKitchenReq extends BaseModel {
             tableName: 't_menu_kitchen_req',
             timestamps: false
         });
+        this.model = this.getModel();
+        this.model.belongsTo(kitchenReqItem['model'],{foreignKey: 'kitchen_req_item_id'});
     }
 };
 module.exports = new  MenuKitchenReq()

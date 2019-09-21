@@ -3,8 +3,8 @@ import {AutoWritedChefMenu} from '../common/AutoWrite.js'
 import db from "../config/db";
 import chefService from './chefService'
 import activeIndStatus from "../model/activeIndStatus";
-import menuItemService from './menuItemService'
-import menuItemOptionService from './menuItemOptionService'
+import menuItemService from './menu/menuItemService'
+import menuItemOptionService from './menu/menuItemOptionService'
 import moment from 'moment'
 
 @AutoWritedChefMenu
@@ -38,7 +38,14 @@ class ChefMenuService extends BaseService{
         })
     }
 
-
+    /**
+     * criteria 默认包含menu_id属性
+     * @param criteria
+     * @returns {*}
+     */
+    getMenuWithoutItemsByCriteria(criteria) {
+        return this.getOne({where:criteria});
+    }
     getMenuByMenuId(criteria) {
         //no user id only can get public menu
         return this.getModel().findOne({attributes:['chef_id','menu_id','menu_name',
@@ -75,6 +82,23 @@ class ChefMenuService extends BaseService{
         this.baseFindByFilter(['chef_id','menu_id','menu_name','menu_code','public_ind','seq_no','menu_rating','num_of_review','min_pers','max_pers','menu_logo_url','unit_price'],{chef_id:chef_id}).then(menuList => {
 
         })
+    }
+
+    /**
+     * {
+  "menu_id": 0,
+  "applied_meal": 1,
+  "min_pers": 0,
+  "max_pers": 0,
+  "event_duration_hr": 0,
+  "chef_arrive_prior_hr": 0,
+  "child_menu_note": "string"
+}
+     * @param criteria
+     */
+    getMenuServingDetailByMenuId(criteria) {
+        let fileds = ['menu_id','applied_meal','min_pers','max_pers','event_duration_hr','chef_arrive_prior_hr','child_menu_note'];
+        return this.getOne({attributes:fileds,where:criteria});
     }
 }
 module.exports = new ChefMenuService()

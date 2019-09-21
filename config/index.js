@@ -13,7 +13,7 @@ const config = {
     jwtSession: {session: true},
     expiresMinutes:60*2,
     // the WHITE_LIST_URL allow to access system ,but them are not  necessary to authenticate
-    WHITE_LIST_URL:["/user/userLogin","/chef/createChef","/user/createUser","/chef/getChefDetailByChefId",'/menu/getMenuByMenuId','/menu/getMenuListByChefId'],
+    WHITE_LIST_URL:["/user/userLogin","/chef/createChef","/user/createUser","/chef/getChefDetailByChefId",'/menu/getMenuByMenuId','/menu/getMenuServingDetailByMenuId','menu/getMenuKitchenRequirementItems','/menu/getMenuKitchenRequirementByMenuId'],
     // when robot_ind 为true时，这种情况下插入数据
     robot_id:0
 }
