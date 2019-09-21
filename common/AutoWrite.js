@@ -73,6 +73,11 @@ module.exports = {
     AutoWritedMenuInclude(target,key,desc) {
         target.model = require('../model/menuInclude')
     },
-
+    AutoWritedMenuPhoto(target,key,desc) {
+        target.model = require('../model/menuPhoto')
+    },
+    AutoWritedMenuBookingReq(target,key,desc) {
+        target.model = require('../model/menuBookingRequirement')
+    },
 
 }

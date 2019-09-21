@@ -10,6 +10,8 @@ import kitchenReqItemService from '../service/menu/kitchenReqItemService'
 import kitchenReqService from '../service/menu/kitchenReqService'
 import menuChefNoteService from '../service/menu/menuChefNoteService'
 import includeItemService from  '../service/menu/includeItemService'
+import menuPhotoService from  '../service/menu/menuPhotoService'
+import menuBookingRequirementService from  '../service/menu/menuBookingRequirementService'
 const router = express.Router()
 // 请求前缀为/menu
 class MenuController {
@@ -160,8 +162,32 @@ class MenuController {
             }
         })
 
+        /**
+         * /menu/getMenuPhotosByMenuId  Get menu's Photo URLs
+         */
+        router.get('/getMenuPhotosByMenuId',async(req,res,next) => {
+            try {
+                let menu_id = req.query.menu_id;
+                let criteria =  await chefMenuService.checkUserIdAndMenuId(req.user_id,menu_id);
+                res.json(await menuPhotoService.getMenuPhotosByMenuId(menu_id));
+            }catch (e) {
+                next(e);
+            }
+        })
 
 
+        /**
+         ​/menu​/getMenuBookingRequirement (Func38) Get Menu Chef's booking requirements for instant booking
+         */
+        router.get('/getMenuBookingRequirement',async(req,res,next) => {
+            try {
+                let menu_id = req.query.menu_id;
+                let criteria =  await chefMenuService.checkUserIdAndMenuId(req.user_id,menu_id);
+                res.json(await menuBookingRequirementService.getMenuBookingRequirement(menu_id));
+            }catch (e) {
+                next(e);
+            }
+        })
 
         return router;
 
