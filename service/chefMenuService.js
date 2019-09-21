@@ -112,7 +112,7 @@ class ChefMenuService extends BaseService{
         if (!menu_id) {
             throw baseResult.MENU_ID_FILED_MANDATORY;
         }
-       return chefService.preparedMenuQueryCriteria(req.user_id,menu_id).then( criteria => {
+       return chefService.preparedMenuQueryCriteria(user_id,menu_id).then( criteria => {
                 return this.getMenuWithoutItemsByCriteria(criteria).then(menu => {
                     if (!menu) throw baseResult.MENU_ID_NOT_EXIST;
                     else

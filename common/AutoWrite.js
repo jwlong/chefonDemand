@@ -70,6 +70,9 @@ module.exports = {
     AutoWritedIncludeItem(target,key,desc) {
         target.model = require('../model/includeItem')
     },
+    AutoWritedMenuInclude(target,key,desc) {
+        target.model = require('../model/menuInclude')
+    },
 
 
 }

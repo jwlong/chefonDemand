@@ -136,6 +136,17 @@ class MenuController {
             }
         })
 
+        router.get('/getMenuIncludeItemsByMenuId',async(req,res,next) => {
+            try {
+                let menu_id = req.query.menu_id;
+                await chefMenuService.checkUserIdAndMenuId(req.user_id,menu_id);
+                res.json(await includeItemService.getMenuIncludeItemsByMenuId(menu_id));
+            }catch (e) {
+                next(e);
+            }
+        })
+
+
         return router;
 
 

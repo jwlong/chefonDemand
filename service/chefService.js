@@ -205,8 +205,9 @@ WHERE cc.chef_id = :chef_id and ct.active_ind = 'A' `;
         let criteria = {menu_id:menu_id,act_ind:activeIndStatus.ACTIVE};
         if (!user_id) {
             criteria.public_ind = 1;
-            return criteria;
+            return new Promise(resolve => resolve(criteria));
         }
+
        return this.getChefByUserId(user_id).then(result => {
             if (result) {
                 criteria.public_ind = 1;
