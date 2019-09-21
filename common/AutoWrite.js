@@ -79,5 +79,7 @@ module.exports = {
     AutoWritedMenuBookingReq(target,key,desc) {
         target.model = require('../model/menuBookingRequirement')
     },
-
+    AutoWritedMenuCuisine(target,key,desc) {
+        target.model = require('../model/menuCuisine')
+    },
 }

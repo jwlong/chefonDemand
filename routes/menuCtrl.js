@@ -12,6 +12,7 @@ import menuChefNoteService from '../service/menu/menuChefNoteService'
 import includeItemService from  '../service/menu/includeItemService'
 import menuPhotoService from  '../service/menu/menuPhotoService'
 import menuBookingRequirementService from  '../service/menu/menuBookingRequirementService'
+import menuCuisineService from  '../service/menu/menuCuisineService'
 const router = express.Router()
 // 请求前缀为/menu
 class MenuController {
@@ -189,6 +190,16 @@ class MenuController {
             }
         })
 
+        /**
+         * /menu/getAvailableCuisineTypes
+         */
+        router.get('/getAvailableCuisineTypes',async(req,res,next) => {
+            try {
+                res.json(await menuCuisineService.getAvailableCuisineTypes());
+            }catch (e) {
+                next(e);
+            }
+        })
         return router;
 
 
