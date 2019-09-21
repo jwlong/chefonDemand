@@ -121,5 +121,16 @@ class ChefMenuService extends BaseService{
             }
         );
     }
+
+    /**
+     *
+     * @param criteria 默认包含menu_id
+     * @returns {*}
+     */
+    getMenuAboutByMenuId(criteria) {
+        let fields = ['menu_id','about'];
+        return this.getOne({attributes:fields,where:criteria});
+    }
+
 }
 module.exports = new ChefMenuService()
