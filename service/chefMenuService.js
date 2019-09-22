@@ -132,5 +132,16 @@ class ChefMenuService extends BaseService{
         return this.getOne({attributes:fields,where:criteria});
     }
 
+    cloneMenuCheck(user_id, menu_id) {
+        return chefService.getChefByUserId(user_id).then(chef => {
+            if (chef){
+               return this.getMenuWithoutItemsByCriteria({chef_id:chef.chef_id,menu_id:menu_id,act_ind:activeIndStatus.ACTIVE}).then(menu => {
+                   if (!menu) throw baseResult.MENU_MENUID_NOT_BELONG_TO_CHEF;
+               })
+            } else {
+                throw baseResult.MENU_ONLY_CHEF_CAN_CREATE_MENU;
+            }
+        })
+    }
 }
 module.exports = new ChefMenuService()

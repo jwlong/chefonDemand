@@ -70,7 +70,8 @@ export default  {
     MENU_NAME_AND_DESC_REQUIRED:new baseResult(401,'Menu name, description, are mandatory,'),
     MENU_NAME_EXISTS:new baseResult(400,'Menu name already taken for the chef.'),
     MENU_CHEF_ID_NOT_EXISTS: new baseResult(400, 'chef Id does not exist.'),
-
+    MENU_MENUID_TOKEN_CONTENT_TYPE_MANDATORY:new baseResult(401,'access_token, content_type, menu_id, menu json fields are mandatory.'),
+    MENU_MENUID_NOT_BELONG_TO_CHEF:new baseResult(403,'menu Id does not belong to chef.'),
     // 未定义错误
     PASSWD_NOT_BE_EMPTY:new baseResult(999,"password can not be empty!"),
     CHEF_EXP_LIST_FILED_INVALID: new baseResult(998,"in experience_list ,start_date,exp_desc are mandatory!"),
