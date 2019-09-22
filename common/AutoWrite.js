@@ -82,4 +82,7 @@ module.exports = {
     AutoWritedMenuCuisine(target,key,desc) {
         target.model = require('../model/menuCuisine')
     },
+    AutoWritedMenuSection(target,key,desc) {
+        target.model = require('../model/menuSection')
+    },
 }

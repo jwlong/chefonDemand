@@ -209,11 +209,11 @@ class MenuController {
                 let menu_id = req.query.menu_id;
                 let criteria = await chefMenuService.checkUserIdAndMenuId(req.user_id,menu_id);
                 res.json(await chefMenuService.getMenuCancelPolicy(criteria));
-
             }catch (e) {
                 next(e);
             }
         })
+
         return router;
 
 

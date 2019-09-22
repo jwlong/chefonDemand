@@ -80,11 +80,11 @@ class ChefMenuService extends BaseService{
      * @param chef_id
      */
     getMenuListByChefId(chef_id) {
-        this.baseFindByFilter(['chef_id','menu_id','menu_name','menu_code','public_ind','seq_no','menu_rating','num_of_review','min_pers','max_pers','menu_logo_url','unit_price'],{chef_id:chef_id}).then(menuList => {
-
-        })
+        return this.baseFindByFilter(['chef_id', 'menu_id', 'menu_name', 'menu_code', 'public_ind', 'seq_no', 'menu_rating', 'num_of_review', 'min_pers', 'max_pers', 'menu_logo_url', 'unit_price'], {
+            chef_id: chef_id,
+            act_ind: activeIndStatus.ACTIVE
+        });
     }
-
     /**
      * {
   "menu_id": 0,
@@ -147,7 +147,6 @@ class ChefMenuService extends BaseService{
     getMenuCancelPolicy(criteria) {
         let fields = ['menu_id','cancel_policy'];
         return this.getOne({attributes:fields,where:criteria});
-
     }
 }
 module.exports = new ChefMenuService()

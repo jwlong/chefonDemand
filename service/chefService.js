@@ -130,8 +130,10 @@ class ChefService extends BaseService{
        }
     }
     getChefByChefId (chefId,trans) {
-        return this.getModel().findOne({where:{chef_id:chefId},transaction:trans})
-
+        return this.getModel().findOne({where:{chef_id:chefId,active_ind:activeIndStatus.ACTIVE},transaction:trans})
+    }
+    getChefIngoreStatusByChefId(chefId,trans) {
+        return this.getOne({where:{chef_id:chefId},transaction:trans})
     }
     updateChefQualification(attr) {
         return this.baseUpdate(attr,{where:{chef_id:attr.chef_id}})
