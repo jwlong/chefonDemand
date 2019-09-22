@@ -103,7 +103,7 @@ class ChefMenuService extends BaseService{
     }
 
     /**
-     * check user_id ,menu_id是否合法，合法返回menu_id下的menu数据
+     * check user_id ,menu_id是否合法，合法返回menu_id下的 查询条件数据
      * @param user_id
      * @param menu_id
      * @returns {PromiseLike<T> | Promise<T>}
@@ -116,7 +116,7 @@ class ChefMenuService extends BaseService{
                 return this.getMenuWithoutItemsByCriteria(criteria).then(menu => {
                     if (!menu) throw baseResult.MENU_ID_NOT_EXIST;
                     else
-                        return menu;
+                        return criteria;
                 });
             }
         );
@@ -142,6 +142,12 @@ class ChefMenuService extends BaseService{
                 throw baseResult.MENU_ONLY_CHEF_CAN_CREATE_MENU;
             }
         })
+    }
+
+    getMenuCancelPolicy(criteria) {
+        let fields = ['menu_id','cancel_policy'];
+        return this.getOne({attributes:fields,where:criteria});
+
     }
 }
 module.exports = new ChefMenuService()
