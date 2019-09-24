@@ -1,8 +1,8 @@
 import express from 'express'
 import chefMenuService from "../service/chefMenuService";
 import chefService from "../service/chefService";
-import menuSectionSevice from "../service/menu/menuSectionSevice";
-
+import menuSectionService from "../service/menu/menuSectionService";
+import foodItemService from "../service/menu/foodItemService";
 import baseResult from "../model/baseResult";
 
 const router = express.Router();
@@ -30,7 +30,7 @@ class MenuFoodSelectionCtroller {
                 if (!menuList || menuList.length == 0) {
                     throw baseResult.MENU_ID_NOT_EXIST;
                 }*/
-                res.json(await menuSectionSevice.getChefMenuSectionsByChefId(chef.chef_id));
+                res.json(await menuSectionService.getChefMenuSectionsByChefId(chef.chef_id));
             }catch (e) {
                 next(e);
             }
@@ -46,7 +46,7 @@ class MenuFoodSelectionCtroller {
                 if (!attr.chef_id) {
                    throw baseResult.MENU_CHEF_ID_NOT_EXISTS;
                 }
-                await menuSectionSevice.addChefMenuSection(attr);
+                await menuSectionService.addChefMenuSection(attr);
                 res.json(baseResult.SUCCESS);
             }catch (e) {
                 next(e);
@@ -59,7 +59,7 @@ class MenuFoodSelectionCtroller {
                if (!chef){
                    throw baseResult.MENU_ONLY_CHEF_CAN_ADD_SECTION;
                }
-               await menuSectionSevice.editChefMenuSection(req.body);
+               await menuSectionService.editChefMenuSection(req.body);
                res.json(baseResult.SUCCESS);
            }catch (e) {
                next(e);
@@ -77,12 +77,77 @@ class MenuFoodSelectionCtroller {
                     throw  baseResult.MENU_SECTION_ID_NOT_EXISTS;
                 }
                 attr.chef_id = chef.chef_id;
-                await menuSectionSevice.removeChefMenuSection(attr);
+                await menuSectionService.removeChefMenuSection(attr);
                 res.json(baseResult.SUCCESS);
             }catch (e) {
                 next(e);
             }
         })
+
+        // /menu/getChefMenuFoodItems  (Func48) Get a list of Chef's custom food items
+        router.get('/getChefMenuFoodItems',async(req,res,next) => {
+            try {
+                let chef = await chefService.getChefByUserId(req.user_id);
+                if (!chef){
+                    throw baseResult.MENU_ONLY_CHEF_CAN_DO_THIS;
+                }
+                res.json(await foodItemService.getChefMenuFoodItemsByChefId(chef.chef_id));
+            }catch (e) {
+                next(e);
+            }
+        });
+
+        // /menu/addChefMenuFoodItem   (Func49) add one to chef's custom food items
+        router.post('/addChefMenuFoodItem',async(req,res,next) => {
+            try {
+                let chef = await chefService.getChefByUserId(req.user_id);
+                if (!chef){
+                    throw baseResult.MENU_ONLY_CHEF_CAN_DO_THIS;
+                }
+                //next add chef menu food
+                let attr = req.body;
+                attr.chef_id = chef.chef_id;
+                await foodItemService.addChefMenuFoodItem(attr);
+                res.json(baseResult.SUCCESS);
+            }catch (e) {
+                next(e);
+            }
+        });
+
+        // /menu/editChefMenuFoodItem
+        router.post('/editChefMenuFoodItem',async(req,res,next) => {
+            try {
+                let chef = await chefService.getChefByUserId(req.user_id);
+                if (!chef){
+                    throw baseResult.MENU_ONLY_CHEF_CAN_DO_THIS;
+                }
+                //next add chef menu food
+                let attr = req.body;
+                attr.chef_id = chef.chef_id;
+                await foodItemService.editChefMenuFoodItem(attr);
+                res.json(baseResult.SUCCESS);
+            }catch (e) {
+                next(e);
+            }
+        });
+
+        // /menu/removeChefMenuFoodItem
+
+        router.post('/removeChefMenuFoodItem',async(req,res,next) => {
+            try {
+                let chef = await chefService.getChefByUserId(req.user_id);
+                if (!chef){
+                    throw baseResult.MENU_ONLY_CHEF_CAN_DO_THIS;
+                }
+                //next add chef menu food
+                let attr = req.body;
+                attr.chef_id = chef.chef_id;
+                await foodItemService.removeChefMenuFoodItem(attr);
+                res.json(baseResult.SUCCESS);
+            }catch (e) {
+                next(e);
+            }
+        });
 
         return router;
     }

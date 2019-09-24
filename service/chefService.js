@@ -34,7 +34,18 @@ class ChefService extends BaseService{
     }
 
     getChefByUserId(userId) {
+        console.log("get active status chef by userId:",userId);
         return this.getModel().findOne({where:{user_id:userId,active_ind:activeIndStatus.ACTIVE}}).then(existOne => {
+            if (existOne) {
+                return existOne;
+            }else {
+                return null;
+            }
+        })
+    }
+    getChefIgnoreStatusByUserId(userId) {
+        console.log("get chef (ignore status) by userId:",userId);
+        return this.getModel().findOne({where:{user_id:userId}}).then(existOne => {
             if (existOne) {
                 return existOne;
             }else {
