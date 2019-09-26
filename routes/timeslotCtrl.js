@@ -14,6 +14,11 @@ class TimeSlotController {
         router.post('/updateChefAvailableTimeSlot', async (req, res, next) => {
             try {
                 let data = utils.keyLowerCase(req.body);
+                let chef = await chefService.getChefByUserId(req.user_id);
+                if (!chef) {
+                    throw baseResult.TIMESLOT_CHEF_NOT_FOUND;
+                }
+
                 await chefAvailableTimeSlotService.checkIsLegal(data);
                 await  chefAvailableTimeSlotService.updateChefAvailableTimeSlot(data);
                 return res.json(baseResult.SUCCESS);
@@ -27,6 +32,11 @@ class TimeSlotController {
             //try{res.json(await chefService.baseFindAll())}catch(err){next(err)}
             try{
                 let data = utils.keyLowerCase(req.body);
+                let chef = chefService.getChefByUserId(req.user_id);
+                if (!chef) {
+                    throw baseResult.TIMESLOT_CHEF_NOT_FOUND
+                }
+                data.chef_id = chef.chef_id;
                 await  chefAvailableTimeSlotService.checkIsLegal(data);
                 await chefUnAvailableTimeSlotService.updateChefUnAvailableTimeSlot(data);
                 return res.json(baseResult.SUCCESS);
@@ -37,7 +47,13 @@ class TimeSlotController {
         router.post('/updateChefDefaultTimeSlot', async (req, res, next) => {
             console.log("updateChefDefaultTimeSlot,request body:",req.body);
             try{
+
                 let data = utils.keyLowerCase(req.body);
+                let chef  = await chefService.getChefByUserId(req.user_id);
+                if (!chef) {
+                    throw baseResult.TIMESLOT_CHEF_NOT_FOUND;
+                }
+                data.chef_id = chef.chef_id;
                 await  chefDefaultScheuleService.updateChefDefaultTimeSlot(data)
                 return res.json(baseResult.SUCCESS);
             }catch(err){next(err)}

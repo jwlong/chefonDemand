@@ -34,18 +34,20 @@ class ChefAvailableTimeSlotService extends BaseService {
         }
 
         data.available_timeslot_list.forEach(timeslot => {
-            timeslot.start_date = new Date(timeslot.start_date);
-            timeslot.end_date = new Date(timeslot.end_date);
-            if (timeslot.start_date.getTime() > timeslot.end_date.getTime()) {
-                throw baseResult.TIMESLOT_INVALID_DATETIME;
-            }
-        })
-        return chefService.getChefByChefId(data.chef_id).then(_chef => {
-            if (!_chef) {
-                throw  baseResult.TIMESLOT_CHEF_ID_NOT_FOUND;
-            }
-        })
+            if (timeslot && timeslot.start_date && timeslot.end_date) {
+                timeslot.start_date = new Date(timeslot.start_date);
+                timeslot.end_date = new Date(timeslot.end_date);
+                if (timeslot.start_date.getTime()<new Date().getTime()) {
+                    throw baseResult.TIMESLOT_STARTDATE_EARLY_TODAY
+                }
 
+                if (timeslot.start_date.getTime() > timeslot.end_date.getTime()) {
+                    throw baseResult.TIMESLOT_INVALID_DATETIME;
+                }
+            }else if (timeslot && !timeslot.start_date) {
+                throw new Error('start_date can not be empty!');
+            }
+        })
     }
 
     retrieveAvailTimeslots(query) {

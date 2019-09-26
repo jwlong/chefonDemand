@@ -40,6 +40,12 @@ class ChefController {
             console.log("updateChef...req body=>",req.body);
             try {
                 let attr = utils.keyLowerCase(req.body);
+                let chefUser = await chefService.getChefByUserId(req.user_id);
+                if (!chefUser) {
+                    throw baseResult.CHEF_USER_ID_NOT_EXIST;
+                }
+                attr.chef_id = chefUser.chef_id;
+
                 if (Array.isArray(attr.experience_list)) {
                     attr.experience_list.forEach(value => {
                         if (!value.exp_desc) {
@@ -73,7 +79,11 @@ class ChefController {
             let attrs = utils.keyLowerCase(req.body);
             console.log("Update chef user qualification information,param=> ",attrs);
             try {
-                await chefService.checkChefIsExist(attrs.chef_id)
+                let chef =  await chefService.getChefByUserId(req.user_id);
+                if (!chef) {
+                    throw baseResult.CHEF_USER_ID_NOT_EXIST;
+                }
+                attrs.chef_id = chef.chef_id;
                 let result = await chefService.updateChefQualification(attrs);
                 console.log("result=>",result)
                 res.json(baseResult.SUCCESS);
@@ -96,6 +106,8 @@ class ChefController {
             console.log("update chef user account's service locations by chef,request body =>",req.body);
             let attrs = utils.keyLowerCase(req.body);
             try {
+                let chef = await chefService.getChefByUserId(req.user_id)
+                attrs.chef_id = chef.chef_id;
                 await chefService.checkChefIsExist(attrs.chef_id)
                 let result = await chefLanguageService.setupChefLanguage(attrs);
                 console.log("result=>",result)
@@ -109,7 +121,11 @@ class ChefController {
             console.log("update chef user account's service locations by chef,request body =>",req.body);
             let attrs = utils.keyLowerCase(req.body);
             try {
-                await  chefService.checkChefIsExist(attrs.chef_id)
+                let chef = await  chefService.getChefByUserId(req.user_id);
+                if (!chef) {
+                    throw baseResult.CHEF_ID_NOT_EXIST;
+                }
+                attrs.chef_id = chef.chef_id;
                 let result = await districtService.updateChefServiceLocation(attrs);
                 res.json(baseResult.SUCCESS);
             }catch (e) {
@@ -138,14 +154,13 @@ class ChefController {
         router.get('/retrieveAvailTimeslots',async(req,res,next) => {
             console.log("Retrieve available timeslots by chef Id,req query:",req.query)
             let query = utils.keyLowerCase(req.query);
-            if (!query['chef_id']){
-               return res.json(baseResult.CHEF_ID_NOT_EXIST);
-            }
+
             try {
-                let chef = await chefService.getChefByChefId(query['chef_id']);
+                let chef = chefService.getChefByUserId(req.user_id);
                 if (!chef) {
                     throw baseResult.CHEF_ID_NOT_EXIST;
                 }
+                query.chef_id = chef.chef_id;
                 let result = await chefAvailableTimeSlotService.retrieveAvailTimeslots(query)
                // result.chef_Id = query.chef_id;
                 return res.json(result);

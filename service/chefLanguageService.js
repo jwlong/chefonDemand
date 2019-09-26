@@ -1,6 +1,6 @@
 import BaseService from './baseService.js'
 import {AutoWritedChefLanguage} from '../common/AutoWrite.js'
-import chefService from './chefService'
+import languageService from './languageService'
 import baseResult from "../model/baseResult";
 import utils from "../common/utils";
 import db from '../config/db'
@@ -43,15 +43,22 @@ class ChefLanguageService extends BaseService{
                     chefLang.chef_id = attr.chef_id;
                     chefLang.lang_code = chefLang.lang_code || chefLang.language_code;
                     lang_codes.push(chefLang.lang_code);
-                    //utils.setCustomTransfer(chefLang,'create');
-                   let p = this.getModel().count({where:{chef_id:chefLang.chef_id,lang_code:chefLang.lang_code},transaction:t}).then(cnt => {
 
-                        if (cnt >0) {
-                           return this.baseUpdate({active_ind:chefLang.active_ind},{where:{chef_id:chefLang.chef_id,lang_code:chefLang.lang_code},transaction:t});
-                        } else {
-                            console.log(",======>",chefLang);
-                            return this.baseCreate(chefLang,{transaction:t});
+                    //utils.setCustomTransfer(chefLang,'create');
+                   let p = languageService.getOne({where:{lang_code:chefLang.lang_code,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(actCtn => {
+                        if (actCtn <= 0) {
+                            throw baseResult.CHEF_EXIST_INVALID_IN_LANG_LIST;
                         }
+
+                        return this.getModel().count({where:{chef_id:chefLang.chef_id,lang_code:chefLang.lang_code},transaction:t}).then(cnt => {
+
+                            if (cnt >0) {
+                                return this.baseUpdate({active_ind:chefLang.active_ind},{where:{chef_id:chefLang.chef_id,lang_code:chefLang.lang_code},transaction:t});
+                            } else {
+
+                                return this.baseCreate(chefLang,{transaction:t});
+                            }
+                        })
                     })
                     promiseArr.push(p);
                 }

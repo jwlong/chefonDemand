@@ -49,6 +49,7 @@ export default  {
     CHEF_MANDATORY_FIELD_EXCEPTION:new baseResult(401,'Chef\'s first name, last name and short description fields are mandatory.'),
     CHEF_USER_ID_NOT_EXIST: new baseResult(400,"user Id does not exist."),
     CHEF_LANG_LIST_EMPTY:new baseResult(401,"language list can not be empty."),
+    CHEF_EXIST_INVALID_IN_LANG_LIST:new baseResult(402,"One of the language in input list is invalid."),
     CHEF_ID_NOT_EXIST: new baseResult(400,'chef Id does not exist.'),
 
     // /chef/updateChefServiceLocation
@@ -60,7 +61,9 @@ export default  {
     TIMESLOT_CHEF_ID_NOT_FOUND : new baseResult(402,"Chef Not Found."),
     TIMESLOT_LIST_EMPTY:new baseResult(400,'Timeslot List is Empty'),
     TIMESLOT_INVALID_DATETIME:new baseResult(407,"Timeslot start datetime can not later than end datetime."),
+    TIMESLOT_STARTDATE_EARLY_TODAY:new baseResult(408, 'Timeslot start datetime can not backdate (earlier than today)'),
     TIMESLOT_PICK_ERROR:new baseResult(420,'Must pick at least one day of the week.'),
+    TIMESLOT_CHEF_NOT_FOUND:new baseResult(402,'Chef Not Found'),
 
 
     //menu部分

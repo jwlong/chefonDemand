@@ -87,11 +87,6 @@ class ChefService extends BaseService{
         }
 
         return db.transaction(t => {
-
-            return this.getModel().findOne({where:{chef_id: attr.chef_id}, transaction: t}).then(existOne => {
-                console.log("existOne: ", existOne);
-
-                if (existOne) {
                     return userService.baseUpdate(attr, {where:{user_id: existOne.user_id}, transaction: t}).then(user => {
 
                         return this.baseUpdate(attr, {where:{chef_id: existOne.chef_id}, transaction: t}).then(chef => {
@@ -120,15 +115,7 @@ class ChefService extends BaseService{
 
                         });
                     });
-
-                } else {
-                    throw baseResult.CHEF_USER_ID_NOT_EXIST;
-                }
-
-            }).catch(err => {
-                throw  err;
             })
-        })
     }
 
     async checkChefIsExist(chefId) {
