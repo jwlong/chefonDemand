@@ -198,13 +198,13 @@ class ChefMenuService extends BaseService{
         this.baseCreate(menu,)
     }
     copy(service, last_menu_id,new_menu_id,t) {
-        service.getModel().findAll({where:{menu_id:last_menu_id},transaction:t}).then(list => {
+        return service.getModel().findAll({where:{menu_id:last_menu_id},transaction:t}).then(list => {
             let copyList = [];
             list.forEach(single => {
                 single.menu_id = new_menu_id;
                 copyList.push(single);
             })
-            service.baseCreateBatch(copyList,{transaction:t});
+           return  service.baseCreateBatch(copyList,{transaction:t});
         })
     }
 }
