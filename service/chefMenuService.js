@@ -174,11 +174,20 @@ class ChefMenuService extends BaseService{
                  // copy t_menu_item
                  return  menuItemService.getModel().findAll({where:{menu_id:last_menu_id},transaction:t}).then(items => {            let promiseArr = [];
                      items.forEach((item,index) => {
-                         item.menu_id = new_menu_id;
-                         item.act_ind = activeIndStatus.ACTIVE;
-                         item.seq_no = item.seq_no +index;
-                         promiseArr.push(menuItemService.baseCreate(item,{transaction:t}));
-                         promiseArr.push(this.copy(menuItemOptionService,last_menu_id,new_menu_id,t));
+                         let createItemPromise = menuItemService.nextId('seq_no',{transaction:t}).then(nextSeqNo => {
+                             let last_item_id = item.menu_item_id;
+                             let oldItem = item.toJSON();
+                             oldItem.seq_no = nextSeqNo+index;
+                             oldItem.menu_id = new_menu_id;
+                             oldItem.act_ind = activeIndStatus.ACTIVE;
+                             oldItem.menu_item_id = null;
+                             console.log("menu item =================>",oldItem);
+                            return menuItemService.baseCreate(oldItem,{transaction:t}).then( resp => {
+                                console.log("last_item_id=================>",last_item_id);
+                                return menuItemOptionService.copyOptionsByItemId(last_item_id,resp.menu_item_id,t);
+                            });
+                         })
+                         promiseArr.push(createItemPromise);
                      })
                      //t_menu_cuisine
                      promiseArr.push(this.copy(menuCuisineService,last_menu_id,new_menu_id,t));
@@ -200,14 +209,14 @@ class ChefMenuService extends BaseService{
                  });
             })
         })
-        this.baseCreate(menu,)
     }
     copy(service, last_menu_id,new_menu_id,t) {
         return service.getModel().findAll({where:{menu_id:last_menu_id},transaction:t}).then(list => {
             let copyList = [];
             list.forEach(single => {
-                single.menu_id = new_menu_id;
-                copyList.push(single);
+                let  copyCuisine = single.toJSON();
+                copyCuisine.menu_id = new_menu_id;
+                copyList.push(copyCuisine);
             })
            return  service.baseCreateBatch(copyList,{transaction:t});
         })
