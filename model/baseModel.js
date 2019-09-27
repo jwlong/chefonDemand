@@ -88,6 +88,7 @@ class BaseModel{
 	// 插入单个实体
 	create(entity,options){
 		utils.setCustomTransfer(entity,'create')
+		console.log("create entity:=============>",entity);
 		return this.model.create(entity,options)
 	}
 	// 批量插入实体集

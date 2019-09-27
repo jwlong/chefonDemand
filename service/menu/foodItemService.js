@@ -37,6 +37,7 @@ class FoodItemService extends BaseService{
                 if (itemCnt >0) {
                     throw baseResult.MENU_FOOD_ITEM_NAME_EXIST;
                 }
+                attr.act_ind = activeIndStatus.ACTIVE;
                 return this.baseCreate(attr,{transaction:t});
             })
         })
@@ -66,13 +67,16 @@ class FoodItemService extends BaseService{
      * @param attr
      */
     removeChefMenuFoodItem(attr) {
-         return this.getOne({where:{chef_id:attr.chef_id,food_item_id:attr.food_item_id,act_ind:activeIndStatus.ACTIVE}}).then(foodItem => {
+         return this.getOne({where:{food_item_id:attr.food_item_id,act_ind:activeIndStatus.ACTIVE}}).then(foodItem => {
             if (foodItem) {
-
-                return this.baseUpdate({act_ind:activeIndStatus.INACTIVE},{where:{food_item_id:attr.food_item_id,chef_id:attr.chef_id},transaction:t});
+                if (foodItem.chef_id !== attr.chef_id) {
+                    throw baseResult.MENU_FOOD_ITEM_ID_NOT_BELONG_TO_CHEF;
+                }
+                return this.baseUpdate({act_ind:activeIndStatus.INACTIVE},{where:{food_item_id:attr.food_item_id,chef_id:attr.chef_id}});
 
             } else {
-                throw baseResult.MENU_FOOD_ITEM_ID_NOT_BELONG_TO_CHEF;
+                throw baseResult.MENU_FOOD_ITEM_ID_NOT_EXISTS;
+
             }
         })
     }

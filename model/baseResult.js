@@ -83,6 +83,7 @@ export default  {
     MENU_SECTION_ID_NOT_EXISTS:new baseResult(401,'menu_section_id does not exist.'),
     MENU_FOOD_ITEM_NAME_EXIST:new baseResult(401,'Menu food item name already exist.'),
     MENU_FOOD_ITEM_ID_NOT_BELONG_TO_CHEF:new baseResult(404,'the food_item_id does not belong to chef'),
+    MENU_FOOD_ITEM_ID_NOT_EXISTS:new baseResult(401,'food_item_id does not exist.'),
     // 未定义错误
     PASSWD_NOT_BE_EMPTY:new baseResult(999,"password can not be empty!"),
     CHEF_EXP_LIST_FILED_INVALID: new baseResult(998,"in experience_list ,start_date,exp_desc are mandatory!"),

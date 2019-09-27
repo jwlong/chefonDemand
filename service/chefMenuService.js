@@ -141,12 +141,13 @@ class ChefMenuService extends BaseService{
         return this.getOne({attributes:fields,where:criteria});
     }
 
-    cloneMenuCheck(user_id, menu_id) {
+    cloneMenu(user_id, menu_id) {
         return chefService.getChefByUserId(user_id).then(chef => {
             if (chef){
                return this.getMenuWithoutItemsByCriteria({chef_id:chef.chef_id,menu_id:menu_id,act_ind:activeIndStatus.ACTIVE}).then(menu => {
                    if (!menu) throw baseResult.MENU_MENUID_NOT_BELONG_TO_CHEF;
-                   this.cloneProcess(menu);
+                   console.log("clone menu:=============>",menu.toJSON());
+                  return this.cloneProcess(menu.toJSON());
                })
             } else {
                 throw baseResult.MENU_ONLY_CHEF_CAN_CREATE_MENU;
@@ -161,19 +162,23 @@ class ChefMenuService extends BaseService{
 
     cloneProcess(menu) {
         // first query
-        db.transaction(t => {
+        return db.transaction(t => {
             // create new menu
             let last_menu_id = menu.menu_id;
             menu.menu_id = null;
+            menu.menu_code = menu.chef_id+moment().format('YYYYMMDDHHmmSSSS')
             return this.baseCreate(menu,{transaction:t}).then(newMenu => {
+                console.log("new menu============>",newMenu.toJSON());
                 let new_menu_id = newMenu.menu_id;
+
                  // copy t_menu_item
-                 let copyMenuItem = menuItemService.getModel().findAll({where:{menu_id:last_menu_id},transaction:t}).then(items => {
-                     let promiseArr = [];
-                     items.forEach(item => {
+                 return  menuItemService.getModel().findAll({where:{menu_id:last_menu_id},transaction:t}).then(items => {            let promiseArr = [];
+                     items.forEach((item,index) => {
                          item.menu_id = new_menu_id;
+                         item.act_ind = activeIndStatus.ACTIVE;
+                         item.seq_no = item.seq_no +index;
                          promiseArr.push(menuItemService.baseCreate(item,{transaction:t}));
-                         promiseArr.push(this.copy(menuItemOptionService,item.menu_item_id,t));
+                         promiseArr.push(this.copy(menuItemOptionService,last_menu_id,new_menu_id,t));
                      })
                      //t_menu_cuisine
                      promiseArr.push(this.copy(menuCuisineService,last_menu_id,new_menu_id,t));

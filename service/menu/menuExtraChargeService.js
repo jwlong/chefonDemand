@@ -9,9 +9,5 @@ class MenuExtraCharge extends BaseService{
     constructor(){
         super(MenuExtraCharge.model)
     }
-
-    copyExtraCharge(last_menu_id, new_menu_id, t) {
-
-    }
 }
 module.exports = new MenuExtraCharge()

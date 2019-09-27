@@ -11,14 +11,18 @@ class MenuFoodSelectionCtroller {
     static initRouter() {
         router.post('/cloneMenuByMenuId', async (req, res, next) => {
             let param = req.headers;
-            if (param.menu_id || param.access_token || param.content_type) {
-                throw baseResult.MENU_MENUID_TOKEN_CONTENT_TYPE_MANDATORY;
+            try {
+                console.log("clone param:============>",param)
+                if (!param.menu_id) {
+                    throw baseResult.MENU_MENUID_TOKEN_CONTENT_TYPE_MANDATORY;
+                }
+                await chefMenuService.cloneMenu(req.user_id, req.headers.menu_id);
+                res.json(baseResult.SUCCESS);
+            }catch (e) {
+                next(e);
             }
-            await chefMenuService.cloneMenuCheck(req.user_id, req.headers.menu_id);
+
             //clone next...
-
-
-
         });
         // /menu/getChefMenuSections:
         router.get('/getChefMenuSections',async(req,res,next) => {
@@ -45,9 +49,7 @@ class MenuFoodSelectionCtroller {
                     throw baseResult.MENU_ONLY_CHEF_CAN_ADD_SECTION;
                 }
                 let attr = req.body;
-                if (!attr.chef_id) {
-                   throw baseResult.MENU_CHEF_ID_NOT_EXISTS;
-                }
+                attr.chef_id = chef.chef_id;
                 await menuSectionService.addChefMenuSection(attr);
                 res.json(baseResult.SUCCESS);
             }catch (e) {
@@ -61,6 +63,8 @@ class MenuFoodSelectionCtroller {
                if (!chef){
                    throw baseResult.MENU_ONLY_CHEF_CAN_ADD_SECTION;
                }
+               let attr = req.body;
+               attr.chef_id = chef.chef_id;
                await menuSectionService.editChefMenuSection(req.body);
                res.json(baseResult.SUCCESS);
            }catch (e) {
@@ -144,6 +148,9 @@ class MenuFoodSelectionCtroller {
                 //next add chef menu food
                 let attr = req.body;
                 attr.chef_id = chef.chef_id;
+                if (!attr.food_item_id) {
+                    throw baseResult.MENU_FOOD_ITEM_ID_NOT_EXISTS;
+                }
                 await foodItemService.removeChefMenuFoodItem(attr);
                 res.json(baseResult.SUCCESS);
             }catch (e) {

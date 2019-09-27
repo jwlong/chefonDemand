@@ -53,7 +53,8 @@ class FoodItem extends BaseModel {
                 allowNull: false
             }
         }, {
-            tableName: 't_food_item'
+            tableName: 't_food_item',
+            timestamps:false
         });
     }
 };
