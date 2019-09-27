@@ -88,4 +88,7 @@ module.exports = {
     AutoWritedFoodItem(target,key,desc) {
         target.model = require('../model/foodItem')
     },
+    AutoWritedMenuBookingRule(target,key,desc) {
+        target.model = require('../model/menuBookingRule')
+    },
 }

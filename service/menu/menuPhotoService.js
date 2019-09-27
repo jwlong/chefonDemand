@@ -23,5 +23,9 @@ class MenuPhotoService extends BaseService{
             return result;
         })
     }
+
+    copyMenuPhoto(last_menu_id, new_menu_id, t) {
+
+    }
 }
 module.exports = new MenuPhotoService()

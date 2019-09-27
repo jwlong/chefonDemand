@@ -20,5 +20,13 @@ class MenuItemOptionService extends BaseService{
         })
         return Promise.all(promiseArr);
     }
+
+    copyOptionsByItemId(item_id,trans) {
+        return this.baseFindByFilter(null,{where:{menu_item_id:item_id},transaction:trans}).then(
+            optionList => {
+               return this.baseCreateBatch(optionList,{transaction:trans})
+            }
+        )
+    }
 }
 module.exports = new MenuItemOptionService()

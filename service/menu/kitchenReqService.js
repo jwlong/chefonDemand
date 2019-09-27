@@ -31,6 +31,17 @@ class KitchenReqService extends BaseService{
          item.kitchen_req_item_id,item.item_name,item_desc,req.qty from t_menu_kitchen_req req  left join t_kitchen_req_item item on req.kitchen_req_item_id = item.kitchen_req_item_id and item.active_ind =:status where req.menu_id =:menuId and req.active_ind =:status `;
        return db.query(sql,{replacements:{menuId:menuId,status:activeIndStatus.ACTIVE},type:db.QueryTypes.SELECT});
     }
+
+    copyKitchenReq(last_menu_id, new_menu_id, t) {
+        return this.getModel().findAll({where:{menu_id:last_menu_id},transaction:t}).then(list => {
+            let newList = [];
+            list.forEach(kitchenReq => {
+                kitchenReq.menu_id = new_menu_id;
+                newList.push(kitchenReq);
+            })
+            return this.baseCreateBatch(newList,{transaction:t});
+        })
+    }
 }
 
 module.exports = new KitchenReqService()

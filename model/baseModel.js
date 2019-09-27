@@ -91,8 +91,8 @@ class BaseModel{
 		return this.model.create(entity,options)
 	}
 	// 批量插入实体集
-	createBatch(entitys){
-		return this.model.bulkCreate(entitys)
+	createBatch(entitys,options){
+		return this.model.bulkCreate(entitys,options)
 	}
 
 }

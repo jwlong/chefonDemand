@@ -45,8 +45,8 @@ class BaseService{
 	baseCreate(entity,options){
 		return this.instance.create(entity,options)
 	}
-	baseCreateBatch(entitys){
-		return this.instance.createBatch(entitys)
+	baseCreateBatch(entitys,options){
+		return this.instance.createBatch(entitys,options)
 	}
 	getModel() {
 		return this.instance.model;

@@ -5,6 +5,15 @@ import chefService from './chefService'
 import activeIndStatus from "../model/activeIndStatus";
 import menuItemService from './menu/menuItemService'
 import menuItemOptionService from './menu/menuItemOptionService'
+import menuCuisineService from './menu/menuCuisineService'
+import kitchenReqService from './menu/kitchenReqService'
+import menuIncludeService from './menu/menuIncludeService'
+import menuChefNoteService from './menu/menuChefNoteService'
+//t_menu_booking_rule
+import menuBookingRuleService from './menu/menuBookingRuleService'
+import menuBookingRequirementService from './menu/menuBookingRequirementService'
+import menuExtraChargeService from './menu/menuExtraChargeService'
+import menuPhotoService from './menu/menuPhotoService'
 import moment from 'moment'
 import baseResult from "../model/baseResult";
 
@@ -137,6 +146,7 @@ class ChefMenuService extends BaseService{
             if (chef){
                return this.getMenuWithoutItemsByCriteria({chef_id:chef.chef_id,menu_id:menu_id,act_ind:activeIndStatus.ACTIVE}).then(menu => {
                    if (!menu) throw baseResult.MENU_MENUID_NOT_BELONG_TO_CHEF;
+                   this.cloneProcess(menu);
                })
             } else {
                 throw baseResult.MENU_ONLY_CHEF_CAN_CREATE_MENU;
@@ -147,6 +157,55 @@ class ChefMenuService extends BaseService{
     getMenuCancelPolicy(criteria) {
         let fields = ['menu_id','cancel_policy'];
         return this.getOne({attributes:fields,where:criteria});
+    }
+
+    cloneProcess(menu) {
+        // first query
+        db.transaction(t => {
+            // create new menu
+            let last_menu_id = menu.menu_id;
+            menu.menu_id = null;
+            return this.baseCreate(menu,{transaction:t}).then(newMenu => {
+                let new_menu_id = newMenu.menu_id;
+                 // copy t_menu_item
+                 let copyMenuItem = menuItemService.getModel().findAll({where:{menu_id:last_menu_id},transaction:t}).then(items => {
+                     let promiseArr = [];
+                     items.forEach(item => {
+                         item.menu_id = new_menu_id;
+                         promiseArr.push(menuItemService.baseCreate(item,{transaction:t}));
+                         promiseArr.push(this.copy(menuItemOptionService,item.menu_item_id,t));
+                     })
+                     //t_menu_cuisine
+                     promiseArr.push(this.copy(menuCuisineService,last_menu_id,new_menu_id,t));
+                     // copy t_menu_kitchen_req
+                     promiseArr.push(this.copy(kitchenReqService,last_menu_id,new_menu_id,t));
+                     // copy t_menu_include
+                     promiseArr.push(this.copy(menuIncludeService,last_menu_id,new_menu_id,t));
+                     // copy t_menu_chef_note
+                     promiseArr.push(this.copy(menuChefNoteService,last_menu_id,new_menu_id,t));
+                     //copy t_menu_booking_rule
+                     promiseArr.push(this.copy(menuBookingRuleService,last_menu_id,new_menu_id,t));
+                     //copy t_menu_booking_requirement
+                     promiseArr.push(this.copy(menuBookingRequirementService,last_menu_id,new_menu_id,t));
+                     // copy t_menu_extra_charge
+                     promiseArr.push(this.copy(menuExtraChargeService,last_menu_id,new_menu_id,t));
+                     // copy  t_menu_photo
+                     promiseArr.push(this.copy(menuPhotoService,last_menu_id,new_menu_id,t));
+                     return Promise.all(promiseArr);
+                 });
+            })
+        })
+        this.baseCreate(menu,)
+    }
+    copy(service, last_menu_id,new_menu_id,t) {
+        service.getModel().findAll({where:{menu_id:last_menu_id},transaction:t}).then(list => {
+            let copyList = [];
+            list.forEach(single => {
+                single.menu_id = new_menu_id;
+                copyList.push(single);
+            })
+            service.baseCreateBatch(copyList,{transaction:t});
+        })
     }
 }
 module.exports = new ChefMenuService()

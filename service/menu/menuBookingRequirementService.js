@@ -19,5 +19,21 @@ class MenuBookingRequirementService extends BaseService{
             return result;
         })
     }
+
+    copyCuisineByMenuId(menu_id,newMenuId, t) {
+        return this.getModel().findAll({where:{menu_id:menu_id},transaction:t}).then(cuisineList => {
+                let copyCuisineList = [];
+                cuisineList.forEach(cuisine => {
+                    cuisine.menu_id = newMenuId;
+                    copyCuisineList.push(cuisine);
+                })
+                return this.baseCreateBatch(copyCuisineList,{transaction:t});
+        })
+    }
+
+    copyBookingReq(last_menu_id, new_menu_id, t) {
+
+
+    }
 }
 module.exports = new MenuBookingRequirementService()

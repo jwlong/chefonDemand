@@ -18,6 +18,17 @@ class MenuChefNoteService extends BaseService{
             return result;
         }))
     }
+
+    copyChefNote(last_menu_id, new_menu_id, t) {
+        this.getModel().findAll({where:{menu_id:last_menu_id}}).then(list => {
+            let copyList = [];
+            list.forEach(chefNote => {
+                chefNote.menu_id = new_menu_id;
+                copyList.push(chefNote);
+            })
+            return this.baseCreateBatch(copyList,{transaction:t});
+        })
+    }
 }
 
 module.exports = new MenuChefNoteService()
