@@ -91,4 +91,7 @@ module.exports = {
     AutoWritedMenuBookingRule(target,key,desc) {
         target.model = require('../model/menuBookingRule')
     },
+    AutoWritedmenuExtraCharge(target,key,desc) {
+        target.model = require('../model/menuExtraCharge')
+    },
 }
