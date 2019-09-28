@@ -28,6 +28,7 @@ class MenuItemOptionService extends BaseService{
                     optionList.forEach((eachOption,index) => {
                         let copyOption = eachOption.toJSON();
                         let p = this.nextId('seq_no',{transaction:trans}).then(nextSeq => {
+                            copyOption.option_id = null;
                             copyOption.menu_item_id = new_item_id;
                             copyOption.seq_no = nextSeq+index;
                             return this.baseCreate(copyOption,{transaction:trans})

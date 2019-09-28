@@ -189,23 +189,28 @@ class ChefMenuService extends BaseService{
                          })
                          promiseArr.push(createItemPromise);
                      })
-                     //t_menu_cuisine
-                     promiseArr.push(this.copy(menuCuisineService,last_menu_id,new_menu_id,t));
-                     // copy t_menu_kitchen_req
-                     promiseArr.push(this.copy(kitchenReqService,last_menu_id,new_menu_id,t));
-                     // copy t_menu_include
-                     promiseArr.push(this.copy(menuIncludeService,last_menu_id,new_menu_id,t));
-                     // copy t_menu_chef_note
-                     promiseArr.push(this.copy(menuChefNoteService,last_menu_id,new_menu_id,t));
-                     //copy t_menu_booking_rule
-                     promiseArr.push(this.copy(menuBookingRuleService,last_menu_id,new_menu_id,t));
-                     //copy t_menu_booking_requirement
-                     promiseArr.push(this.copy(menuBookingRequirementService,last_menu_id,new_menu_id,t));
-                     // copy t_menu_extra_charge
-                     promiseArr.push(this.copy(menuExtraChargeService,last_menu_id,new_menu_id,t));
-                     // copy  t_menu_photo
-                     promiseArr.push(this.copy(menuPhotoService,last_menu_id,new_menu_id,t));
-                     return Promise.all(promiseArr);
+                     return Promise.all(promiseArr).then(result=> {
+                         let otherPromiseArr = [];
+                         //t_menu_cuisine
+                         otherPromiseArr.push(this.copy(menuCuisineService,last_menu_id,new_menu_id,t));
+                         // copy t_menu_kitchen_req
+                         otherPromiseArr.push(this.copy(kitchenReqService,last_menu_id,new_menu_id,t));
+                         // copy t_menu_include
+                         otherPromiseArr.push(this.copy(menuIncludeService,last_menu_id,new_menu_id,t));
+                         // copy t_menu_chef_note
+                         otherPromiseArr.push(this.copy(menuChefNoteService,last_menu_id,new_menu_id,t));
+                         //copy t_menu_booking_rule
+                         otherPromiseArr.push(this.copy(menuBookingRuleService,last_menu_id,new_menu_id,t));
+                         //copy t_menu_booking_requirement
+                         otherPromiseArr.push(this.copy(menuBookingRequirementService,last_menu_id,new_menu_id,t));
+                         // copy t_menu_extra_charge
+                         otherPromiseArr.push(this.copy(menuExtraChargeService,last_menu_id,new_menu_id,t));
+                         // copy  t_menu_photo
+                         otherPromiseArr.push(this.copy(menuPhotoService,last_menu_id,new_menu_id,t));
+                         return Promise.all(otherPromiseArr);
+                     });
+
+
                  });
             })
         })
