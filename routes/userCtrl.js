@@ -104,6 +104,37 @@ class UserController {
                 next(e);
             }
         })
+        // /user/refreshAccessToken
+
+        router.post('/refreshAccessToken',async(req,res,next) => {
+            try {
+                let query = req.body;
+                if (!query.refresh_token ) {
+                    throw baseResult.USER_REFRESH_TOKEN_MUST_BE_SUPPLIED;
+                }
+                if (!query.ipv4_address) {
+                    throw  baseResult.USER_IPV4_ERROR
+                }
+                if (!query.user_name || !query.password) {
+                    throw baseResult.USER_INVALID_NAME_PASSWD;
+                }
+                if (!query.grant_type || query.grant_type !== 'refresh_token') {
+                    throw baseResult.USER_GRANT_TYPE_MUST_BE_REFRESH_TOKEN;
+                }
+                let result =  await userService.refreshAccessToken(query);
+                if (result) {
+                    const tokenInfo = {
+                        valid_until: result.valid_until,
+                        token_string:result.token_string,
+                        refresh_token:result.refresh_token,
+                        token_type:'Bearer'
+                    };
+                    return res.json(tokenInfo);
+                }
+            }catch (e) {
+                next(e);
+            }
+        })
         return router;
     }
 

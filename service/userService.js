@@ -6,6 +6,7 @@ import accessTokenService from "./accessTokenService";
 import cfg from "../config";
 import moment from "moment"
 import uuid from 'uuid';
+import activeIndStatus from "../model/activeIndStatus";
 @AutoWritedUser
 class UserService extends BaseService{
     constructor(){
@@ -51,27 +52,38 @@ class UserService extends BaseService{
 
     loginHandler(userLoginParam) {
         return db.transaction(t=> {
-           return this.getModel().findOne({where:{user_name:userLoginParam.user_name},transaction:t}).then(user => {
-                if (user && this.validPassword(user.password,userLoginParam.password)) {
+            return this.loginAndGenToken(userLoginParam,t);
+        })
+    }
+    loginAndGenToken(userLoginParam,t) {
+        return this.getModel().findOne({where:{user_name:userLoginParam.user_name},transaction:t}).then(user => {
+            if (user && this.validPassword(user.password,userLoginParam.password)) {
 
-                    return accessTokenService.nextId('token_id',{transaction:t}).then(nextId => {
-                        let tokenData = {};
-                        tokenData.token_id = nextId;
-                        tokenData.user_id = user.user_id;
-                        tokenData.token_string = uuid.v1();
-                        tokenData.refresh_token = uuid.v1();
-                        tokenData.valid_until = moment().add(cfg.expiresMinutes, 'minutes');
-                        tokenData.ipv4_address = userLoginParam.ipv4_address;
-                        console.log("will insert into access_token_record:",tokenData);
-                        return accessTokenService.baseCreate(tokenData,{transaction:t})
-                    });
-                } else {
-                    throw baseResult.USER_INVALID_NAME_PASSWD;
-                }
+                return accessTokenService.nextId('token_id',{transaction:t}).then(nextId => {
+                    let tokenData = {};
+                    tokenData.token_id = nextId;
+                    tokenData.user_id = user.user_id;
+                    tokenData.token_string = uuid.v1();
+                    tokenData.refresh_token = uuid.v1();
+                    tokenData.for_order = false;
+                    tokenData.valid_until = moment().add(cfg.expiresMinutes, 'minutes');
+                    tokenData.ipv4_address = userLoginParam.ipv4_address;
+                    console.log("will insert into access_token_record:",tokenData);
+                    return accessTokenService.baseCreate(tokenData,{transaction:t})
+                });
+            } else {
+                throw baseResult.USER_INVALID_NAME_PASSWD;
+            }
+        })
+    }
+
+    refreshAccessToken(query) {
+        return db.transaction(t => {
+            return accessTokenService.baseUpdate({active_ind:activeIndStatus.INACTIVE},{where:{refresh_token:query.refresh_token},transaction:t}).then(result => {
+                 console.log("update t_access_token count:",result);
+                 return this.loginAndGenToken(query,t);
             })
         })
-
-
     }
 }
 module.exports = new UserService()

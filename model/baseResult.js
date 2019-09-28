@@ -35,7 +35,7 @@ export default  {
     // user 部分
     USER_INVALID_NAME_PASSWD:new baseResult(400,"Invalid username/password supplied"),
     USER_IPV4_ERROR:new baseResult(401,"IPv4_address must be supplied"),
-
+    USER_REFRESH_TOKEN_MUST_BE_SUPPLIED:new baseResult(402,'refresh_token must be supplied'),
     USER_NAME_ALREADY_TOKEN:new baseResult(400,"user name already taken."),
     USER_MANDATORY_FIELD_EXCEPTION: new baseResult(401,"user first name, last name, password,email address and contact no. fields are mandatory."),
     USER_TERMS_EXCEPTION:new baseResult(402,"user must accept terms and conditions."),
@@ -43,7 +43,7 @@ export default  {
 
     USER_VERITY_INVALID:new baseResult(421,'Verification Code is invalid.'),
     USER_VERITY_EXPIRED:new baseResult(422,'Verification Code expired.'),
-
+    USER_GRANT_TYPE_MUST_BE_REFRESH_TOKEN:new baseResult(999,"grant type must be 'refresh_token' "),
     //chef部分
     CHEF_NAME_ALREADY_TOKEN:new baseResult(400,"user name already taken."),
     CHEF_MANDATORY_FIELD_EXCEPTION:new baseResult(401,'Chef\'s first name, last name and short description fields are mandatory.'),
