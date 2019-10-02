@@ -11,12 +11,12 @@ class MenuChefNoteService extends BaseService{
 
     getMenuChefNoteByMenuId(menu_id) {
         let fileds = ['menu_chef_note_id','menu_chef_note'];
-        this.baseFindByFilter(fileds,{menu_id:menu_id,active_ind:activeIndStatus.ACTIVE}.then(notes => {
+        return this.baseFindByFilter(fileds,{menu_id:menu_id,active_ind:activeIndStatus.ACTIVE}).then(notes => {
             let result = {};
             result.menu_id = menu_id;
             result.menu_chef_note_list = notes;
             return result;
-        }))
+        })
     }
 
     copyChefNote(last_menu_id, new_menu_id, t) {
