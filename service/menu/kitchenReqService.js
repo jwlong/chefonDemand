@@ -4,6 +4,7 @@ import Sequelize from 'sequelize'
 import activeIndStatus from "../../model/activeIndStatus";
 import chefMenuService from '../chefMenuService'
 import db from '../../config/db';
+import chefMenu from '../../model/chefMenu'
 import baseResult from "../../model/baseResult";
 const Op = Sequelize.Op
 @AutoWritedKitchenReq
@@ -12,7 +13,7 @@ class KitchenReqService extends BaseService{
         super(KitchenReqService.model)
     }
     getMenuKitchenRequirementByMenuId(criteria) {
-       return chefMenuService.getMenuWithoutItemsByCriteria(criteria).then(menu => {
+       return chefMenu.getModel().findOne({where:criteria}).then(menu => {
             if (menu) {
                 return this.getKitchenReqItemDetail(menu.menu_id).then(reqlist => {
                     let result = {};
