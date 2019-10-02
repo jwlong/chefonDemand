@@ -2,7 +2,6 @@ import BaseService from '../baseService.js'
 import {AutoWritedKitchenReq} from '../../common/AutoWrite.js'
 import Sequelize from 'sequelize'
 import activeIndStatus from "../../model/activeIndStatus";
-import chefMenuService from '../chefMenuService'
 import db from '../../config/db';
 import chefMenu from '../../model/chefMenu'
 import baseResult from "../../model/baseResult";
