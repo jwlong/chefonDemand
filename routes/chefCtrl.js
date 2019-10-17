@@ -64,7 +64,7 @@ class ChefController {
                 if (!attr.password) {
                     throw baseResult.PASSWD_NOT_BE_EMPTY;
                 }
-
+                attr.user_id = req.user_id;
                 let chef = await chefService.updateChef(attr)
                 console.log("chef: ", chef);
                 return res.json(baseResult.SUCCESS);
@@ -156,7 +156,7 @@ class ChefController {
             let query = utils.keyLowerCase(req.query);
 
             try {
-                let chef = chefService.getChefByUserId(req.user_id);
+                let chef = await chefService.getChefByUserId(req.user_id);
                 if (!chef) {
                     throw baseResult.CHEF_ID_NOT_EXIST;
                 }

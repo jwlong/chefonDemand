@@ -87,10 +87,10 @@ class ChefService extends BaseService{
         }
 
         return db.transaction(t => {
-                    return userService.baseUpdate(attr, {where:{user_id: existOne.user_id}, transaction: t}).then(user => {
+                    return userService.baseUpdate(attr, {where:{user_id: attr.user_id}, transaction: t}).then(user => {
 
-                        return this.baseUpdate(attr, {where:{chef_id: existOne.chef_id}, transaction: t}).then(chef => {
-                            console.log("chef: ", chef);
+                        return this.baseUpdate(attr, {where:{chef_id: attr.chef_id}, transaction: t}).then(updateCnt => {
+                            console.log("update chef count : ", updateCnt);
                             let promiseArr =  [] ;
                             let experience_list = attr.experience_list;
                             let cuisine_type = attr.cuisine_type;
@@ -98,7 +98,7 @@ class ChefService extends BaseService{
                             if (Array.isArray(experience_list) && experience_list.length > 0) {
                               experience_list.forEach((exp,index) => {
                                     console.log("exp=>",exp);
-                                     promiseArr.push(chefExpService.updateChefReferToExperience(existOne,exp,t,index));
+                                     promiseArr.push(chefExpService.updateChefReferToExperience(attr.chef_id,exp,t,index));
                                 })
                             }
 
@@ -106,7 +106,7 @@ class ChefService extends BaseService{
                                 let cuisineTypeIds = [];
                                 cuisine_type.forEach(type => {
                                     cuisineTypeIds.push(type.cuisine_type_id);
-                                    promiseArr.push(chefCuisineSerivce.updateChefReferToCuisine(existOne.chef_id,type,t))
+                                    promiseArr.push(chefCuisineSerivce.updateChefReferToCuisine(attr.chef_id,type,t))
                                 })
                                 let inactivePromise =  chefCuisineSerivce.baseUpdate({active_ind:activeIndStatus.INACTIVE},{where:{chef_id:attr.chef_id,active_ind:activeIndStatus.ACTIVE,cuisine_type_id:{[Op.notIn]:cuisineTypeIds}},transaction:t})
                                 promiseArr.push(inactivePromise);
