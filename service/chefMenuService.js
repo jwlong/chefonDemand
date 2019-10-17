@@ -34,15 +34,24 @@ class ChefMenuService extends BaseService{
         attr.chef_arrive_prior_hr = 1;
         attr.act_ind = activeIndStatus.ACTIVE;
         attr.menu_code =  attr.chef_id+moment().format('YYYYMMDDHHmmSSSS')
+        if (!attr.menu_name || !attr.menu_desc) {
+            throw baseResult.MENU_NAME_FIELD_MANDATORY;
+        }
     }
+
     createMenuNameByChefId(attr) {
         this.preparedChefMenu(attr);
-        return db.transaction(t=> {
-           return this.nextId('menu_id',{transaction:t}).then(nextId => {
-                attr.menu_id = nextId;
-               return this.nextId('seq_no',{transaction:t}).then(nextSeqNo => {
+        return db.transaction(t => {
+            return this.getModel().count({
+                where: {chef_id: attr.chef_id, menu_name: attr.menu_name},
+                transaction: t
+            }).then(cnt => {
+                if (cnt > 0) {
+                    throw baseResult.MENU_NAME_EXISTS;
+                }
+                return this.nextId('seq_no', {transaction: t}).then(nextSeqNo => {
                     attr.seq_no = nextSeqNo;
-                    return this.baseCreate(attr,{transaction:t})
+                    return this.baseCreate(attr, {transaction: t})
                 })
             })
         })

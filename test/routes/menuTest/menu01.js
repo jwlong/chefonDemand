@@ -1,6 +1,6 @@
 describe("Routes: user Login", () => {
     "use strict";
-    let token;
+    let token = '65981300-2bcf-44f8-853a-b9e2559c589f';
     let user_name = "test1568819681689"
 /*    describe("POST /user/createUser", () => {
         it("returns create user result", done => {
@@ -32,7 +32,7 @@ describe("Routes: user Login", () => {
                 });
         });
     });*/
-    describe("GET /user/userLogin", () => {
+/*    describe("GET /user/userLogin", () => {
         it("returns api access token", done => {
             request.get("/user/userLogin")
                 .query({
@@ -48,7 +48,7 @@ describe("Routes: user Login", () => {
                     done(err);
                 });
         });
-    });
+    });*/
     describe("get /menu/getMenuByMenuId", () => {
         it("returns chef menu result", done => {
             request.get("/menu/getMenuByMenuId")
@@ -62,5 +62,20 @@ describe("Routes: user Login", () => {
                 });
         });
     });
+
+    describe("get /menu/getMenuByMenuId", () => {
+        it("returns chef menu result", done => {
+            request.get("/menu/getMenuByMenuId")
+                .set("access_token",`${token}`)
+                .query({menu_id:30001})
+                .expect(200)
+                .end((err, res) => {
+                    console.log("body=====>",res.body);
+                    //  expect(res.body.code).to.eql(200);
+                    done(err);
+                });
+        });
+    });
+
 })
 
