@@ -209,7 +209,9 @@ WHERE cc.chef_id = :chef_id and ct.active_ind = 'A' `;
         }
 
        return this.getChefByUserId(user_id).then(result => {
-            if (result) {
+           console.log("result=>",result);
+           // 当前用户不是chef，只能访问public_ind 为1的内容
+            if (!result) {
                 criteria.public_ind = 1;
             }
             return criteria;
