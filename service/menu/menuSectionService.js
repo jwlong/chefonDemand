@@ -83,7 +83,7 @@ class MenuSectionService extends BaseService{
                 if (!chef) {
                     throw baseResult.MENU_CHEF_MUST_BE_ACTIVE;
                 }
-                return this.getModel().count({where:{menu_section_name:attr.menu_section_name,act_ind:activeIndStatus.ACTIVE},transaction:t}).then(cnt => {
+                return this.getModel().count({where:{chef_id:chef.chef_id,menu_section_name:attr.menu_section_name,act_ind:activeIndStatus.ACTIVE},transaction:t}).then(cnt => {
                     if (cnt > 0) {
                         throw  baseResult.MENU_SECTION_NAME_EXISTS;
                     }
