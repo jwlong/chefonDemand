@@ -33,7 +33,7 @@ class FoodItemService extends BaseService{
      */
     addChefMenuFoodItem(attr) {
         return db.transaction(t=> {
-            return this.getModel().count({where:{food_item_name:attr.food_item_name,act_ind:activeIndStatus.ACTIVE},transaction:t}).then( itemCnt => {
+            return this.getModel().count({where:{chef_id:attr.chef_id,food_item_name:attr.food_item_name,act_ind:activeIndStatus.ACTIVE},transaction:t}).then( itemCnt => {
                 if (itemCnt >0) {
                     throw baseResult.MENU_FOOD_ITEM_NAME_EXIST;
                 }
@@ -46,7 +46,7 @@ class FoodItemService extends BaseService{
 
     editChefMenuFoodItem(attr) {
         return db.transaction(t => {
-            return this.getModel().count({where:{food_item_name:attr.food_item_name,act_ind:activeIndStatus.ACTIVE},transaction:t}).then( nameCnt => {
+            return this.getModel().count({where:{chef_id:attr.chef_id,food_item_name:attr.food_item_name,act_ind:activeIndStatus.ACTIVE},transaction:t}).then( nameCnt => {
                 if (nameCnt >0) {
                     throw baseResult.MENU_FOOD_ITEM_NAME_EXIST;
                 }

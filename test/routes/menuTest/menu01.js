@@ -63,11 +63,29 @@ describe("Routes: user Login", () => {
         });
     });
 
-    describe("get /menu/getMenuByMenuId", () => {
+    describe("post /menu/createMenuNameByChefId", () => {
         it("returns chef menu result", done => {
-            request.get("/menu/getMenuByMenuId")
+            request.post("/menu/getMenuByMenuId")
                 .set("access_token",`${token}`)
-                .query({menu_id:30001})
+                .send({
+                    "user_name": "231"+new Date().getTime(),
+                    "password": "123456",
+                    "salutation": "1",
+                    "first_name": "1",
+                    "middle_name": "1",
+                    "last_name": "1",
+                    "email_address": "user@example.com",
+                    "contact_no": "1",
+                    "sms_notify_ind": true,
+                    "birthday": "2019-08-21",
+                    "address_1": "add1",
+                    "address_2": "addr2",
+                    "address_3": "addr3",
+                    "accept_marketing_ind": true,
+                    "accept_terms_ind": true,
+                    "robot_ind": false,
+                    "ipv4_address": "198.51.100.42"
+                })
                 .expect(200)
                 .end((err, res) => {
                     console.log("body=====>",res.body);
