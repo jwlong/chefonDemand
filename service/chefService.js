@@ -213,6 +213,8 @@ WHERE cc.chef_id = :chef_id and ct.active_ind = 'A' `;
            // 当前用户不是chef，只能访问public_ind 为1的内容
             if (!result) {
                 criteria.public_ind = 1;
+            }else {
+                criteria.chef_id = result.chef_id;
             }
             return criteria;
         })
