@@ -14,15 +14,100 @@ import menuBookingRuleService from './menu/menuBookingRuleService'
 import menuBookingRequirementService from './menu/menuBookingRequirementService'
 import menuExtraChargeService from './menu/menuExtraChargeService'
 import menuPhotoService from './menu/menuPhotoService'
+import orderService from './orderService'
+import messageService from './messageService'
 import moment from 'moment'
 import baseResult from "../model/baseResult";
+import msgCfg from '../common/messgeConf'
+import userService from './userService'
+import stringFormat from 'string-format'
+import locationService from './chefLocationService'
 
+const Op = Sequelize.Op
 @AutoWritedChefMenu
 class ChefMenuService extends BaseService{
     constructor(){
         super(ChefMenuService.model)
     }
+    //
+    updateMenuByChefIdDirectly(chef_id,menu_id,attrs) {
+        let promiseArr = [];
+        // 删除之前已经存在的记录
+        let chefMenu = {};
+        let part1 =  this.baseUpdate({active_ind:activeIndStatus.DELETE},{where:{menu_id:menu_id,chef_id:chef_id}}).then(resp => {
+            chefMenu = resp.toJSON();
+            return menuItemService.batchUpdateStatus(menu_id,activeIndStatus.DELETE,t).then( updatdItemList => {
+                let deletePromise = [];
+                if (updatdItemList) {
+                    updatdItemList.forEach(item => {
+                        deletePromise.push(menuItemOptionService.batchUpdateStatus(item,activeIndStatus.DELETE,t));
+                    })
+                }
+                return Promise.all(deletePromise);
+                }
+            )
+        })
+        promiseArr.push(part1);
+        // insert new record with request body and menu_code use same menu_code
+        attrs.menu_code = chefMenu.menu_code;
+        attrs.chef_id = chefMenu.chef_id;
+        promiseArr.push(this.baseCreate(attrs,{transaction:t}));
 
+        attrs.menu_item_list.forEach(value => {
+            let  pm = menuItemService.baseCreate(value,{transaction:t}).then(item => {
+                return this.baseCreate(item.menu_item_option_list,{transaction:t})
+            })
+           promiseArr.push(pm);
+        })
+
+        return Promise.all(promiseArr);
+    }
+
+
+
+    updateMenuByChefId(chef_id,menu_id,attrs) {
+        return db.transaction(t => {
+            return this.getOne({where:{chef_id:chef_id,menu_id:menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(chefMenu => {
+                if (chefMenu) {
+                    if (chefMenu.public_ind === 1) {
+                        // If any existing outstanding orders (orders not yet performed) referencing this public menu_id
+                        return orderService.getModel().findAll({where:{menu_id:menu_id,active_ind:activeIndStatus.ACTIVE,event_date:{[Op.gt]:moment()}},transaction:t}).then(orderList => {
+                            if (orderList) {
+                                // clone menu
+                               return this.baseCreate(attrs,{transaction:t}).then(resp => {
+                                    // copy menu_item
+                                    let promiseArr = [];
+
+                                    promiseArr.push(attrs.menu_item_list.forEach(value => {
+                                      return  menuItemService.baseCreate(value,{transaction:t}).then(item => {
+                                            return menuItemOptionService.batchInsert(menuItem,t);
+                                        })
+                                    }))
+                                   promiseArr.push(this.baseUpdate({active_ind:activeIndStatus.REPLACE,public_ind:0},{where:{menu_id:menu_id,chef_id:chef_id},transaction:t}));
+                                    orderList.forEach( order => {
+                                        let user = userService.getById(order.user_id);
+                                        let notity_username = user.first_name+" "+user.last_name;
+                                        let msgBody = msgCfg.update_menu_notify.format(notity_username);
+                                        promiseArr.push(messageService.insertMessage(order.user_id,msgBody,{transaction:t}));
+                                    })
+                                    return Promise.all(promiseArr);
+                                })
+                            }else {
+                                return updateMenuByChefIdDirectly(chefMenu.chef_id,chefMenu.menu_id,t);
+                            }
+                        })
+                    } else if (chefMenu.public_ind === 0) {
+                        //
+                        return updateMenuByChefIdDirectly(chefMenu.chef_id,chefMenu.menu_id,t);
+                    }
+                }else {
+                    throw baseResult.MENU_ID_NOT_EXIST;
+                }
+            })
+        })
+
+
+    }
     preparedChefMenu(attr) {
         //default value
         attr.public_ind = 0;
@@ -98,9 +183,19 @@ class ChefMenuService extends BaseService{
      * @param chef_id
      */
     getMenuListByChefId(chef_id) {
-        return this.baseFindByFilter(['chef_id', 'menu_id', 'menu_name', 'menu_code', 'public_ind', 'seq_no', 'menu_rating', 'num_of_review', 'min_pers', 'max_pers', 'menu_logo_url', 'unit_price'], {
+       /* return this.baseFindByFilter(['chef_id', 'menu_id', 'menu_name', 'menu_code', 'public_ind', 'seq_no', 'min_pers', 'max_pers', 'menu_logo_url', 'unit_price'], {
             chef_id: chef_id,
             act_ind: activeIndStatus.ACTIVE
+        });
+*/
+       let sql = `select m.chef_id, m.menu_id, m.menu_name, m.menu_code, m.public_ind, m.seq_no, m.min_pers, m.max_pers, m.menu_logo_url, m.unit_price,avg(rating.overall_rating) menu_rating ,count(rating.rating_id) num_of_review,min(m.unit_price) min_unit_price from chefondemand.t_chef_menu m left join chefondemand.t_order o on o.menu_id = m.menu_id and o.active_ind = 'A'
+left join chefondemand.t_user_rating rating on o.order_id = rating.order_id and m.active_ind = 'A'
+where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
+        return db.query(sql,{replacements:{chef_id:chef_id},type:db.QueryTypes.SELECT}).then(result => {
+            return  locationService.baseFindByFilter(['district'],{chef:chef_id}).then(districtList => {
+                result.chef_service_locations = districtList;
+                return result;
+            })
         });
     }
     /**

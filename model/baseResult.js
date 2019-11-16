@@ -70,6 +70,7 @@ export default  {
     MENU_ID_NOT_EXIST:new baseResult(400,'menu Id does not exist.'),
     MENU_ID_FILED_MANDATORY:new baseResult(401,'menu_id field is mandatory.'),
     MENU_ONLY_CHEF_CAN_CREATE_MENU:new baseResult(402,'Only chef can create menu.'),
+    MENU_ONLY_CHEF_CAN_UPDATE:new baseResult(402,'Only chef can update menu.'),
     MENU_ONLY_CHEF_CAN_DO_THIS:new baseResult(402,'Only chef can perform this operation.'),
     MENU_ONLY_CHEF_CAN_ADD_SECTION:new baseResult(402,'Only chef can add new menu section.'),
     MENU_NAME_AND_DESC_REQUIRED:new baseResult(401,'Menu name, description, are mandatory,'),

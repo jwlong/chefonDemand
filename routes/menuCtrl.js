@@ -53,28 +53,6 @@ class MenuController {
             }
         })
 
-        //(Func14a) Chef update his menu
-        router.post('/updateMenuByChefId',async(req,res,next) =>{
-            try {
-            }catch (e) {
-                next(e);
-            }
-        })
-
-        //(Func16) Get active (public / non-public) menu info for listing by chef Id
-        ///menu/getMenuListByChefId
-        router.get('/getMenuListByChefId',async(req,res,next) =>{
-            try {
-                let chef_id = req.body.chef_id;
-                if (!chef_id || (chef_id && !await chefService.getChefByChefId(chef_id))) {
-                    throw baseResult.MENU_CHEF_ID_NOT_EXISTS;
-                }
-               await chefMenuService.getMenuListByChefId(chef_id);
-
-            }catch (e) {
-                next(e);
-            }
-        })
 
         /*
         /menu/getMenuServingDetailByMenuId
@@ -213,6 +191,42 @@ class MenuController {
                 next(e);
             }
         })
+
+
+        // func_14a
+
+        router.post('/updateMenuByChefId',async(req,res,next) => {
+            try {
+                let menu_id = req.query.menu_id;
+                if (!menu_id) {
+                    throw baseResult.MENU_ID_FILED_MANDATORY;
+                }
+                let chef = await chefService.getChefByUserId(req.user_id);
+                if (!chef) {
+                    throw baseResult.MENU_ONLY_CHEF_CAN_UPDATE;
+                }
+                await chefMenuService.updateMenuByChefId(chef.chef_id,menu_id,req.body)
+                res.json(baseResult.SUCCESS)
+            }catch (e) {
+                next(e);
+            }
+        })
+
+        //(Func16) Get active (public / non-public) menu info for listing by chef Id
+        ///menu/getMenuListByChefId
+        router.get('/getMenuListByChefId',async(req,res,next) =>{
+            try {
+                let chef = await chefService.getChefByUserId(req.user_id);
+                if (!chef) {
+                    throw baseResult.CHEF_ID_NOT_EXIST;
+                }
+                await  chefMenuService.getMenuListByChefId(chef_id);
+            }catch (e) {
+                next(e);
+            }
+        })
+
+
 
         return router;
 

@@ -43,7 +43,7 @@ class UserService extends BaseService{
         return this.baseFindByFilter(null,{user_name:username,password:password});
     }
     getById(userId) {
-        return this.baseFindByFilter(null,{user_id:userId})
+        return this.baseFindByFilter(null,{user_id:userId,active_ind:activeIndStatus.ACTIVE})
     }
     validPassword(encodedPassword, password) {
         console.log("result passwd:",UserService.model.isPassword(encodedPassword, password));

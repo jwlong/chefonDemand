@@ -94,4 +94,13 @@ module.exports = {
     AutoWritedmenuExtraCharge(target,key,desc) {
         target.model = require('../model/menuExtraCharge')
     },
+    AutoWritedOrder(target,key,desc) {
+        target.model = require('../model/order')
+    },
+    AutoWritedMessage(target,key,desc) {
+        target.model = require('../model/message')
+    },
+    AutoWritedUserRate(target,key,desc) {
+        target.model = require('../model/userRating')
+    },
 }

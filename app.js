@@ -4,7 +4,6 @@ import cookieParser from 'cookie-parser'
 import bodyParser from 'body-parser'
 import multipart from 'connect-multiparty'
 import compression from 'compression'
-import jwt from 'jsonwebtoken'
 import cfg from './config/index'
 import baseResult from './model/baseResult'
 var userContext = require('./common/userContext')

@@ -3,7 +3,6 @@
  */
 import express from 'express'
 import userService from '../service/userService';
-import jwt from "jsonwebtoken"
 import cfg from '../config/index'
 import baseResult from "../model/baseResult";
 import utils from "../common/utils";

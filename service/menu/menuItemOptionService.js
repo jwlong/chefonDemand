@@ -40,5 +40,32 @@ class MenuItemOptionService extends BaseService{
             }
         )
     }
+
+    batchInsert(menuItem, t) {
+        let optionList = menuItem.menu_item_option_list;
+        let promiseArr = [];
+        if (optionList) {
+            optionList.forEach(o => {
+                let p = this.nextId('seq_no',{transaction:t}).then(nextSeq => {
+                    o.menu_item_id = menuItem.menu_item_id;
+                    o.seq_no = nextSeq;
+                    this.baseCreate(o,{transaction:t})
+
+                })
+                promiseArr.push(p);
+            })
+            return Promise.all(promiseArr);
+        }
+    }
+    batchUpdateStatus(menuItem, updatedStatus, t) {
+        this.getModel().findAll({where:{menu_item_id:menuItem.menu_item_id,active_ind:activeIndStatus.ACTIVE}}).then( optionList => {
+            let promiseArr = [];
+            optionList.forEach(value => {
+                value.active_ind = updatedStatus;
+                promiseArr.push(this.baseUpdate(value,{transaction:t}));
+            })
+            return Promise.all(promiseArr);
+        })
+    }
 }
 module.exports = new MenuItemOptionService()
