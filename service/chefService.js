@@ -5,10 +5,12 @@ import userService from './userService'
 import baseResult from "../model/baseResult"
 import user from '../model/user'
 import chefCuisineSerivce from './chefCuisineSerivce'
+/*import chefMenuService from './chefMenuService'*/
 import chefExpService from './chefExpService'
 import activeIndStatus from "../model/activeIndStatus";
 import Sequelize from 'sequelize'
 const Op = Sequelize.Op
+import moment from 'moment'
 
 @AutoWritedChefModel
 class ChefService extends BaseService{
@@ -16,7 +18,7 @@ class ChefService extends BaseService{
         super(ChefService.model)
     }
     getChefList(attr) {
-        return ChefService.model.getChefList(attr)
+        return this.getModel().findAll(attr);
     }
 
     isChefWithUserId(userId) {
@@ -202,7 +204,7 @@ WHERE cc.chef_id = :chef_id and ct.active_ind = 'A' `;
     }
 
     preparedMenuQueryCriteria(user_id,menu_id) {
-        let criteria = {menu_id:menu_id,act_ind:activeIndStatus.ACTIVE};
+        let criteria = {menu_id:menu_id,active_ind:activeIndStatus.ACTIVE};
         if (!user_id) {
             criteria.public_ind = 1;
             return new Promise(resolve => resolve(criteria));
@@ -220,6 +222,47 @@ WHERE cc.chef_id = :chef_id and ct.active_ind = 'A' `;
         })
 
     }
+    covertQueryParam(query) {
+        //convert param
+        // page index start
+        if (query.page_no === 0 || query.page_no === 1) {
+            query.startIndex = 0
+        }else {
+            query.startIndex  = (query.page_no*query.pageSize -1);
+        }
+        query.langCodes =[],query.cuisineTypeIds = [],query.districtCodes = [];
+        if (query.language_list) {
+            query.language_list.forEach(code => {
+                query.langCodes.push(code);
+            })
+        }
+        if (query.cuisine_type_list) {
+            query.cuisine_type_list.forEach(typeId => {
+                query.cuisineTypeIds.push(typeId);
+            })
+        }
+        if (query.district_code_list)  {
+            query.district_code_list.forEach(districtCode => {
+                query.districtCodes.push(districtCode);
+            })
+        }
+    }
 
+    checkFilters(query) {
+        if (!query.page_no || isNaN(query)) {
+            throw baseResult.PAGE_NUMBER_INVALID;
+        }
+        if (query.start_date) {
+            //
+            if(moment(query.start_date).isBefore(moment())) {
+                throw baseResult.MENU_START_DATE_ERROR;
+            }
+            if (query.end_date) {
+                if (moment(query.end_date).isBefore(query.start_date)) {
+                    throw baseResult.MENU_END_DATE_MUST_AFTER_START_DATE;
+                }
+            }
+        }
+    }
 }
 module.exports = new ChefService()

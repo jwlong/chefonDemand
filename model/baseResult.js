@@ -86,9 +86,24 @@ export default  {
     MENU_FOOD_ITEM_NAME_EXIST:new baseResult(401,'Menu food item name already exist.'),
     MENU_FOOD_ITEM_ID_NOT_BELONG_TO_CHEF:new baseResult(404,'the food_item_id does not belong to chef'),
     MENU_FOOD_ITEM_ID_NOT_EXISTS:new baseResult(401,'food_item_id does not exist.'),
+    // menu review
+    MENU_ONLY_REGULAR_USER_CAN_DO:new baseResult(402,' Only regular user (non-chef) can add menu review.'),
+    MENU_CAN_OLNY_ADD_ACTIVE_MENU:new baseResult(403," Can only add menu review for active menu."),
+
+
     // 未定义错误
     PASSWD_NOT_BE_EMPTY:new baseResult(999,"password can not be empty!"),
     CHEF_EXP_LIST_FILED_INVALID: new baseResult(998,"in experience_list ,start_date,exp_desc are mandatory!"),
 
+
+
+    MENU_START_DATE_ERROR:new baseResult(400,'start_date can not be earlier than today.'),
+    MENU_END_DATE_MUST_AFTER_START_DATE:new baseResult(401,'end_date must be => start_date.'),
+    MENU_LANGUAGE_CODE_LIST_INVALID:new baseResult(402,'one of language code is invalid.'),
+    MENU_CUISINE_TYPE_LIST_INVALID:new baseResult(403,'one of cuisine type code is invalid.'),
+    MENU_DISTRICT_CODE_INVALID:new baseResult(404,'one of district code is invalid.'),
+    PAGE_NUMBER_INVALID:new baseResult(405,'page number is invalid'),
+
+    MENU_QUERY_PARAM_MANDATORY:new baseResult(401,'access_token, content_type, menu_id, menu json fields are mandatory.')
 
 };

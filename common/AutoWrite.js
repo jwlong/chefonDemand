@@ -103,4 +103,7 @@ module.exports = {
     AutoWritedUserRate(target,key,desc) {
         target.model = require('../model/userRating')
     },
+    AutoWritedUserPref(target,key,desc) {
+        target.model = require('../model/userPref')
+    },
 }

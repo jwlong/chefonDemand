@@ -3,6 +3,7 @@ import {AutoWritedMenuBookingReq} from '../../common/AutoWrite.js'
 import Sequelize from 'sequelize'
 import activeIndStatus from "../../model/activeIndStatus";
 import db from "../../config/db";
+import chefMenuService from "../chefMenuService";
 const Op = Sequelize.Op
 @AutoWritedMenuBookingReq
 class MenuBookingRequirementService extends BaseService{
@@ -34,6 +35,21 @@ class MenuBookingRequirementService extends BaseService{
     copyBookingReq(last_menu_id, new_menu_id, t) {
 
 
+    }
+
+    updateBookingRequirementDirectly(status, last_menu_id, new_menu_id, attrs, t) {
+        return chefMenuService.baseUpdate({active_ind:activeIndStatus.REPLACE,public_ind:0},{where:{menu_id:last_menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(updatedMenu => {
+            let promiseArr = [];
+            let newList = [];
+            let p1 = this.baseUpdate({active_ind:status},{where:{menu_id:last_menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t});
+            promiseArr.push(p1);
+            attrs.forEach(item => {
+                item.menu_id = new_menu_id;
+                newList.push(item);
+            })
+            promiseArr.push(this.baseCreateBatch(newList,{transaction:t}));
+            return Promise.all(promiseArr);
+        })
     }
 }
 module.exports = new MenuBookingRequirementService()

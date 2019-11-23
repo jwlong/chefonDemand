@@ -87,7 +87,7 @@ module.exports = function(sequelize, DataTypes) {
       type: Sequelize.INTEGER(11),
       allowNull: false
     },
-    act_ind: {
+    active_ind: {
       type: Sequelize.STRING(1),
       allowNull: false
     }

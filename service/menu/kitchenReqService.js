@@ -42,6 +42,19 @@ class KitchenReqService extends BaseService{
             return this.baseCreateBatch(newList,{transaction:t});
         })
     }
+    updateKitchenReqBySelf(status,last_menu_id, new_menu_id,attrs, t) {
+        let promiseArr = [];
+        let newList = [];
+        let p1 = this.baseUpdate({active_ind:status},{where:{menu_id:last_menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t});
+        promiseArr.push(p1);
+        attrs.forEach(kitchenReq => {
+            kitchenReq.menu_id = new_menu_id;
+            newList.push(kitchenReq);
+        })
+        promiseArr.push(this.baseCreateBatch(newList,{transaction:t}));
+        return Promise.all(promiseArr);
+    }
+
 }
 
 module.exports = new KitchenReqService()

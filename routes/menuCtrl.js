@@ -41,7 +41,7 @@ class MenuController {
                 if (!query.menu_id) {
                     throw baseResult.MENU_ID_NOT_EXIST
                 }
-                let criteria = {menu_id:query.menu_id,act_ind:activeIndStatus.ACTIVE}
+                let criteria = {menu_id:query.menu_id,active_ind:activeIndStatus.ACTIVE}
                 if (await chefService.isOnlyCanAccessPublic(userId)) {
                     criteria.public_ind = 1;
                 }
@@ -63,7 +63,7 @@ class MenuController {
                 if (!menu_id) {
                     throw baseResult.MENU_ID_FILED_MANDATORY;
                 }
-                let criteria = {menu_id:menu_id,act_ind:activeIndStatus.ACTIVE}
+                let criteria = {menu_id:menu_id,active_ind:activeIndStatus.ACTIVE}
                 if (await chefService.isOnlyCanAccessPublic(req.user_id)) {
                     criteria.public_ind = 1;
                 }
@@ -197,7 +197,7 @@ class MenuController {
 
         router.post('/updateMenuByChefId',async(req,res,next) => {
             try {
-                let menu_id = req.query.menu_id;
+                let menu_id = req.body.menu_id;
                 if (!menu_id) {
                     throw baseResult.MENU_ID_FILED_MANDATORY;
                 }
@@ -220,18 +220,157 @@ class MenuController {
                 if (!chef) {
                     throw baseResult.CHEF_ID_NOT_EXIST;
                 }
-                await  chefMenuService.getMenuListByChefId(chef_id);
+                res.json(await  chefMenuService.getMenuListByChefId(chef_id));
             }catch (e) {
                 next(e);
             }
         })
 
+        // func22: /menu/updateMenuServingDetailByMenuId
+        router.post('/updateMenuServingDetailByMenuId',async(req,res,next) =>{
+            try {
+                let attrs = req.body;
+                if (!attrs || !attrs.menu_id) {
+                    throw baseResult.MENU_QUERY_PARAM_MANDATORY;
+                }
 
+                let chef = await chefService.getChefByUserId(req.user_id);
+                if (!chef) {
+                    throw baseResult.MENU_ONLY_CHEF_CAN_UPDATE;
+                }
+                await  chefMenuService.updateMenuServingDetailByMenuId(chef.chef_id,attrs.menu_id,attrs);
+                res.json(baseResult.SUCCESS)
+            }catch (e) {
+                next(e);
+            }
+        })
+
+        // func#25: /menu/updateMenuKitchenRequirementByMenuId
+        router.post('/updateMenuKitchenRequirementByMenuId',async(req,res,next) =>{
+            try {
+                let attrs = req.body;
+                if (!attrs || !attrs.menu_id) {
+                    throw baseResult.MENU_QUERY_PARAM_MANDATORY;
+                }
+
+                let chef = await chefService.getChefByUserId(req.user_id);
+                if (!chef) {
+                    throw baseResult.MENU_ONLY_CHEF_CAN_UPDATE;
+                }
+                await  chefMenuService.updateMenuKitchenRequirementByMenuId(chef.chef_id,attrs.menu_id,attrs);
+                res.json(baseResult.SUCCESS)
+            }catch (e) {
+                next(e);
+            }
+        })
+
+        //func 27 /menu/updateMenuChefNoteByMenuId
+        router.post('/updateMenuChefNoteByMenuId',async(req,res,next) =>{
+            try {
+                let attrs = req.body;
+                if (!attrs || !attrs.menu_id) {
+                    throw baseResult.MENU_QUERY_PARAM_MANDATORY;
+                }
+
+                let chef = await chefService.getChefByUserId(req.user_id);
+                if (!chef) {
+                    throw baseResult.MENU_ONLY_CHEF_CAN_UPDATE;
+                }
+                await  chefMenuService.updateMenuChefNoteByMenuId(chef.chef_id,attrs.menu_id,attrs);
+                res.json(baseResult.SUCCESS)
+            }catch (e) {
+                next(e);
+            }
+        })
+
+        // func#30: /menu/updateMenuIncludeItemsByMenuId
+        router.post('/updateMenuIncludeItemsByMenuId',async(req,res,next) =>{
+            try {
+                let attrs = req.body;
+                if (!attrs || !attrs.menu_id) {
+                    throw baseResult.MENU_QUERY_PARAM_MANDATORY;
+                }
+
+                let chef = await chefService.getChefByUserId(req.user_id);
+                if (!chef) {
+                    throw baseResult.MENU_ONLY_CHEF_CAN_UPDATE;
+                }
+                await  chefMenuService.updateMenuIncludeItemsByMenuId(chef.chef_id,attrs.menu_id,attrs);
+                res.json(baseResult.SUCCESS)
+            }catch (e) {
+                next(e);
+            }
+        })
+
+        //func#32: /menu/updateMenuAboutByMenuId
+        router.post('/updateMenuAboutByMenuId',async(req,res,next) =>{
+            try {
+                let attrs = req.body;
+                if (!attrs || !attrs.menu_id) {
+                    throw baseResult.MENU_QUERY_PARAM_MANDATORY;
+                }
+
+                let chef = await chefService.getChefByUserId(req.user_id);
+                if (!chef) {
+                    throw baseResult.MENU_ONLY_CHEF_CAN_UPDATE;
+                }
+                await  chefMenuService.updateMenuAboutByMenuId(chef.chef_id,attrs.menu_id,attrs);
+                res.json(baseResult.SUCCESS)
+            }catch (e) {
+                next(e);
+            }
+        })
+
+        // func#33: /menu/getMenuRatingByMenuId
+        router.get('/getMenuRatingByMenuId',async(req,res,next) =>{
+            try {
+                let attrs = req.headers;
+                if (!attrs || !attrs.menu_id) {
+                    throw baseResult.MENU_QUERY_PARAM_MANDATORY;
+                }
+                let criteria = await chefMenuService.checkUserIdAndMenuId(req.user_id,menu_id);
+
+                res.json(await  chefMenuService.getMenuRatingByMenuId(criteria));
+            }catch (e) {
+                next(e);
+            }
+        })
+        // func34# /menu/getMenuReviewsByMenuId
+        router.get('/getMenuReviewsByMenuId',async(req,res,next) =>{
+            try {
+                let attrs = req.headers;
+                if (!attrs || !attrs.menu_id) {
+                    throw baseResult.MENU_QUERY_PARAM_MANDATORY;
+                }
+                await chefMenuService.checkUserIdAndMenuId(req.user_id,attrs.menu_id);
+                res.json(await  chefMenuService.getMenuReviewsByMenuId(attrs.menu_id));
+            }catch (e) {
+                next(e);
+            }
+        })
+
+       // func#35: /menu/addMenuReviewsByMenuId
+        router.post('/addMenuReviewsByMenuId',async(req,res,next) =>{
+            try {
+                let menu_id = req.body.menu_id;
+                if (!menu_id) {
+                    throw baseResult.MENU_QUERY_PARAM_MANDATORY;
+                }
+                let chef = await  chefService.getChefByUserId(req.user_id);
+                if (chef) {
+                    // if user is chef throw error
+                    throw baseResult.
+                }
+
+               // await chefMenuService.checkUserIdAndMenuId(req.user_id,menu_id);
+
+                res.json(await  chefMenuService.addMenuReviewsByMenuId(menu_id));
+            }catch (e) {
+                next(e);
+            }
+        })
 
         return router;
-
-
-
 
     }
 

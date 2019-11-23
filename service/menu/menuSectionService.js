@@ -32,7 +32,7 @@ class MenuSectionService extends BaseService{
 
     getChefMenuSectionsByChefId(chef_id) {
         let fields = ['menu_section_id','menu_section_name','menu_section_desc'];
-        return this.baseFindByFilter(fields,{chef_id:chef_id,act_ind:activeIndStatus.ACTIVE}).then(sectionList =>{
+        return this.baseFindByFilter(fields,{chef_id:chef_id,active_ind:activeIndStatus.ACTIVE}).then(sectionList =>{
             let result = {};
             result.chef_id = chef_id;
             result.section_list = sectionList;
@@ -58,11 +58,11 @@ class MenuSectionService extends BaseService{
                         throw baseResult.MENU_CHEF_MUST_BE_ACTIVE;
                     }
                 }
-              return this.getModel().count({where:{chef_id:chef.chef_id,menu_section_name:attr.menu_section_name,act_ind:activeIndStatus.ACTIVE},transaction:t}).then(cnt => {
+              return this.getModel().count({where:{chef_id:chef.chef_id,menu_section_name:attr.menu_section_name,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(cnt => {
                    if (cnt > 0) {
                        throw  baseResult.MENU_SECTION_NAME_EXISTS;
                    }
-                   attr.act_ind = activeIndStatus.ACTIVE;
+                   attr.active_ind = activeIndStatus.ACTIVE;
                    return this.baseCreate(attr,{transaction:t});
                })
           })
@@ -83,13 +83,13 @@ class MenuSectionService extends BaseService{
                 if (!chef) {
                     throw baseResult.MENU_CHEF_MUST_BE_ACTIVE;
                 }
-                return this.getModel().count({where:{chef_id:chef.chef_id,menu_section_name:attr.menu_section_name,act_ind:activeIndStatus.ACTIVE},transaction:t}).then(cnt => {
+                return this.getModel().count({where:{chef_id:chef.chef_id,menu_section_name:attr.menu_section_name,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(cnt => {
                     if (cnt > 0) {
                         throw  baseResult.MENU_SECTION_NAME_EXISTS;
                     }
                     return this.getModel().count({where:{menu_section_id:attr.menu_section_id,chef_id:attr.chef_id},transaction:t}).then( sectionCnt => {
                         if (sectionCnt >0) {
-                            attr.act_ind = activeIndStatus.ACTIVE;
+                            attr.active_ind = activeIndStatus.ACTIVE;
                             return this.baseUpdate(attr,{where:{chef_id:attr.chef_id,menu_section_id:attr.menu_section_id},transaction:t});
                         }else {
                             throw baseResult.MENU_SECTION_ID_NOT_BELONG_CHEF;
@@ -113,13 +113,13 @@ class MenuSectionService extends BaseService{
                 if (!chef) {
                     throw baseResult.MENU_CHEF_MUST_BE_ACTIVE;
                 }
-                return this.getModel().count({where:{menu_section_id:attr.menu_section_id,act_ind:activeIndStatus.ACTIVE},transaction:t}).then(cnt => {
+                return this.getModel().count({where:{menu_section_id:attr.menu_section_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(cnt => {
                     if (!cnt ||  cnt === 0) {
                         throw  baseResult.MENU_SECTION_ID_NOT_EXISTS;
                     }
-                    return this.getModel().count({where:{menu_section_id:attr.menu_section_id,chef_id:attr.chef_id,act_ind:activeIndStatus.ACTIVE},transaction:t}).then( sectionCnt => {
+                    return this.getModel().count({where:{menu_section_id:attr.menu_section_id,chef_id:attr.chef_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then( sectionCnt => {
                         if (sectionCnt >0) {
-                            attr.act_ind = activeIndStatus.INACTIVE;
+                            attr.active_ind = activeIndStatus.INACTIVE;
                             return this.baseUpdate(attr,{where:{menu_section_id:attr.menu_section_id},transaction:t});
                         }else {
                             throw baseResult.MENU_SECTION_ID_NOT_BELONG_CHEF;

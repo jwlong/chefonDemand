@@ -557,7 +557,7 @@ paths:
         <p>if user_id not found in t_chef, then return error code 402</p>
         <p>Produce a new record for t_chef_menu with chef_id, new menu_id, menu_name, menu_desc, public_ind=0, 
         set seq_no = (max seq_no + 1) of t_chef_menu for same chef_id, set applied_meal default to 3 (both lunch and dinner), unit_price default to 0.0000, instant_ind default to 1, min_pers default to 1, 
-          event_duration_hr default to 2.00, chef_arrive_prior_hr default to 1, act_ind=1, the rest of the fields set to null. create_on, update_on default to today's date, create_by, update_by default to chef's user_id
+          event_duration_hr default to 2.00, chef_arrive_prior_hr default to 1, active_ind=1, the rest of the fields set to null. create_on, update_on default to today's date, create_by, update_by default to chef's user_id
         
       "
       operationId: "createMenu"

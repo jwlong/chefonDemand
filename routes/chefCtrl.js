@@ -7,10 +7,14 @@ import userService from  '../service/userService'
 import cfg from '../config/index'
 import baseResult from '../model/baseResult'
 import chefLanguageService from   '../service/chefLanguageService'
+import chefMenuService from '../service/chefMenuService'
 import chefAvailableTimeSlotService from '../service/chefAvailableTimeSlotService'
 import districtService from '../service/districtService'
 import moment from 'moment'
 import utils from "../common/utils";
+import userPrefService from '../service/userPrefService'
+
+
 const router = express.Router()
 var userContext = require('../common/userContext')
 // 请求前缀为/chef
@@ -168,6 +172,22 @@ class ChefController {
                 next(e);
             }
         })
+
+
+        // func#17: /chef/findChefByFilters
+        //active chefs by filtering of meal start date, meal type, languages, cuisine types, district codes parameters
+        router.post("/findChefByFilters",async(req,res,next) => {
+            try{
+                let query = req.body;
+                chefService.checkFilters(query);
+                query.pageSize = await userPrefService.getPageSize(req.user_id)
+                chefService.covertQueryParam(query);
+                res.json(await  chefMenuService.findChefByFilters(query))
+            }catch (e) {
+                next(e);
+            }
+        })
+
         return router;
 
 
