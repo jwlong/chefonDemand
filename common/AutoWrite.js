@@ -106,4 +106,13 @@ module.exports = {
     AutoWritedUserPref(target,key,desc) {
         target.model = require('../model/userPref')
     },
+    AutoWritedOrderItem(target,key,desc) {
+    target.model = require('../model/orderItem')
+    },
+    AutoWritedOrderItemOption(target,key,desc) {
+        target.model = require('../model/orderItemOption')
+    },
+    AutoWritedOrderGuest(target,key,desc) {
+        target.model = require('../model/orderGuestList')
+    },
 }

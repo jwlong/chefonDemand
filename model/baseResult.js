@@ -86,10 +86,12 @@ export default  {
     MENU_FOOD_ITEM_NAME_EXIST:new baseResult(401,'Menu food item name already exist.'),
     MENU_FOOD_ITEM_ID_NOT_BELONG_TO_CHEF:new baseResult(404,'the food_item_id does not belong to chef'),
     MENU_FOOD_ITEM_ID_NOT_EXISTS:new baseResult(401,'food_item_id does not exist.'),
+
+
     // menu review
     MENU_ONLY_REGULAR_USER_CAN_DO:new baseResult(402,' Only regular user (non-chef) can add menu review.'),
     MENU_CAN_OLNY_ADD_ACTIVE_MENU:new baseResult(403," Can only add menu review for active menu."),
-
+    MENU_ONLY_CHEF_CAN_MODIFY:new baseResult(402,'Only chef can modify menu.'),
 
     // 未定义错误
     PASSWD_NOT_BE_EMPTY:new baseResult(999,"password can not be empty!"),
@@ -102,8 +104,18 @@ export default  {
     MENU_LANGUAGE_CODE_LIST_INVALID:new baseResult(402,'one of language code is invalid.'),
     MENU_CUISINE_TYPE_LIST_INVALID:new baseResult(403,'one of cuisine type code is invalid.'),
     MENU_DISTRICT_CODE_INVALID:new baseResult(404,'one of district code is invalid.'),
+    MENU_NO_CHANGE_AVAILABILITY:new baseResult(403,'No change to menu\'s availability.'),
     PAGE_NUMBER_INVALID:new baseResult(405,'page number is invalid'),
 
-    MENU_QUERY_PARAM_MANDATORY:new baseResult(401,'access_token, content_type, menu_id, menu json fields are mandatory.')
+    MENU_QUERY_PARAM_MANDATORY:new baseResult(401,'access_token, content_type, menu_id, menu json fields are mandatory.'),
+
+    // order
+    ORDER_USER_INVALID:new baseResult(999,'user_id is a not a valid active user, then he is not allow to place an order.'),
+    ORDER_USER_ONLY_ACTIVE_GUEST:new baseResult(402,'Only valid active user can enter guest list.'),
+    ORDER_ONLY_PUBLIC_MENU_CAN_CREATED:new baseResult(400,'Only public menu can be used to create orders.'),
+    ORDER_MUSE_BE_PLACED_BEFORE_PREORDER_DATE:new baseResult(401,'Order must be placed before preorder date.'),
+    //
+    ORDER_SECTION_USER_ONLY_ACTIVE_GUEST:new baseResult(400,'Only active guest can update order selection.'),
+    ORDER_SECTION_GUEST_LIST_INVALID:new baseResult(401,'Only active order before preparation days is allowed to update guest order selection.')
 
 };

@@ -31,10 +31,29 @@ class ChefMenuService extends BaseService{
     constructor(){
         super(ChefMenuService.model)
     }
-    test() {
-        console.log("hello=================")
+    getOneByMenuId(menu_id) {
+        return this.getOne({where:{menu_id:menu_id,active_ind:activeIndStatus.ACTIVE}})
     }
-    //
+    getPublicIndStatusArr(user_id) {
+        if (!user_id) {
+            return new Promise().then(() =>{
+                let result = [1]
+                return result;
+            })
+        }
+        return chefService.getChefByUserId(user_id).then(
+            chef => {
+                let arr = [];
+                if (chef) {
+                    arr = [0,1];
+                }else {
+                    arr = [0];
+                }
+                return arr;
+            }
+        )
+    }
+
     updateMenuByChefIdDirectly(chef_id,menu_id,attrs,t) {
         let promiseArr = [];
         // 删除之前已经存在的记录
@@ -696,5 +715,138 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
             return result;
         })
     }
+
+    updateMenuVisibility(attrs) {
+        return db.transaction(t => {
+            return this.getOne({where:{menu_id:attrs.menu_id,chef_id:attrs.chef_id
+                ,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(
+                menu => {
+                    if (menu){
+                        if (menu.public_ind === attrs.public_ind) {
+                            throw baseResult.MENU_NO_CHANGE_AVAILABILITY;
+                        }else {
+                            return this.baseUpdate({public_ind:attrs.public_ind},
+                                {where:{menu_id:menu.menu_id,chef_id:menu.chef_id},transaction:t}).then(
+                                    resp => {
+                                        if (attrs.public_ind === 0 && menu.public_ind === 1){
+                                            return orderService.getModel().findAll({where:{menu_id:menu.menu_id,active_ind:activeIndStatus.ACTIVE,event_date:{[Op.gt]:moment()}},transaction:t}).then(orderList => {
+                                                if (orderList) {
+                                                    let promiseArr = [];
+                                                    orderList.forEach( order => {
+                                                        let user = userService.getById(order.user_id);
+                                                        let notity_username = user.first_name+" "+user.last_name;
+                                                        let msgBody = msgCfg.update_menu_notify.format(notity_username);
+                                                        promiseArr.push(messageService.insertMessage(order.user_id,msgBody,{transaction:t}));
+                                                    })
+                                                    return Promise.all(promiseArr);
+                                                }
+                                            })
+                                        }
+                                    }
+
+                            )
+                        }
+                    }else {
+                        throw baseResult.MENU_ID_NOT_EXIST;
+                    }
+                }
+            )
+        })
+
+    }
+
+    updateMenuCancelPolicy(attrs) {
+        return db.transaction(t => {
+            return this.getOne({where:{chef_id:attrs.chef_id,menu_id:attrs.menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(chefMenu => {
+                if (chefMenu) {
+                    if (chefMenu.public_ind === 1) {
+                        return this.publicMenuHandler(chefMenu,this.updateMenuCancelPolicyDirectly(attrs,t),t);
+                    }else {
+                        return this.updateMenuCancelPolicyDirectly(attrs,t);
+                    }
+                }})
+        })
+    }
+    updateMenuCancelPolicyDirectly(attrs, t) {
+        return this.baseUpdate({cancel_policy:attrs.cancel_policy},
+            {where:{menu_id:attrs.menu_id,chef_id:attrs.chef_id,active_ind:activeIndStatus.ACTIVE},transaction:t});
+    }
+    getMenuListByChefsChoice(attrs) {
+        return this.getMenuListBy(attrs);
+    }
+    getMenuListBy(attrs) {
+        let query_col_sql = `SELECT m.menu_id, m.chef_id, m.menu_name, m.menu_code, m.menu_desc,
+                m.public_ind, m.min_pers, m.max_pers, m.menu_logo_url,m.unit_price, m.seq_no,
+                avg(rating.overall_rating) menu_rating,
+                sum(rating.rating_id)      num_of_review`;
+        let total_sql = `select count(m.menu_id) total `;
+        let sql =`FROM t_chef_menu m
+                LEFT JOIN t_order o ON o.menu_id = m.menu_id AND o.active_ind = 'A'
+                LEFT JOIN t_user_rating rating ON o.order_id = rating.order_id AND rating.active_ind = 'A'
+                WHERE m.public_ind IN (:publicIndArr) `
+        if(attrs.byRecommend) {
+            sql += `AND m.chef_recommend_ind = 1`;
+        }
+            sql += `GROUP BY `;
+        if (attrs.byPopular) {
+            sql += ` orderPlacedNum desc,`;
+        }
+        sql += ` m.menu_id ORDER BY menu_rating desc, m.update_on desc `
+        let limit_sql = ` limit :startIdx and :pageSize `;
+        let queryPageCount = total_sql + sql;
+        let pageQuerySql = query_col_sql + sql +limit_sql;
+        return db.query(queryPageCount,{replacements:{publicIndArr:attrs.publicIndArr},
+            type:db.QueryTypes.SELECT}).then(totalCount => {
+            let total_pages = (totalCount  +  attrs.pageSize  - 1) /  attrs.pageSize;
+            return db.query(pageQuerySql,{replacements:{publicIndArr:attrs.publicIndArr},
+                type:db.QueryTypes.SELECT}).then(
+                menuList => {
+                    let result = {};
+                    let promiseArr = [];
+                    if (menuList) {
+                        return locationService.getLocationsByMenuList(menuList,total_pages);
+                    }
+                }
+            )
+        } )
+    }
+    getMenuListByRating(attrs) {
+        return this.getMenuListBy(attrs);
+    }
+    getArchiveDetailByChefId(chef_id) {
+        let sql = `SELECT
+          m.chef_id,
+          count(m.menu_id) menu_qty,
+          count(section.menu_section_id) section_qty,
+          count(food.food_item_id) dish_qty,
+          (CASE WHEN m.family_menu = 1 THEN count(menu_id) END) family_menu_qty,
+          (CASE WHEN m.work_menu = 1 THEN count(menu_id) END) work_menu_qty
+        from t_chef_menu m
+        LEFT JOIN t_food_item food on food.chef_id = m.chef_id AND food.active_ind ='A'
+        LEFT JOIN t_menu_section section  on section.chef_id = m.chef_id AND  section.active_ind ='A'
+        WHERE m.active_ind = 'A' AND m.chef_id = :chef_id
+        GROUP BY m.chef_id`;
+        return db.query(sql,{replacements:{chef_id:chef_id},type:db.QueryTypes.SELECT});
+    }
+
+
+    checkMenuCanCreateOrder(menu_id) {
+        return this.getOneByMenuId(menu_id).then(
+            menu => {
+                if (menu.public_ind === 0) {
+                    throw baseResult.ORDER_ONLY_PUBLIC_MENU_CAN_CREATED;
+                }else if(menu.public_ind === 1) {
+                    let d1 = moment(menu.event_date);
+                    let diffDays = d1.diff(moment(),'days');
+                    if (diffDays < menu.preparation_days) {
+                        throw baseResult.ORDER_MUSE_BE_PLACED_BEFORE_PREORDER_DATE
+                    }
+                }
+            }
+        );
+
+    }
 }
+
+
 module.exports = new ChefMenuService()

@@ -6,10 +6,12 @@ import baseResult from "../model/baseResult";
 import chefMenuService from '../service/chefMenuService'
 import chefService from "../service/chefService";
 import activeIndStatus from "../model/activeIndStatus";
+import userRateService from '../service/userRateService'
 import kitchenReqItemService from '../service/menu/kitchenReqItemService'
 import kitchenReqService from '../service/menu/kitchenReqService'
 import menuChefNoteService from '../service/menu/menuChefNoteService'
 import includeItemService from  '../service/menu/includeItemService'
+import userPrefService from '../service/userPrefService'
 import menuPhotoService from  '../service/menu/menuPhotoService'
 import menuBookingRequirementService from  '../service/menu/menuBookingRequirementService'
 import menuCuisineService from  '../service/menu/menuCuisineService'
@@ -352,23 +354,129 @@ class MenuController {
        // func#35: /menu/addMenuReviewsByMenuId
         router.post('/addMenuReviewsByMenuId',async(req,res,next) =>{
             try {
-                let menu_id = req.body.menu_id;
-                if (!menu_id) {
+                let attrs = req.body;
+                if (!attrs.menu_id) {
                     throw baseResult.MENU_QUERY_PARAM_MANDATORY;
                 }
-                let chef = await  chefService.getChefByUserId(req.user_id);
+                let chef = await chefService.getChefByUserId(req.user_id);
                 if (chef) {
                     // if user is chef throw error
-                    throw baseResult.
+                    throw baseResult.MENU_ONLY_REGULAR_USER_CAN_DO
                 }
-
-               // await chefMenuService.checkUserIdAndMenuId(req.user_id,menu_id);
-
-                res.json(await  chefMenuService.addMenuReviewsByMenuId(menu_id));
+                attrs.user_id = req.user_id;
+                await  userRateService.addMenuReviewsByMenuId(attrs);
+                res.json(baseResult.SUCCESS);
             }catch (e) {
                 next(e);
             }
         })
+        // func#41: /menu/updateMenuVisibility
+        router.post('/updateMenuVisibility',async(req,res,next) =>{
+            try {
+                let attrs = req.headers;
+                console.log("headers param:",attrs);
+                if (!attrs.menu_id || !attrs.public_ind) {
+                    throw baseResult.MENU_QUERY_PARAM_MANDATORY;
+                }
+                let chef = chefService.getChefByUserId(req.user_id);
+                if (!chef) {
+                    throw baseResult.MENU_ONLY_CHEF_CAN_MODIFY
+                }
+                attrs.chef_id = chef.chef_id;
+                await  chefMenuService.updateMenuVisibility(attrs);
+                res.json(baseResult.SUCCESS)
+
+            }catch (e){
+                next(e);
+            }
+        })
+
+        //func#43: /menu/updateMenuCancelPolicy
+        router.post('/updateMenuCancelPolicy',async(req,res,next) =>{
+            try {
+                let attrs = req.body;
+                if (!attrs.menu_id || !attrs.cancel_policy) {
+                    throw baseResult.MENU_QUERY_PARAM_MANDATORY;
+                }
+                let chef = chefService.getChefByUserId(req.user_id);
+                if (!chef) {
+                    throw baseResult.MENU_ONLY_CHEF_CAN_MODIFY
+                }
+                attrs.chef_id = chef.chef_id;
+                await  chefMenuService.updateMenuCancelPolicy(attrs);
+                res.json(baseResult.SUCCESS)
+
+            }catch (e){
+                next(e);
+            }
+        })
+        // func#52: /menu/getMenuListByChefsChoice
+        router.get('/getMenuListByChefsChoice',async(req,res,next) =>{
+            try {
+                let attrs = req.headers;
+                if (!attrs.page_no) {
+                    throw 'page_no is required!'
+                }
+                let publicStatusArr = await chefMenuService.getPublicIndStatusArr(req.user_id);
+                attrs.pageSize = await userPrefService.getPageSize(req.user_id)
+                attrs.publicIndArr = publicStatusArr;
+                attrs.byRecommend = true;
+                res.json(await chefMenuService.getMenuListByChefsChoice(attrs));
+            }catch (e){
+                next(e);
+            }
+        })
+        // func#53: /menu/getMenuListByRating
+        router.get('/getMenuListByRating',async(req,res,next) =>{
+            try {
+                let attrs = req.headers;
+                if (!attrs.page_no) {
+                    throw 'page_no is required!'
+                }
+                let publicStatusArr = await chefMenuService.getPublicIndStatusArr(req.user_id);
+                attrs.pageSize = await userPrefService.getPageSize(req.user_id)
+                attrs.publicIndArr = publicStatusArr;
+                attrs.byRating = true;
+                res.json(await chefMenuService.getMenuListByRating(attrs));
+            }catch (e){
+                next(e);
+            }
+        })
+        // func#54: /menu/getMenuListByPopular
+        router.get('/getMenuListByPopular',async(req,res,next) =>{
+            try {
+                let attrs = req.headers;
+                if (!attrs.page_no) {
+                    throw 'page_no is required!'
+                }
+                let publicStatusArr = await chefMenuService.getPublicIndStatusArr(req.user_id);
+                attrs.pageSize = await userPrefService.getPageSize(req.user_id)
+                attrs.publicIndArr = publicStatusArr;
+                attrs.byPopular = true;
+                res.json(await chefMenuService.getMenuListBy(attrs));
+            }catch (e){
+                next(e);
+            }
+        })
+        //func#60: /menu/getArchiveDetailByChefId
+        router.get('/getArchiveDetailByChefId',async(req,res,next) =>{
+            try {
+                let attrs = req.headers;
+                if (!attrs.page_no) {
+                    throw 'page_no is required!'
+                }
+                let chef = chefService.getChefByUserId(req.user_id);
+                if (!chef){
+                    throw baseResult.MENU_ONLY_CHEF_CAN_DO_THIS;
+                }
+                res.json(await chefMenuService.getArchiveDetailByChefId(chef.chef_id));
+            }catch (e){
+                next(e);
+            }
+        })
+
+
+
 
         return router;
 

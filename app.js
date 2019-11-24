@@ -41,6 +41,7 @@ app.use('/user',require('./routes/userCtrl'))
 app.use('/timeslot',require('./routes/timeslotCtrl'))
 app.use('/menu',require('./routes/menuCtrl'))
 app.use('/menu',require('./routes/menuFoodSectionCtrl'))
+app.use('/order',require('./routes/orderCtr'))
 app.use(errorHandler);
 if (!module.parent) {
     app.listen(config.port, function() {
