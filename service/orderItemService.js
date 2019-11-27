@@ -2,6 +2,8 @@ import BaseService from './baseService.js'
 import {AutoWritedOrderItem} from '../common/AutoWrite.js'
 import db from "../config/db";
 import orderItemOptionService from './orderItemService'
+import orderGuestService from './orderGuestService'
+import activeIndStatus from "../model/activeIndStatus";
 @AutoWritedOrderItem
 class OrderItemService extends BaseService {
     constructor() {
@@ -22,5 +24,82 @@ class OrderItemService extends BaseService {
         })
         return Promise.all(promiseArr);
     }
+
+    updateItemAndOptions(items, attrs, t) {
+        let promiseArr = [];
+        items.forEach(i => {
+            let p =  this.baseUpdate({active_ind:activeIndStatus.REPLACE},{where:{order_id:attrs.order_id,order_guest_id:attrs.order_guest_id},transaction:t}).then(
+                resp => {
+                    return this.newInsert(attrs,t);
+                }
+            );
+            promiseArr.push(p);
+        })
+        return Promise.all(promiseArr);
+    }
+
+    newInsert(attrs,t) {
+        let orderItmes = attrs.order_item_list;
+        let itemPrmArr = [];
+        orderItmes.forEach(item => {
+            item.order_id = attrs.order_id;
+            item.seq_no = item.seq_no;
+            item.order_guest_id = attrs.order_guest_id;
+           let p = this.baseCreate(item,{transaction:t}).then(insertedItem => {
+                let itemOptions = item.order_item_option_list;
+                let pOptions = [];
+                itemOptions.forEach(option => {
+                    option.order_item_id = insertedItem.order_item_id;
+                    option.seq_no = option.seq_no;
+                    pOptions.push(orderItemOptionService.baseCreate(option,{transaction:t}));
+                })
+                return Promise.all(pOptions);
+            })
+            itemPrmArr.push(p);
+        })
+        return Promise.all(itemPrmArr);
+    }
+
+    cancelItemAndOptions(order_id, t) {
+          return this.getModel().findAll({where:{order_id:order_id
+                   ,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(itemList => {
+               if (itemList) {
+                   let promiseArr = [];
+                   itemList.forEach(item => {
+                       let p = this.baseUpdate({active_ind:activeIndStatus.DELETE},{where:
+                               {order_id:order_id},transaction:t}).then(updated => {
+                           return orderItemOptionService.cancelOptionsByItemId(item.order_item_id,t).then(resp => {
+                               return orderGuestService.baseUpdate({active_ind:activeIndStatus.DELETE},{where:{order_id:order_id,active_ind:activeIndStatus.ACTIVE},transaction:t});
+                           })
+                       })
+                       promiseArr.push(p);
+                   })
+                   return Promise.all(promiseArr);
+               }
+
+           })
+    }
+
+    cancelOptionsByItemId(order_item_id,t) {
+       return orderItemOptionService.baseUpdate({active_ind:activeIndStatus.DELETE},{where:{order_item_id:order_item_id},transaction:t});
+    }
+
+    getItemsAndOptionsByOrder(order_id) {
+       return orderItemService.getModel().findAll({where:{order_id:order_id,active_ind:activeIndStatus.ACTIVE}}).then(itemList => {
+            let itemPrmArr = [];
+            itemList.for(item => {
+
+                let pItem = orderItemOptionService.getModel().findAll({where:{order_item_id:item.order_item_id,active_ind:activeIndStatus.ACTIVE}}).then(options => {
+                    item.order_item_option_list = options;
+                    return item;
+
+                })
+                itemPrmArr.push(pItem);
+            })
+            return Promise.all(itemPrmArr);
+
+        })
+    }
+
 }
 module.exports = new OrderItemService()

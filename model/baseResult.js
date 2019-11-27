@@ -111,11 +111,15 @@ export default  {
 
     // order
     ORDER_USER_INVALID:new baseResult(999,'user_id is a not a valid active user, then he is not allow to place an order.'),
+    ORDER_ONLY_ACTIVE_USER_CANCEL:new baseResult(402,'Only valid active user can cancel his order.'),
+    ORDER_NOT_BELONG_USER:new baseResult(401,'Order does not belong to user.'),
     ORDER_USER_ONLY_ACTIVE_GUEST:new baseResult(402,'Only valid active user can enter guest list.'),
     ORDER_ONLY_PUBLIC_MENU_CAN_CREATED:new baseResult(400,'Only public menu can be used to create orders.'),
     ORDER_MUSE_BE_PLACED_BEFORE_PREORDER_DATE:new baseResult(401,'Order must be placed before preorder date.'),
     //
     ORDER_SECTION_USER_ONLY_ACTIVE_GUEST:new baseResult(400,'Only active guest can update order selection.'),
-    ORDER_SECTION_GUEST_LIST_INVALID:new baseResult(401,'Only active order before preparation days is allowed to update guest order selection.')
+    ORDER_SECTION_GUEST_LIST_INVALID:new baseResult(401,'Only active order before preparation days is allowed to update guest order selection.'),
+    ORDER_CANCEL_WITHIN_HOURS:new baseResult(403,'Can only cancel within cancelling hours.'),
+    ORDER_ONLY_CHEF_AND_USER_CAN_VIEW:new baseResult(402,'Only chef and user can view his orders.')
 
 };

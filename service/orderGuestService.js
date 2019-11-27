@@ -2,6 +2,8 @@ import BaseService from './baseService.js'
 import {AutoWritedOrderGuest} from '../common/AutoWrite.js'
 import db from "../config/db";
 import activeIndStatus from "../model/activeIndStatus";
+import orderItemService from './orderItemService'
+import orderItemOptionService from './orderItemOptionService'
 import baseResult from "../model/baseResult";
 
 @AutoWritedOrderGuest
@@ -50,13 +52,31 @@ class OrderGuestService extends BaseService {
         })
     }
 
-    updateOrderGuestSelectionByOrderId(attrs) {
+    updateOrderGuestSelectionByOrderId(attrs,menu) {
         this.getModel().findOne({where:{order_id:attrs.order_id,order_guest_id:attrs.order_guest_id}}).then(
             guest =>{
-                if (guest) {
+                if (guest && guest.active_ind === activeIndStatus.ACTIVE) {
+                    // replace
+                    let orderItemPrmArr = [];
+
+                    attrs.order_item_list.forEach(item => {
+                        let orderItemPrm = orderItemService.getModel().findAll({where:{order_id:attrs.order_id,order_guest_id:attrs.order_guest_id},transaction:t}).then(items => {
+                            if (items) {
+                                // replaces
+                                return orderItemService.updateItemAndOptions(items,attrs,t);
+
+                            }else {
+                                // new add
+                                return orderItemService.newInsert(attrs,t);
+                            }
+                        })
+                        orderItemPrmArr.push(orderItemPrm);
+                    })
+                    return Promise.all(orderItemPrmArr);
 
                 }else {
-                    throw baseResult.ORDER_SECTION_GUEST_LIST_INVALID;
+                    // new add
+                    throw baseResult.ORDER_SECTION_USER_ONLY_ACTIVE_GUEST;
                 }
             }
         )
