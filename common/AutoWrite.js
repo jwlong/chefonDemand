@@ -115,4 +115,7 @@ module.exports = {
     AutoWritedOrderGuest(target,key,desc) {
         target.model = require('../model/orderGuestList')
     },
+    AutoWritedUserMenuView(target,key,desc) {
+        target.model = require('../model/userMenuView')
+    },
 }

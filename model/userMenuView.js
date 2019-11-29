@@ -1,6 +1,6 @@
 import Sequelize from 'Sequelize'
 import BaseModel from './baseModel.js'
-class UserWishList extends BaseModel {
+class UserMenuView extends BaseModel {
     constructor() {
         super('t_user_menu_view', {
             view_id: {
@@ -57,4 +57,4 @@ class UserWishList extends BaseModel {
         });
     };
 }
-module.exports = new UserWishList();
+module.exports = new UserMenuView();

@@ -93,6 +93,11 @@ class BaseModel{
 	}
 	// 批量插入实体集
 	createBatch(entitys,options){
+		if (entitys) {
+			entitys.forEach(entity => {
+                utils.setCustomTransfer(entity,'create')
+			})
+		}
 		return this.model.bulkCreate(entitys,options)
 	}
 

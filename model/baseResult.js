@@ -44,6 +44,7 @@ export default  {
     USER_VERITY_INVALID:new baseResult(421,'Verification Code is invalid.'),
     USER_VERITY_EXPIRED:new baseResult(422,'Verification Code expired.'),
     USER_GRANT_TYPE_MUST_BE_REFRESH_TOKEN:new baseResult(999,"grant type must be 'refresh_token' "),
+    USER_LOGOUT_ONLY_ACTIVE:new baseResult(402,'Only active valid user can logout from system.'),
     //chef部分
     CHEF_NAME_ALREADY_TOKEN:new baseResult(400,"user name already taken."),
     CHEF_MANDATORY_FIELD_EXCEPTION:new baseResult(401,'Chef\'s first name, last name and short description fields are mandatory.'),

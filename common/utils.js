@@ -1,6 +1,7 @@
 import baseResult from "../model/baseResult";
 import accessTokenService from "../service/accessTokenService";
 import moment from 'moment'
+import activeIndStatus from "../model/activeIndStatus";
 
 const userContext = require('../common/userContext')
 const utils = {
@@ -64,7 +65,7 @@ const utils = {
         }
     },
     validToken(tokenString, req) {
-        return accessTokenService.getModel().findOne({where: {token_string: tokenString}}).then(accessToken => {
+        return accessTokenService.getModel().findOne({where: {token_string: tokenString,active_ind:activeIndStatus.ACTIVE}}).then(accessToken => {
             console.log("access token =>", accessToken);
             if (accessToken) {// access token exist
                 if (moment(accessToken.valid_until).isBefore(moment())) {

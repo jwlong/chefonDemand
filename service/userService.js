@@ -3,6 +3,8 @@ import {AutoWritedUser} from '../common/AutoWrite.js'
 import db from "../config/db";
 import baseResult from '../model/baseResult'
 import accessTokenService from "./accessTokenService";
+import userMenuViewService from './useMenuViewService'
+import chefMenuService from  './chefMenuService'
 import cfg from "../config";
 import moment from "moment"
 import uuid from 'uuid';
@@ -43,7 +45,7 @@ class UserService extends BaseService{
         return this.baseFindByFilter(null,{user_name:username,password:password});
     }
     getById(userId) {
-        return this.baseFindByFilter(null,{user_id:userId,active_ind:activeIndStatus.ACTIVE})
+        return this.getModel().findOne({where:{user_id:userId,active_ind:activeIndStatus.ACTIVE}})
     }
     validPassword(encodedPassword, password) {
         console.log("result passwd:",UserService.model.isPassword(encodedPassword, password));
@@ -84,6 +86,33 @@ class UserService extends BaseService{
                  return this.loginAndGenToken(query,t);
             })
         })
+    }
+    // logout and insert t_user_menu_view
+    userLogout(attrs) {
+        return db.transaction(t => {
+            return accessTokenService.baseUpdate({active_ind: activeIndStatus.INACTIVE}, {
+                where: {
+                    user_id: attrs.user_id,
+                    active_ind: activeIndStatus.ACTIVE
+                }, transaction: t
+            }).then(updatedToken => {
+                let checkPromiseArr = [];
+                attrs.menu_viewed_list.forEach(viewd => {
+                    viewd.user_id = attrs.user_id;
+                    checkPromiseArr.push(chefMenuService.getOneByMenuId(viewd.menu_id).then(chefMenu => {
+                        if (!chefMenu) {
+                            throw 'menu_id is not exists!';
+                        }
+                    }))
+                })
+                return Promise.all(checkPromiseArr).then(resp => {
+                        return userMenuViewService.baseCreateBatch(attrs.menu_viewed_list, {transaction: t});
+                    }
+                )
+
+            })
+        })
+
     }
 }
 module.exports = new UserService()

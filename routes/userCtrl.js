@@ -134,6 +134,29 @@ class UserController {
                 next(e);
             }
         })
+
+        // func 62 /user/userLogout
+        router.get('/userLogout',async(req, res,next) => {
+            try {
+                let attrs = req.body;
+                if (!attrs || !attrs.menu_viewed_list) {
+                    throw  'LogoutUserRequest is required!';
+                }
+
+                let user = await userService.getById(req.user_id);
+
+                if (!user) {
+                    throw baseResult.USER_LOGOUT_ONLY_ACTIVE;
+                }
+                attrs.user_id = user.user_id;
+                console.log("LogoutUserRequest param :",attrs);
+                await userService.userLogout(attrs);
+                res.json(baseResult.SUCCESS);
+            }catch (e) {
+                next(e);
+            }
+        })
+
         return router;
     }
 
