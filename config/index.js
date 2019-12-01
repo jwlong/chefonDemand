@@ -20,7 +20,7 @@ const config = {
         '/menu/getMenuBookingRequirement','menu/getAvailableCuisineTypes',
         '/menu/getMenuCancelPolicy','/menu/getMenuChefNoteByMenuId',
         '/menu/getMenuRatingByMenuId','/menu/getMenuReviewsByMenuId','/menu/getMenuListByPopular',
-        '/menu/getMenuListByRating','/menu/getMenuListByChefsChoice'],
+        '/menu/getMenuListByRating','/menu/getMenuListByChefsChoice','/chef/findChefByFilters'],
     // when robot_ind 为true时，这种情况下插入数据
     robot_id:0,
     sys_user_id:1

@@ -73,5 +73,9 @@ class ChefLanguageService extends BaseService{
 
         return this.baseCreateBatch(attr.language_list);
     }
+
+    countChefLangByLangCode(langCode) {
+        return this.getModel().count({where:{lang_code:langCode,active_ind:activeIndStatus.ACTIVE}});
+    }
 }
 module.exports = new ChefLanguageService()

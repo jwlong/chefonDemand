@@ -1,6 +1,7 @@
 import Sequelize from 'Sequelize'
 import BaseModel from './baseModel.js'
 import bcrypt from "bcrypt"
+import activeIndStatus from "./activeIndStatus";
 
 class User extends BaseModel {
     constructor () {
@@ -170,5 +171,8 @@ class User extends BaseModel {
         console.log(bcrypt.compareSync(password, encodedPassword))
         return bcrypt.compareSync(password, encodedPassword);
     };
+    getById(userId,t) {
+        return this.getModel().findOne({where:{user_id:userId,active_ind:activeIndStatus.ACTIVE},transaction:t})
+    }
 }
 module.exports = new User()

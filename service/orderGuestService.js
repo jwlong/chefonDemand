@@ -82,5 +82,25 @@ class OrderGuestService extends BaseService {
         )
 
     }
+
+    getGuestListAndOptionsByOrder(order_id) {
+        return this.getModel().findAll({where:{order_id:order_id,active_ind:activeIndStatus.ACTIVE}}).then(guestList =>{
+            let promiseArr = [];
+            guestList.forEach(guest => {
+                let p = orderItemService.getModel().findAll({where:{order_id:order_id,order_guest_id:guest.order_guest_id,active_ind:activeIndStatus.ACTIVE}}).then(itemList => {
+                    let result = {};
+                    result = guest.toJSON();
+                    return orderItemOptionService.getOptionsByItems(itemList).then(list => {
+                        result.guest_order_item_list = list;
+                        return result
+                    });
+                  ;
+                })
+                promiseArr.push(p);
+            })
+            return Promise.all(promiseArr);
+        })
+
+    }
 }
 module.exports = new OrderGuestService()

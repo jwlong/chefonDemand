@@ -71,7 +71,7 @@ class OrderService extends BaseService{
         let whereSql = `where 1=1 `;
         let orderSql = ``;
         if (attrs.chef_id) {
-            whereSql += ' and menu.chef_id = :chef_id and o.user_id=:user_id';
+            whereSql += ' and menu.chef_id = :chef_id ';
             orderSql  = queryOrder+sql+whereSql;
 
         }else {
@@ -79,7 +79,7 @@ class OrderService extends BaseService{
             orderSql = queryOrder + sql + whereSql;
 
         }
-        return db.query(chefSql,{replacements:attrs,type:db.QueryTypes.SELECT}).then(orderList => {
+        return db.query(orderSql,{replacements:attrs,type:db.QueryTypes.SELECT}).then(orderList => {
             let result = {};
             result.order_list = orderList;
             let oPrmArr = [];
@@ -88,10 +88,11 @@ class OrderService extends BaseService{
                     order.order_item_list = itemList;
                     return order;
                 });
-                let p2 = orderGuestService.getModel().findAll({where:{order_id:order_id,active_ind:activeIndStatus.ACTIVE}}).then(guestList =>{
-                    order.guest_list = guestList;
-                    return order;
-                })
+
+               let p2 = orderGuestService.getGuestListAndOptionsByOrder(order.order_id).then(guestList => {
+                   order.guest_list =   guestList;
+                   return order;
+               })
                 oPrmArr.push(p);
                 oPrmArr.push(p2);
             })
@@ -113,6 +114,26 @@ class OrderService extends BaseService{
         }else {
 
         }*/
+
+    }
+
+    getOrderStatisticsByChefId(chef_id) {
+        let sql = `select
+            count(distinct o.order_id) 30_days_bookings,
+            count(distinct view.view_id) 30_days_views,
+            avg(rating.overall_rating) overall_rating,
+            count(distinct rating.rating_id) num_of_review,
+            sum(o.sub_total) month_to_day_earnings,
+            CONCAT (ROUND(case when  (count(distinct am.message_id) +3 /count(distinct tm.message_id)) >1 then 1 else
+            (count(distinct am.message_id)+3 /count(distinct tm.message_id)) end)*100 ,'%') response_rate
+            from t_order o
+            left join t_chef_menu m on o.menu_id = m.menu_id and m.active_ind = 'A'
+            left join t_user_rating rating on o.order_id = rating.order_id and rating.active_ind = 'A'
+            left join t_user_menu_view view on m.menu_id = view.menu_id and view.active_ind = 'A'
+            left join t_message am on  am.to_user_id = o.user_id and am.active_ind = 'A'
+            left join t_message tm on  tm.from_user_id = o.user_id and tm.active_ind = 'A'
+            where m.chef_id = :chef_id and o.active_ind = 'A'`;
+        return db.query(sql,{replacements:{chef_id:chef_id},type:db.QueryTypes.SELECT});
 
     }
 }

@@ -182,6 +182,8 @@ class ChefController {
                 chefService.checkFilters(query);
                 query.pageSize = await userPrefService.getPageSize(req.user_id)
                 chefService.covertQueryParam(query);
+                await chefService.checkParam(query);
+                console.log("query => ",query);
                 res.json(await  chefMenuService.findChefByFilters(query))
             }catch (e) {
                 next(e);

@@ -52,6 +52,12 @@ export default  {
     CHEF_LANG_LIST_EMPTY:new baseResult(401,"language list can not be empty."),
     CHEF_EXIST_INVALID_IN_LANG_LIST:new baseResult(402,"One of the language in input list is invalid."),
     CHEF_ID_NOT_EXIST: new baseResult(400,'chef Id does not exist.'),
+    CHEF_ONE_OF_LANG_INVALID:new baseResult(402, 'one of language code is invalid.'),
+    CHEF_ONE_OF_CUSITYPE_INVALID:new baseResult(403, 'one of cuisine type code is invalid.'),
+    CHEF_ONE_OF_DISTRICT_INVALID:new baseResult(404, 'one of district code is invalid.'),
+
+
+
 
     // /chef/updateChefServiceLocation
     CHEF_DISTRICT_CODE_NOT_EXIST:new baseResult(401,"district code does not exist."),

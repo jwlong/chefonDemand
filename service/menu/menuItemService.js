@@ -8,8 +8,25 @@ class MenuItemService extends BaseService{
         super(MenuItemService.model)
     }
 
+    getActiveMenuListByMenuId(menu_id,t) {
+        return this.getModel().findAll({where:{menu_id:menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t});
+    }
+    /**
+     * @param menu_id
+     * @param status
+     * @param t
+     * @returns {PromiseLike<T> | Promise<T>}
+     */
     batchUpdateStatus(menu_id,status,t) {
-        return this.baseUpdate({active_ind:status},{where:{menu_id:menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t});
+        debugger
+        return this.getModel().findAll({where:{menu_id:menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(
+            itemList => {
+                return this.baseUpdate({active_ind:status},{where:{menu_id:menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(cnt =>{
+                    return itemList;
+                })
+            }
+
+        )
     }
 }
 module.exports = new MenuItemService()

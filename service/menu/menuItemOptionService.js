@@ -49,8 +49,7 @@ class MenuItemOptionService extends BaseService{
                 let p = this.nextId('seq_no',{transaction:t}).then(nextSeq => {
                     o.menu_item_id = menuItem.menu_item_id;
                     o.seq_no = nextSeq;
-                    this.baseCreate(o,{transaction:t})
-
+                    return this.baseCreate(o,{transaction:t})
                 })
                 promiseArr.push(p);
             })
@@ -58,7 +57,7 @@ class MenuItemOptionService extends BaseService{
         }
     }
     batchUpdateStatus(menuItem, updatedStatus, t) {
-        this.getModel().findAll({where:{menu_item_id:menuItem.menu_item_id,active_ind:activeIndStatus.ACTIVE}}).then( optionList => {
+        return this.getModel().findAll({where:{menu_item_id:menuItem.menu_item_id,active_ind:activeIndStatus.ACTIVE}}).then( optionList => {
             let promiseArr = [];
             optionList.forEach(value => {
                 value.active_ind = updatedStatus;

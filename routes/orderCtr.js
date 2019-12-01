@@ -109,22 +109,34 @@ class OrderController {
         router.get('/getOrdersByUserId',async(req,res,next) =>{
             try {
                 let attrs = {};
-                let user = userService.getById(req.user_id);
+                let user = await  userService.getById(req.user_id);
                 if (!user) {
                     throw baseResult.ORDER_ONLY_CHEF_AND_USER_CAN_VIEW
                 }
-                let chefUser = chefService.getChefByUserId(user.user_id);
+                let chefUser = await chefService.getChefByUserId(user.user_id);
                 attrs.user_id = user.user_id;
                 if (chefUser) {
                     attrs.chef_id = chefUser.chef_id;
                 }
-                orderService.getOrdersByUserId(attrs);
-
+                res.json(await orderService.getOrdersByUserId(attrs));
             }catch (e) {
                 next(e);
             }
         })
         //func 61 order/getOrderStatisticsByChefId
+
+        router.get('/getOrderStatisticsByChefId',async(req,res,next) =>{
+            try {
+                let chefUser = await  chefService.getChefByUserId(req.user_id);
+                if (!chefUser) {
+                    throw baseResult.MENU_ONLY_CHEF_CAN_DO_THIS;
+                }
+                res.json(await  orderService.getOrderStatisticsByChefId(chefUser.chef_id));
+            }catch (e) {
+                next(e);
+            }
+        })
+
 
         return router;
     }

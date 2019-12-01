@@ -47,7 +47,8 @@ class OrderGuestList extends BaseModel {
                 allowNull: false
             }
         }, {
-            tableName: 't_order_guest_list'
+            tableName: 't_order_guest_list',
+            timestamps: false
         });
     }
 };

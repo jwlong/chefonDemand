@@ -222,7 +222,7 @@ class MenuController {
                 if (!chef) {
                     throw baseResult.CHEF_ID_NOT_EXIST;
                 }
-                res.json(await  chefMenuService.getMenuListByChefId(chef_id));
+                res.json(await  chefMenuService.getMenuListByChefId(chef.chef_id));
             }catch (e) {
                 next(e);
             }
@@ -330,8 +330,8 @@ class MenuController {
                 if (!attrs || !attrs.menu_id) {
                     throw baseResult.MENU_QUERY_PARAM_MANDATORY;
                 }
-                let criteria = await chefMenuService.checkUserIdAndMenuId(req.user_id,menu_id);
-
+                let criteria = await chefMenuService.checkUserIdAndMenuId(req.user_id,attrs.menu_id);
+                console.log("func 33 criteria========> ",criteria);
                 res.json(await  chefMenuService.getMenuRatingByMenuId(criteria));
             }catch (e) {
                 next(e);
@@ -419,8 +419,13 @@ class MenuController {
                 }
                 let publicStatusArr = await chefMenuService.getPublicIndStatusArr(req.user_id);
                 attrs.pageSize = await userPrefService.getPageSize(req.user_id)
+                if (attrs.page_no <= 0) {
+                    attrs.page_no = 1;
+                }
+                attrs.startIdx = (attrs.page_no -1)*attrs.pageSize;
                 attrs.publicIndArr = publicStatusArr;
                 attrs.byRecommend = true;
+                console.log("func 52 attrs: =========>",attrs)
                 res.json(await chefMenuService.getMenuListByChefsChoice(attrs));
             }catch (e){
                 next(e);
@@ -435,6 +440,7 @@ class MenuController {
                 }
                 let publicStatusArr = await chefMenuService.getPublicIndStatusArr(req.user_id);
                 attrs.pageSize = await userPrefService.getPageSize(req.user_id)
+                attrs.startIdx = (attrs.page_no -1)*attrs.pageSize;
                 attrs.publicIndArr = publicStatusArr;
                 attrs.byRating = true;
                 res.json(await chefMenuService.getMenuListByRating(attrs));
@@ -451,6 +457,7 @@ class MenuController {
                 }
                 let publicStatusArr = await chefMenuService.getPublicIndStatusArr(req.user_id);
                 attrs.pageSize = await userPrefService.getPageSize(req.user_id)
+                attrs.startIdx = (attrs.page_no -1)*attrs.pageSize;
                 attrs.publicIndArr = publicStatusArr;
                 attrs.byPopular = true;
                 res.json(await chefMenuService.getMenuListBy(attrs));
@@ -461,11 +468,7 @@ class MenuController {
         //func#60: /menu/getArchiveDetailByChefId
         router.get('/getArchiveDetailByChefId',async(req,res,next) =>{
             try {
-                let attrs = req.headers;
-                if (!attrs.page_no) {
-                    throw 'page_no is required!'
-                }
-                let chef = chefService.getChefByUserId(req.user_id);
+                let chef = await chefService.getChefByUserId(req.user_id);
                 if (!chef){
                     throw baseResult.MENU_ONLY_CHEF_CAN_DO_THIS;
                 }

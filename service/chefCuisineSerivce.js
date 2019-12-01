@@ -2,6 +2,7 @@ import BaseService from './baseService.js'
 import {AutoWritedChefCuisine} from '../common/AutoWrite.js'
 import utils from "../common/utils";
 import cuisineTypeService from "./cuisineTypeService";
+import activeIndStatus from "../model/activeIndStatus";
 
 @AutoWritedChefCuisine
 class ChefCuisineService extends BaseService{
@@ -24,6 +25,10 @@ class ChefCuisineService extends BaseService{
                 throw 'cuisine_type not exist! cuisine_type_id: '+type.cuisine_type_id;
             }
         })
+    }
+
+    countByTypeId(typeId,t) {
+        return this.getModel().count({where:{cuisine_type_id:typeId,active_ind:activeIndStatus.ACTIVE},transaction:t});
     }
 }
 module.exports = new ChefCuisineService()

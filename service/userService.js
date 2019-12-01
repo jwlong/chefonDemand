@@ -44,8 +44,8 @@ class UserService extends BaseService{
     getUser(username,password) {
         return this.baseFindByFilter(null,{user_name:username,password:password});
     }
-    getById(userId) {
-        return this.getModel().findOne({where:{user_id:userId,active_ind:activeIndStatus.ACTIVE}})
+    getById(userId,t) {
+        return this.getModel().findOne({where:{user_id:userId,active_ind:activeIndStatus.ACTIVE},transaction:t})
     }
     validPassword(encodedPassword, password) {
         console.log("result passwd:",UserService.model.isPassword(encodedPassword, password));
@@ -115,4 +115,4 @@ class UserService extends BaseService{
 
     }
 }
-module.exports = new UserService()
+module.exports = new UserService

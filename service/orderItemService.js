@@ -1,7 +1,7 @@
 import BaseService from './baseService.js'
 import {AutoWritedOrderItem} from '../common/AutoWrite.js'
 import db from "../config/db";
-import orderItemOptionService from './orderItemService'
+import orderItemOptionService from './orderItemOptionService'
 import orderGuestService from './orderGuestService'
 import activeIndStatus from "../model/activeIndStatus";
 @AutoWritedOrderItem
@@ -85,13 +85,15 @@ class OrderItemService extends BaseService {
     }
 
     getItemsAndOptionsByOrder(order_id) {
-       return orderItemService.getModel().findAll({where:{order_id:order_id,active_ind:activeIndStatus.ACTIVE}}).then(itemList => {
+       return this.getModel().findAll({where:{order_id:order_id,active_ind:activeIndStatus.ACTIVE}}).then(itemList => {
             let itemPrmArr = [];
-            itemList.for(item => {
+            itemList.forEach(item => {
 
                 let pItem = orderItemOptionService.getModel().findAll({where:{order_item_id:item.order_item_id,active_ind:activeIndStatus.ACTIVE}}).then(options => {
-                    item.order_item_option_list = options;
-                    return item;
+                    let result = {};
+                    result = item.toJSON();
+                    result.order_item_option_list = options;
+                    return result;
 
                 })
                 itemPrmArr.push(pItem);
@@ -102,4 +104,5 @@ class OrderItemService extends BaseService {
     }
 
 }
-module.exports = new OrderItemService()
+//module.exports = new OrderItemService()
+export default new OrderItemService()

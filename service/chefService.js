@@ -5,8 +5,10 @@ import userService from './userService'
 import baseResult from "../model/baseResult"
 import user from '../model/user'
 import chefCuisineSerivce from './chefCuisineSerivce'
+import chefLanguageService from  './chefLanguageService'
 /*import chefMenuService from './chefMenuService'*/
 import chefExpService from './chefExpService'
+import chefLocationService from './chefLocationService'
 import activeIndStatus from "../model/activeIndStatus";
 import Sequelize from 'sequelize'
 const Op = Sequelize.Op
@@ -233,23 +235,23 @@ WHERE cc.chef_id = :chef_id and ct.active_ind = 'A' `;
         query.langCodes =[],query.cuisineTypeIds = [],query.districtCodes = [];
         if (query.language_list) {
             query.language_list.forEach(code => {
-                query.langCodes.push(code);
+                query.langCodes.push(code.lang_code);
             })
         }
         if (query.cuisine_type_list) {
             query.cuisine_type_list.forEach(typeId => {
-                query.cuisineTypeIds.push(typeId);
+                query.cuisineTypeIds.push(typeId.cuisine_type_id);
             })
         }
         if (query.district_code_list)  {
             query.district_code_list.forEach(districtCode => {
-                query.districtCodes.push(districtCode);
+                query.districtCodes.push(districtCode.district_code);
             })
         }
     }
 
     checkFilters(query) {
-        if (!query.page_no || isNaN(query)) {
+        if (!query.page_no || isNaN(query.page_no)) {
             throw baseResult.PAGE_NUMBER_INVALID;
         }
         if (query.start_date) {
@@ -264,5 +266,37 @@ WHERE cc.chef_id = :chef_id and ct.active_ind = 'A' `;
             }
         }
     }
+
+    checkParam(query) {
+        console.log("check Param=======>",query)
+        let promiseArr = [];
+        query.cuisineTypeIds.forEach(typeId => {
+           let typePrm =  chefCuisineSerivce.countByTypeId(typeId).then(cnt => {
+                if (cnt == 0 || !cnt) {
+                    throw baseResult.CHEF_ONE_OF_CUSITYPE_INVALID;
+                }
+            })
+            promiseArr.push(typePrm);
+        })
+
+        query.langCodes.forEach(langCode => {
+          let langPrm =  chefLanguageService.countChefLangByLangCode(langCode).then(cnt => {
+                if (!cnt || cnt == 0) {
+                    throw baseResult.CHEF_ONE_OF_LANG_INVALID;
+                }
+            })
+            promiseArr.push(langPrm);
+        })
+        query.districtCodes.forEach(districtCode => {
+           let disPrm =  chefLocationService.countByDistrict(districtCode).then(cnt => {
+                if (!cnt || cnt == 0) {
+                    throw baseResult.CHEF_ONE_OF_DISTRICT_INVALID;
+                }
+            });
+           promiseArr.push(disPrm);
+        })
+        return Promise.all(promiseArr)
+    }
 }
-module.exports = new ChefService()
+//module.exports = new ChefService()
+export default new ChefService();

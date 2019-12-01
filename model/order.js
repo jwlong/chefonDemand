@@ -128,7 +128,8 @@ class Order extends BaseModel {
                 allowNull: false
             }
         }, {
-            tableName: 't_order'
+            tableName: 't_order',
+            timestamps: false
         });
     }
 };
