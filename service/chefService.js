@@ -297,6 +297,20 @@ WHERE cc.chef_id = :chef_id and ct.active_ind = 'A' `;
         })
         return Promise.all(promiseArr)
     }
+
+    getCityList(menu,districtCodes) {
+        let sql = `select city.city_name,city.city_code from t_city city
+                  left join t_district t on city.city_code = t.city_code and t.active_ind = 'A'
+                  left join t_chef_service_location t2 on t.district_code = t2.district and t2.active_ind = 'A'
+                  left join t_chef tc on t2.chef = tc.chef_id and tc.active_ind = 'A'
+                where tc.chef_id = :chef_id and city.active_ind = 'A' and t2.district in (:districtCodes) `;
+        return db.query(sql,{replacements:{chef_id:menu.chef_id,districtCodes:districtCodes},type:db.QueryTypes.SELECT}).then(resp => {
+                menu.city_code_list = resp;
+                console.log("menu =========>",menu)
+                return menu;
+        });
+
+    }
 }
 //module.exports = new ChefService()
 export default new ChefService();

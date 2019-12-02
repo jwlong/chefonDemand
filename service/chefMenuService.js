@@ -455,7 +455,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
             user.photo_url  chef_photo_url,
             max(rating.overall_rating) highest_rate,
             menu_logo_url `
-        let totalSql = `count(m.chef_id) `;
+        let totalSql = `count(distinct m.chef_id)  total `;
         let sql = `from t_chef_menu m
             left join t_chef chef on m.chef_id = chef.chef_id and chef.active_ind = 'A'
             left join t_user user on chef.user_id = user.user_id and user.active_ind = 'A'
@@ -471,16 +471,16 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
             and cuisine.cuisine_type_id in (:typeIds)
             and location.district in (:districtCodes)
             group by m.chef_id,m.menu_id`;
-        let limitSql = `  limit :startIndex , :pageSize`;
+        let limitSql = ` order by menu_rating desc limit :startIndex , :pageSize`;
         let queryTotalSql = preSql + totalSql + sql;
         let filterSql = preSql + querySql + sql +limitSql;
         let replacements = {mealType:query.meal_type,langCodeList:query.langCodes,typeIds:query.cuisineTypeIds,districtCodes:query.districtCodes,startDate:query.start_date,endDate:query.end_date};
 
         return db.query(queryTotalSql,{replacements:replacements,type:db.QueryTypes.SELECT}).then(totalRecord => {
             let result = {};
-            console.log("total record:==========>",totalRecord);
-            if (totalRecord[0]) {
-                result.total_pages = (totalRecord[0]  +  query.pageSize  - 1) /  query.pageSize;
+            console.log("total record:==========>",totalRecord[0]);
+            if (totalRecord[0] && totalRecord[0]) {
+                result.total_pages = (totalRecord[0].total  +  query.pageSize  - 1) /  query.pageSize;
             }else {
                 result.total_pages = 0;
             }
@@ -849,6 +849,61 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
                 }
             }
         );
+
+    }
+
+    findMenuByFilters(query) {
+        let countSql = `select count(distinct m.menu_id) total`;
+        let querySql = ` select tc.chef_id,m.menu_id,
+          t_user.photo_url chef_photo_url,m.menu_logo_url,t_user.user_id,
+          count(rating.user_id) num_of_review,
+          avg(overall_rating) menu_rating `;
+        let sql = ` from t_chef_menu m
+          left join t_chef tc on m.chef_id = tc.chef_id and tc.active_ind = 'A'
+          left join t_chef_language lang on lang.chef_id = m.chef_id and lang.active_ind ='A'
+          left join t_chef_cuisine cuisine  on cuisine.chef_id = m.chef_id and  cuisine.active_ind ='A'
+          left join t_chef_service_location location  on location.chef = m.chef_id and location.active_ind ='A'
+          left join t_user on tc.user_id = t_user.user_id and t_user.active_ind = 'A'
+          left join t_order o on o.menu_id = m.menu_id and  o.active_ind = 'A'
+          left join t_user_rating rating on o.order_id = rating.order_id and rating.active_ind ='A'  
+          where m.start_date < :start_date and m.end_date > :start_date and m.end_date >:end_date  and
+          m.active_ind = 'A' and applied_meal=:meal_type
+           and m.applied_meal = :meal_type
+            and lang.lang_code in (:langCodes)
+            and cuisine.cuisine_type_id in (:cuisineTypeIds)
+            and location.district in (:districtCodes)
+        group by  m.menu_id `;
+        let orderBySql = ' order by menu_rating desc limit :startIndex,:pageSize ';
+        let totalSql = countSql + sql;
+        let filterSql = querySql + sql + orderBySql;
+        return db.query(totalSql,{replacements:query}).then(totalRecord => {
+            let result = {};
+            console.log("totalRecord==========>",totalRecord[0])
+            if (totalRecord[0] && totalRecord[0][0] ) {
+                result.total_pages = (totalRecord[0][0].total  +  query.pageSize  - 1) /  query.pageSize;
+            }else {
+                result.total_pages = 0;
+                result.page_no = query.page_no;
+                result.menu_list = [];
+                return result;
+
+            }
+            result.page_no = query.page_no;
+
+            return db.query(filterSql,{replacements:query,type:db.QueryTypes.SELECT}).then(
+                list => {
+                    let promiseArr = [];
+                    list.forEach(menu => {
+                        promiseArr.push(chefService.getCityList(menu,query.districtCodes));
+                    })
+                    return Promise.all(promiseArr).then(list => {
+                        result.menu_list = list;
+                        return result;
+                    })
+                }
+            )
+        })
+
 
     }
 }

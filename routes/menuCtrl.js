@@ -227,6 +227,23 @@ class MenuController {
                 next(e);
             }
         })
+        // func 20 /menu/findMenuByFilters
+
+        router.get('/findMenuByFilters',async(req,res,next) =>{
+            try {
+                let query = req.body;
+                chefService.checkFilters(query);
+                query.pageSize = await userPrefService.getPageSize(req.user_id)
+                chefService.covertQueryParam(query);
+                await chefService.checkParam(query);
+                console.log("query => ",query);
+                res.json(await  chefMenuService.findMenuByFilters(query))
+            }catch (e) {
+                next(e);
+            }
+        })
+
+
 
         // func22: /menu/updateMenuServingDetailByMenuId
         router.post('/updateMenuServingDetailByMenuId',async(req,res,next) =>{
