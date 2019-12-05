@@ -1,6 +1,7 @@
 import BaseService from '../baseService.js'
 import {AutoWritedMenuItemOption} from '../../common/AutoWrite.js'
 import activeIndStatus from "../../model/activeIndStatus";
+import menuItemService from './menuItemService'
 
 @AutoWritedMenuItemOption
 class MenuItemOptionService extends BaseService{
@@ -66,5 +67,25 @@ class MenuItemOptionService extends BaseService{
             return Promise.all(promiseArr);
         })
     }
+
+    updateReplaceStatus(menuItem,t) {
+        return this.getModel().findAll({where:{menu_item_id:menuItem.menu_item_id,active_ind:activeIndStatus.ACTIVE}}).then( optionList => {
+            let promiseArr = [];
+            optionList.forEach(value => {
+                promiseArr.push(this.baseUpdate({active_ind:activeIndStatus.REPLACE},{where:{menu_item_id:menuItem.menu_item_id,option_id:value.option_id,active_ind:activeIndStatus.ACTIVE},transaction:t}));
+            })
+            return Promise.all(promiseArr);
+        })
+    }
+    updateStatusByMenuId(menu_id,status,t) {
+        return menuItemService.getActiveMenuListByMenuId(menu_id,t).then(menuItemList => {
+            let promiseArr = [];
+            menuItemList.forEach(item => {
+                promiseArr.push(this.updateReplaceStatus(item,t));
+            })
+            return Promise.all(promiseArr);
+        })
+    }
 }
-module.exports = new MenuItemOptionService()
+//module.exports = new MenuItemOptionService()
+export default new MenuItemOptionService();
