@@ -252,12 +252,13 @@ class MenuController {
                 if (!attrs || !attrs.menu_id) {
                     throw baseResult.MENU_QUERY_PARAM_MANDATORY;
                 }
-
                 let chef = await chefService.getChefByUserId(req.user_id);
+                console.log("chef =====>",chef.chef_id);
                 if (!chef) {
                     throw baseResult.MENU_ONLY_CHEF_CAN_UPDATE;
                 }
-                await  chefMenuService.updateMenuServingDetailByMenuId(chef.chef_id,attrs.menu_id,attrs);
+                attrs.chef_id = chef.chef_id;
+                await  chefMenuService.updateMenuServingDetailByMenuId(attrs.chef_id,attrs.menu_id,attrs);
                 res.json(baseResult.SUCCESS)
             }catch (e) {
                 next(e);

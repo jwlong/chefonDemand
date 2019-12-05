@@ -140,4 +140,5 @@ class OrderService extends BaseService{
 
     }
 }
-module.exports = new OrderService()
+// module.exports = new OrderService()
+export default new OrderService()

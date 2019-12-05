@@ -346,7 +346,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
     }
 
     /**
-     * chefMenu中clone动作不生成亲折menu_code,使用原来的
+     * chefMenu
      * @param menu
      * @param t
      * @returns {PromiseLike<T> | Promise<T>}
@@ -354,6 +354,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
     cloneNewLogic(menu,t,notCloneTypes,dataMapByNotCloneTypes) {
         // create new menu
         let last_menu_id = menu.menu_id;
+        menu.menu_code =  menu.chef_id+moment().format('YYYYMMDDHHmmSSSS');
         if (!notCloneTypes) {
             notCloneTypes = [];
         }
@@ -362,6 +363,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
         }
         menu.menu_id = null;
         //menu.menu_code = menu.menu_code
+        console.log("clone menu=========>",menu)
         return this.baseCreate(menu,{transaction:t}).then(newMenu => {
             console.log("new menu============>",newMenu.toJSON());
             let new_menu_id = newMenu.menu_id;
@@ -514,8 +516,9 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
         return db.transaction(t => {
             return this.getOne({where:{chef_id:chef_id,menu_id:menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(chefMenu => {
                 if (chefMenu) {
-                    if (chefMenu.public_ind === 1) {
-                        return this.publicMenuHandler(chefMenu,this.updateMenuServingDetailByMenuIdDirectly(attrs,t),t);
+                    console.log("chef Menu ====>",chefMenu.public_ind)
+                    if (chefMenu.public_ind === true) {
+                        return this.publicMenuHandler(chefMenu.toJSON(),this.updateMenuServingDetailByMenuIdDirectly(attrs,t),attrs,t);
                     }else {
                         return this.updateMenuServingDetailByMenuIdDirectly(attrs,t);
                     }
@@ -528,16 +531,21 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
         return this.baseUpdate(attrs,{where:{chef_id:attrs.chef_id,menu_id:attrs.menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t});
     }
 
-    publicMenuHandler(chefMenu,noOrderService,t,cloneExlcudes,dataMapByNotCloneTypes) {
+    publicMenuHandler(chefMenu,noOrderService,attrs,t,cloneExlcudes,dataMapByNotCloneTypes) {
+        console.log("public menu handler ....")
         // If any existing outstanding orders (orders not yet performed) referencing this public menu_id
         return orderService.getModel().findAll({where:{menu_id:chefMenu.menu_id,active_ind:activeIndStatus.ACTIVE,event_date:{[Op.gt]:moment()}},transaction:t}).then(orderList => {
-            if (orderList) {
-               return  this.baseUpdate({active_ind:activeIndStatus.REPLACE,public_ind:0},{where:{menu_id:chefMenu.menu_id,chef_id:chefMenu.chef_id},transaction:t}).then(updatedMenu => {
-                    let newMenu = updatedMenu.toJSON();
-                    newMenu.public_ind = activeIndStatus.ACTIVE;
-                    newMenu.parent_menu_id = updatedMenu.menu_id;
+            console.log("orderlist =>",orderList)
+            if (orderList && orderList.length>0) {
+                debugger
+               return  this.baseUpdate({active_ind:activeIndStatus.REPLACE,public_ind:0},{where:{menu_id:chefMenu.menu_id,chef_id:chefMenu.chef_id},transaction:t}).then(updateCnt => {
+                    console.log("begin to clone  its related records....")
+                    let newMenu = chefMenu;
+                    newMenu.public_ind = 0;
+                    newMenu.parent_menu_id = chefMenu.menu_id;
                     return this.cloneNewLogic(newMenu,t,cloneExlcudes,dataMapByNotCloneTypes).then(
                         resp => {
+                            attrs.menu_code = chefMenu.menu_code; // 变性前的menu_code;
                             return messageService.insertMessageByOrderList(orderList,attrs);
                         }
 
@@ -594,7 +602,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
 
                         dataMap.put(cloneExclude.kitchenReq,attrs.kitchen_req_items);
 
-                        return this.publicMenuHandler(chefMenu,noOrderService,t,cloneExcludes,dataMap);
+                        return this.publicMenuHandler(chefMenu,noOrderService,attrs,t,cloneExcludes,dataMap);
                     }else {
                         return this.baseUpdate({active_ind:activeIndStatus.REPLACE,public_ind:0},{where:{},transaction:t}).then(updatedMenu => {
                             return kitchenReqService.updateKitchenReqBySelf(activeIndStatus.DELETE,menu_id,menu_id,attrs.kitchen_req_items,t)
@@ -617,7 +625,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
                         let cloneExcludes = [cloneExclude.menuChefNote] ;
                         let dataMap = new Map();
                         dataMap.put(cloneExclude.menuChefNote,attrs.menu_chef_note_list);
-                        return this.publicMenuHandler(chefMenu,noOrderService,t,cloneExcludes,dataMap);
+                        return this.publicMenuHandler(chefMenu,noOrderService,attrs,t,cloneExcludes,dataMap);
                     }else {
                         return noOrderService;
                     }
@@ -639,7 +647,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
                         let cloneExcludes = [cloneExclude.menuInclude] ;
                         let dataMap = new Map();
                         dataMap.put(cloneExclude.menuInclude,attrs.include_items);
-                        return this.publicMenuHandler(chefMenu,noOrderService,t,cloneExcludes,dataMap);
+                        return this.publicMenuHandler(chefMenu,noOrderService,attrs,t,cloneExcludes,dataMap);
                     }else {
                         return noOrderService;
                     }
@@ -656,7 +664,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
                 if (chefMenu) {
                     let noOrderService = this.updateMenuAboutDirectly(chef_id,menu_id,attrs,t);
                     if (chefMenu.public_ind === 1) {
-                        return this.publicMenuHandler(chefMenu,noOrderService,t,null,null);
+                        return this.publicMenuHandler(chefMenu,noOrderService,attrs,t,null,null);
                     }else {
                         return noOrderService;
                     }
@@ -762,7 +770,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
             return this.getOne({where:{chef_id:attrs.chef_id,menu_id:attrs.menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(chefMenu => {
                 if (chefMenu) {
                     if (chefMenu.public_ind === 1) {
-                        return this.publicMenuHandler(chefMenu,this.updateMenuCancelPolicyDirectly(attrs,t),t);
+                        return this.publicMenuHandler(chefMenu,this.updateMenuCancelPolicyDirectly(attrs,t),attrs,t);
                     }else {
                         return this.updateMenuCancelPolicyDirectly(attrs,t);
                     }
