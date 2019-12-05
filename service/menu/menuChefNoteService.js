@@ -37,15 +37,22 @@ class MenuChefNoteService extends BaseService{
             let newList = [];
             let p1 = this.baseUpdate({active_ind:status},{where:{menu_id:last_menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t});
             promiseArr.push(p1);
-            attrs.forEach(item => {
+            console.log("attrs ==========>",attrs)
+            attrs.forEach((item,index) => {
                 item.menu_id = new_menu_id;
-                newList.push(item);
+                let p = this.nextId('menu_chef_note_id',{transaction:t}).then(nextId => {
+                    item.menu_chef_note_id = nextId + index;
+                    return this.baseCreate(item,{transaction:t})
+                })
+                promiseArr.push(p);
+               // promiseArr.push(this.baseCreateBatch(newList,{transaction:t}));
             })
-            promiseArr.push(this.baseCreateBatch(newList,{transaction:t}));
+
             return Promise.all(promiseArr);
         })
     }
 
 }
 
-module.exports = new MenuChefNoteService()
+//module.exports = new MenuChefNoteService()
+export  default new MenuChefNoteService();

@@ -945,4 +945,5 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
 }
 
 
-module.exports = new ChefMenuService()
+//module.exports = new ChefMenuService()
+export default new ChefMenuService()
