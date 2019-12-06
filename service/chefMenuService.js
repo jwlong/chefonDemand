@@ -410,7 +410,8 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
                         // copy t_menu_chef_note
                         otherPromiseArr.push(this.copy(menuChefNoteService,last_menu_id,new_menu_id,t));
                     }else {
-                        otherPromiseArr.push(menuChefNoteService.updateChefNoteByDirectly(activeIndStatus.REPLACE,last_menu_id,new_menu_id,dataMapByNotCloneTypes.get(cloneExclude.menuChefNote),t))
+                        console.log("when copy t_menu_chef_note,new menu_id",new_menu_id);
+                        otherPromiseArr.push(menuChefNoteService.updateChefNoteByDirectly(activeIndStatus.REPLACE,last_menu_id,new_menu_id,dataMapByNotCloneTypes.get(cloneExclude.menuChefNote),t,false))
                     }
                     if (notCloneTypes.indexOf(cloneExclude.menuBookingRule) == -1) {
                         //copy t_menu_booking_rule
@@ -648,14 +649,14 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
         return db.transaction(t=> {
             return this.getOne({where:{chef_id:chef_id,menu_id:menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(chefMenu => {
                 if (chefMenu) {
-                    let noOrderService = menuChefNoteService.updateChefNoteByDirectly(activeIndStatus.DELETE,menu_id,menu_id,attrs.menu_chef_note_list,t);
+                    let p = menuChefNoteService.updateChefNoteByDirectly(activeIndStatus.DELETE,menu_id,menu_id,attrs.menu_chef_note_list,t);
                     if (chefMenu.public_ind === true) {
                         let cloneExcludes = [cloneExclude.menuChefNote] ;
                         let dataMap = new Map();
                         dataMap.set(cloneExclude.menuChefNote,attrs.menu_chef_note_list);
-                        return this.publicMenuHandler(chefMenu.toJSON(),noOrderService,attrs,t,cloneExcludes,dataMap);
+                        return this.publicMenuHandler(chefMenu.toJSON(),menuChefNoteService,attrs,t,cloneExcludes,dataMap);
                     }else {
-                        return noOrderService;
+                        return menuChefNoteService.updateChefNoteByDirectly(activeIndStatus.DELETE,menu_id,null,attrs.menu_chef_note_list,t);
                     }
                 }else {
                     throw baseResult.MENU_ID_NOT_EXIST;
