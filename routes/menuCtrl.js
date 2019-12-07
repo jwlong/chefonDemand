@@ -334,6 +334,7 @@ class MenuController {
                 if (!chef) {
                     throw baseResult.MENU_ONLY_CHEF_CAN_UPDATE;
                 }
+                attrs.chef_id = chef.chef_id;
                 await  chefMenuService.updateMenuAboutByMenuId(chef.chef_id,attrs.menu_id,attrs);
                 res.json(baseResult.SUCCESS)
             }catch (e) {
@@ -416,11 +417,12 @@ class MenuController {
                 if (!attrs.menu_id || !attrs.cancel_policy) {
                     throw baseResult.MENU_QUERY_PARAM_MANDATORY;
                 }
-                let chef = chefService.getChefByUserId(req.user_id);
+                let chef = await  chefService.getChefByUserId(req.user_id);
                 if (!chef) {
                     throw baseResult.MENU_ONLY_CHEF_CAN_MODIFY
                 }
                 attrs.chef_id = chef.chef_id;
+                console.log("updateMenuCancelPolicy attrs===>",attrs);
                 await  chefMenuService.updateMenuCancelPolicy(attrs);
                 res.json(baseResult.SUCCESS)
 
