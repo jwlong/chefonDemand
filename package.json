@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "babel-node bin/www",
-    "dev": "nodemon bin/www --watch *.*  --exec babel-node",
+    "dev": "nodemon bin/www --watch *.*  --exec babel-node --inspect",
     "test": "mocha test/**/tests.js",
     "testMenu": "mocha test/**/menu*.js"
   },
