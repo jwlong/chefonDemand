@@ -63,33 +63,38 @@ class OrderGuestService extends BaseService {
     }
 
     updateOrderGuestSelectionByOrderId(attrs,menu) {
-        this.getModel().findOne({where:{order_id:attrs.order_id,order_guest_id:attrs.order_guest_id}}).then(
-            guest =>{
-                if (guest && guest.active_ind === activeIndStatus.ACTIVE) {
-                    // replace
-                    let orderItemPrmArr = [];
+      return  db.transaction(t=> {
+            return this.getModel().findOne({where:{order_id:attrs.order_id,order_guest_id:attrs.order_guest_id}}).then(
+                guest =>{
+                    if (guest && guest.active_ind === activeIndStatus.ACTIVE) {
+                        // replace
+                        let orderItemPrmArr = [];
 
-                    attrs.order_item_list.forEach(item => {
-                        let orderItemPrm = orderItemService.getModel().findAll({where:{order_id:attrs.order_id,order_guest_id:attrs.order_guest_id},transaction:t}).then(items => {
-                            if (items) {
-                                // replaces
-                                return orderItemService.updateItemAndOptions(items,attrs,t);
+                        attrs.order_item_list.forEach(item => {
+                            let orderItemPrm = orderItemService.getModel().findAll({where:{order_id:attrs.order_id,order_guest_id:attrs.order_guest_id},transaction:t}).then(items => {
+                                console.log("item list =>",items);
+                                if (items && items.length > 0) {
+                                    // replaces
+                                    return orderItemService.updateItemAndOptions(items,attrs,t);
 
-                            }else {
-                                // new add
-                                return orderItemService.newInsert(attrs,t);
-                            }
+                                }else {
+                                    // new add
+                                    return orderItemService.newInsert(attrs,t);
+                                }
+                            })
+                            orderItemPrmArr.push(orderItemPrm);
                         })
-                        orderItemPrmArr.push(orderItemPrm);
-                    })
-                    return Promise.all(orderItemPrmArr);
+                        return Promise.all(orderItemPrmArr);
 
-                }else {
-                    // new add
-                    throw baseResult.ORDER_SECTION_USER_ONLY_ACTIVE_GUEST;
+                    }else {
+                        // new add
+                        throw baseResult.ORDER_SECTION_USER_ONLY_ACTIVE_GUEST;
+                    }
                 }
-            }
-        )
+            )
+
+        })
+
 
     }
 
