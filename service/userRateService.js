@@ -31,8 +31,7 @@ class UserRateService extends BaseService{
         FROM t_order o
           LEFT JOIN t_chef_menu m ON m.menu_id = o.menu_id AND m.active_ind = 'A'
         WHERE m.menu_id = :menu_id AND o.active_ind = 'A' AND order_id = :order_id`;
-
-        let ratingSql = `SELECT
+  /*      let ratingSql = `SELECT
           avg(rating.overall_rating)              overall_rating,
           avg(rating.menu_quality)                menu_quality,
           avg(service_quality)                    service_quality,
@@ -44,19 +43,14 @@ class UserRateService extends BaseService{
           LEFT JOIN t_order o ON rating.order_id = o.order_id AND o.active_ind = 'A'
           LEFT JOIN t_chef_menu m ON m.menu_id = o.menu_id AND m.active_ind = 'A'
         WHERE m.menu_id = :menu_id AND rating.active_ind = 'A'
-        GROUP BY m.menu_id`;
+        GROUP BY m.menu_id`;*/
         return db.transaction(t=> {
             //transaction:trans
             return db.query(sql,{replacements:{menu_id:attrs.menu_id,order_id:attrs.order_id},
                 type:db.QueryTypes.SELECT ,transaction:t}).then(resp => {
                     if (resp) {
-                        return db.query(ratingSql,{replacements:{menu_id:attrs.menu_id},type:db.QueryTypes.SELECT,transaction:t}).then(
-                            avgResult => {
-                                let newRating = avgResult.toJSON();
-                                Object.assign(newRating,attrs);
-                                return this.baseCreate(newRating,{transaction:t});
-                            }
-                        )
+                       attrs.overall_rating = this.getoverallRatingByAvg(attrs);
+                        return this.baseCreate(attrs,{transaction:t});
                     }else{
                         throw baseResult.MENU_CAN_OLNY_ADD_ACTIVE_MENU;
                     }
@@ -64,5 +58,18 @@ class UserRateService extends BaseService{
         })
     }
 
+    /**
+     * "menu_quality": 0,
+     "service_quality": 0,
+     "mastery_flavour_cooking_techniques": 0,
+     "personality_of_chef_in_cuisine": 0,
+     "hygene": 0,
+     "value_for_money": 0,
+     */
+
+    getoverallRatingByAvg(attrs) {
+      let total =  attrs.menu_quality + attrs.service_quality+ attrs.mastery_flavour_cooking_techniques+attrs.personality_of_chef_in_cuisine+attrs.personality_of_chef_in_cuisine+attrs.hygene+attrs.value_for_money;
+      return total / 7;
+    }
 }
 module.exports = new UserRateService()

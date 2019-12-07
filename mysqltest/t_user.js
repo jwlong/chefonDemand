@@ -114,6 +114,15 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
     },
+    identity_id_type: {
+      type: Sequelize.INTEGER(11),
+        allowNull:true,
+        defaultValue: 0
+    },
+    identity_id: {
+        type: Sequelize.STRING(45),
+        allowNull:false,
+    },
     rating_level: {
       type: Sequelize.INTEGER(1),
       allowNull: true
