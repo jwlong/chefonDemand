@@ -16,6 +16,18 @@ class Order extends BaseModel {
                     key: 'user_id'
                 }
             },
+            payment_ref_id: {
+                type: Sequelize.STRING(36),
+                allowNull: false,
+            },
+            city_code: {
+                type: Sequelize.STRING(5),
+                allowNull: false,
+            },
+            country_code: {
+                type: Sequelize.STRING(3),
+                allowNull: false,
+            },
             pending_order_id: {
                 type: Sequelize.INTEGER(11),
                 allowNull: true,

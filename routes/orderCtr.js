@@ -19,7 +19,7 @@ class OrderController {
         router.post('/createOrderByMenuId',async(req,res,next) =>{
             try {
                 let createOrderRequest = req.body;
-                let user = userService.getById(req.user_id)
+                let user = await  userService.getById(req.user_id)
                 if (!user) {
                     throw baseResult.ORDER_USER_INVALID;
                 }
@@ -28,8 +28,10 @@ class OrderController {
                 }
                 let menu_id = createOrderRequest.menu_id;
                 let menu = await  chefMenuService.checkMenuCanCreateOrder(menu_id);
-                res.json(await orderSevice.createOrderByMenuId(createOrderRequest,menu))
-
+                createOrderRequest.user_name = user.user_name;
+                createOrderRequest.user_id = req.user_id;
+                let orderId = await orderService.createOrderByMenuId(createOrderRequest);
+                res.json({order_id:orderId})
             }catch (e){
                 next(e);
             }

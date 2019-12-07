@@ -13,21 +13,58 @@ class OrderService extends BaseService{
     constructor(){
         super(OrderService.model)
     }
-    createOrderByMenuId(createOrderRequest,menu) {
-        db.transaction(t=> {
+    createOrderByMenuId(createOrderRequest) {
+       return db.transaction(t=> {
             let orderItemList = createOrderRequest.order_item_list;
-            let addOrder = delete createOrderRequest.order_item_list;
-            return this.baseCreate(addOrder,{transaction:t}).then(resp => {
-                //orderItemService.baseCreate()
-                return orderItemService.addItemList(orderItemList,t).then(
-                    result => {
-                        return resp.order_id;
-                    }
-                );
+            let addOrder = createOrderRequest;
+            console.log("createOrderRequest ===>",addOrder,orderItemList)
+
+            return this.nextId('order_id',{transaction:t}).then(nextId => {
+                addOrder.order_id = nextId;
+                if (!addOrder.accept_kitchen_requirement_chef_note_ind) {
+                    addOrder.accept_kitchen_requirement_chef_note_ind = 0;
+                }
+                if (!addOrder.accept_terms_ind)  {
+                    addOrder.accept_terms_ind = 0;
+                }
+                return this.baseCreate(addOrder,{transaction:t}).then(resp => {
+                    return orderGuestService.createGuestByCreateOrderRequest(createOrderRequest,resp.order_id,t).then(createdGuest => {
+                        //orderItemService.baseCreate()
+                        console.log("create guest list =>",createdGuest)
+                        return orderItemService.addItemList(orderItemList,createdGuest,t).then(
+                            result => {
+                                console.log("order ==> order_id:"+resp.order_id)
+                                return resp.order_id;
+                            }
+                        );
+
+                    })
+                })
+
             })
+
         })
     }
+    createOrderAndGuestList(createOrderRequest) {
+        // create order
+        return this.nextId('order_id',{transaction:t}).then(nextId => {
+            let addOrder = {};
+            addOrder.order_id = nextId;
+            if (!addOrder.accept_kitchen_requirement_chef_note_ind) {
+                addOrder.accept_kitchen_requirement_chef_note_ind = 0;
+            }
+            if (!addOrder.accept_terms_ind) {
+                addOrder.accept_terms_ind = 0;
+            }
+            return this.baseCreate(addOrder,{transaction:t}).then(resp => {
+                let guest = {};
+                guest.order_id = resp.order_id;
 
+            })
+
+        })
+
+    }
     getOneByOrderId(order_id,t) {
         return this.getOne({where:{order_id:order_id,active_ind:activeIndStatus.ACTIVE},transaction:t});
     }

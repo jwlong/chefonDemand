@@ -100,7 +100,20 @@ class OrderGuestService extends BaseService {
             })
             return Promise.all(promiseArr);
         })
+    }
 
+    createGuestByCreateOrderRequest(createOrderRequest,order_id,t) {
+        let guest = {};
+        guest.order_id = order_id;
+        guest.guest_name = createOrderRequest.user_name;
+        guest.email_address = createOrderRequest.email_address;
+        guest.contact_no = createOrderRequest.contact_no;
+        return this.nextId('order_guest_id',{transaction:t}).then(
+            nextId => {
+                guest.order_guest_id = nextId;
+                return this.baseCreate(guest,{transaction:t});
+            }
+        )
     }
 }
 module.exports = new OrderGuestService()
