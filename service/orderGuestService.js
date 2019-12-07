@@ -14,29 +14,39 @@ class OrderGuestService extends BaseService {
 
     updateOrderGuestListByOrderId(updateOrderGuestList) {
        return db.transaction(t => {
-            this.getModel().findAll({
+           return this.getModel().findAll({
                 where: {order_id: updateOrderGuestList.order_id,active_ind:activeIndStatus.ACTIVE}, transaction: t
             }).then(guestListResp => {
                 let requiredAddList = updateOrderGuestList.guest_list;
                 let actInsertArr = [];
+                let matchOldguestNameArr = [];
                 let oldNeedDeleted = [];
                 requiredAddList.forEach(value => {
                     value.order_id = updateOrderGuestList.order_id;
-                    if (guestListResp) {
+                    if (guestListResp && guestListResp.length > 0) {
                         let notSame = false;
-                        guestListResp.forEach(oldGuest => {
-                            if (oldGuest.guest_name !== value.guest_name) {
-                                notSame = true;
-                                oldNeedDeleted.push(oldGuest);
-                            }
-                        })
-                        if (notSame) {
+                        if (!guestListResp.some(oldGuest => {
+                            return oldGuest.guest_name === value.guest_name;
+                        })) {
                             actInsertArr.push(value);
+                        }else {
+                            matchOldguestNameArr.push(value);
                         }
                     } else {
                         actInsertArr.push(value);
                     }
                 })
+               console.log("matchOldguestNameArr =>",matchOldguestNameArr)
+               guestListResp.forEach(oldGuest => {
+                   if (!matchOldguestNameArr.some(item => {
+                       return item.guest_name === oldGuest.guest_name;
+                   })) {
+                       oldNeedDeleted.push(oldGuest);
+                   }
+               })
+
+               console.log("add arr,",actInsertArr);
+               console.log("delete arr,",oldNeedDeleted);
                 return this.baseCreateBatch(actInsertArr,{transaction:t}).then(resp => {
                     if (oldNeedDeleted.length > 0) {
                         let promiseArr = [];

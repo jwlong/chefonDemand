@@ -40,7 +40,7 @@ class OrderController {
         router.post('/updateOrderGuestListByOrderId',async(req,res,next) =>{
             try {
                 let updateOrderGuestList = req.body;
-                let user = userService.getById(req.user_id)
+                let user = await userService.getById(req.user_id)
                 if (!user) {
                     throw baseResult.ORDER_USER_ONLY_ACTIVE_GUEST;
                 }
