@@ -42,7 +42,7 @@ class KitchenReqService extends BaseService{
             return this.baseCreateBatch(newList,{transaction:t});
         })
     }
-    updateKitchenReqBySelf(status,last_menu_id, new_menu_id,attrs, t) {
+    updateDirectly(status,last_menu_id, new_menu_id,attrs, t) {
         let promiseArr = [];
         let newList = [];
         let p1 = this.baseUpdate({active_ind:status},{where:{menu_id:last_menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t});

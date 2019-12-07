@@ -21,7 +21,8 @@ class MenuIncludeService extends BaseService{
     }
 
 
-    updateMenuIncludeItemsDirectly(status, last_menu_id, new_menu_id, attrs, t) {
+    updateDirectly(status, last_menu_id, new_menu_id, attrs, t) {
+        console.log("updateMenuIncludeItemsDirectly...")
         return chefMenuService.baseUpdate({active_ind:activeIndStatus.REPLACE,public_ind:0},{where:{menu_id:last_menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(updatedMenu => {
             let promiseArr = [];
             let newList = [];

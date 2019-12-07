@@ -368,78 +368,86 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
         return this.baseCreate(menu,{transaction:t}).then(newMenu => {
             console.log("new menu============>",newMenu.toJSON());
             let new_menu_id = newMenu.menu_id;
+            // update order to new menu_id
+            return orderService.updateMenuIdWithNewMenuId(last_menu_id,new_menu_id,t).then(
+                orderCnt => {
+                    // copy t_menu_item
+                    return  menuItemService.getModel().findAll({where:{menu_id:last_menu_id},transaction:t}).then(items => {            let promiseArr = [];
+                        items.forEach((item,index) => {
+                            let createItemPromise = menuItemService.nextId('seq_no',{transaction:t}).then(nextSeqNo => {
+                                let last_item_id = item.menu_item_id;
+                                let oldItem = item.toJSON();
+                                oldItem.seq_no = nextSeqNo+index;
+                                oldItem.menu_id = new_menu_id;
+                                oldItem.active_ind = activeIndStatus.ACTIVE;
+                                oldItem.menu_item_id = null;
+                                console.log("menu item =================>",oldItem);
+                                return menuItemService.baseCreate(oldItem,{transaction:t}).then( resp => {
+                                    console.log("last_item_id=================>",last_item_id);
+                                    return menuItemOptionService.copyOptionsByItemId(last_item_id,resp.menu_item_id,t);
+                                });
+                            })
+                            promiseArr.push(createItemPromise);
+                        })
+                        return Promise.all(promiseArr).then(result=> {
+                            let otherPromiseArr = [];
+                            //t_menu_cuisine
+                            if (notCloneTypes.indexOf(cloneExclude.menuCuisine) == -1) {
+                                otherPromiseArr.push(this.copy(menuCuisineService,last_menu_id,new_menu_id,t));
+                            }
+                            if (notCloneTypes.indexOf(cloneExclude.kitchenReq) == -1) {
+                                // copy t_menu_kitchen_req
+                                otherPromiseArr.push(this.copy(kitchenReqService,last_menu_id,new_menu_id,t));
+                            }else{
+                                otherPromiseArr.push(kitchenReqService.updateDirectly(activeIndStatus.DELETE,last_menu_id,new_menu_id,dataMapByNotCloneTypes.get(cloneExclude.kitchenReq),t));
+                            }
 
-            // copy t_menu_item
-            return  menuItemService.getModel().findAll({where:{menu_id:last_menu_id},transaction:t}).then(items => {            let promiseArr = [];
-                items.forEach((item,index) => {
-                    let createItemPromise = menuItemService.nextId('seq_no',{transaction:t}).then(nextSeqNo => {
-                        let last_item_id = item.menu_item_id;
-                        let oldItem = item.toJSON();
-                        oldItem.seq_no = nextSeqNo+index;
-                        oldItem.menu_id = new_menu_id;
-                        oldItem.active_ind = activeIndStatus.ACTIVE;
-                        oldItem.menu_item_id = null;
-                        console.log("menu item =================>",oldItem);
-                        return menuItemService.baseCreate(oldItem,{transaction:t}).then( resp => {
-                            console.log("last_item_id=================>",last_item_id);
-                            return menuItemOptionService.copyOptionsByItemId(last_item_id,resp.menu_item_id,t);
+                            if (notCloneTypes.indexOf(cloneExclude.menuInclude) == -1) {
+                                // copy t_menu_include
+                                otherPromiseArr.push(this.copy(menuIncludeService,last_menu_id,new_menu_id,t));
+                            }else {
+                                otherPromiseArr.push(menuIncludeService.updateDirectly(activeIndStatus.DELETE,last_menu_id,new_menu_id,dataMapByNotCloneTypes.get(cloneExclude.menuInclude),t))
+                            }
+                            if (notCloneTypes.indexOf(cloneExclude.menuChefNote) == -1) {
+                                // copy t_menu_chef_note
+                                otherPromiseArr.push(this.copy(menuChefNoteService,last_menu_id,new_menu_id,t));
+                            }else {
+                                console.log("when copy t_menu_chef_note,new menu_id",new_menu_id);
+                                otherPromiseArr.push(menuChefNoteService.updateDirectly(activeIndStatus.DELETE,last_menu_id,new_menu_id,dataMapByNotCloneTypes.get(cloneExclude.menuChefNote),t,false))
+                            }
+                            if (notCloneTypes.indexOf(cloneExclude.menuBookingRule) == -1) {
+                                //copy t_menu_booking_rule
+                                otherPromiseArr.push(this.copy(menuBookingRuleService,last_menu_id,new_menu_id,t));
+                            }else {
+                                otherPromiseArr.push(menuBookingRuleService.updateDirectly(activeIndStatus.DELETE,last_menu_id,new_menu_id,dataMapByNotCloneTypes.get(cloneExclude.menuBookingRule),t))
+                            }
+                            if (notCloneTypes.indexOf(cloneExclude.menuBookingRequirement) == -1) {
+                                //copy t_menu_booking_requirement
+                                otherPromiseArr.push(this.copy(menuBookingRequirementService,last_menu_id,new_menu_id,t));
+                            }else{
+                                otherPromiseArr.push(menuBookingRequirementService.updateDirectly(activeIndStatus.DELETE,last_menu_id,new_menu_id,dataMapByNotCloneTypes.get(cloneExclude.menuBookingRule),t))
+                            }
+                            if (notCloneTypes.indexOf(cloneExclude.menuExtraCharge) == -1) {
+                                // copy t_menu_extra_charge
+                                otherPromiseArr.push(this.copy(menuExtraChargeService,last_menu_id,new_menu_id,t));
+                            }
+                            if (notCloneTypes.indexOf(cloneExclude.menuPhoto) == -1) {
+                                // copy  t_menu_photo
+                                otherPromiseArr.push(this.copy(menuPhotoService,last_menu_id,new_menu_id,t));
+                            }
+                            return Promise.all(otherPromiseArr);
                         });
-                    })
-                    promiseArr.push(createItemPromise);
-                })
-                return Promise.all(promiseArr).then(result=> {
-                    let otherPromiseArr = [];
-                    //t_menu_cuisine
-                    if (notCloneTypes.indexOf(cloneExclude.menuCuisine) == -1) {
-                        otherPromiseArr.push(this.copy(menuCuisineService,last_menu_id,new_menu_id,t));
-                    }
-                    if (notCloneTypes.indexOf(cloneExclude.kitchenReq) == -1) {
-                        // copy t_menu_kitchen_req
-                        otherPromiseArr.push(this.copy(kitchenReqService,last_menu_id,new_menu_id,t));
-                    }else{
-                        otherPromiseArr.push(kitchenReqService.updateKitchenReqBySelf(activeIndStatus.REPLACE,last_menu_id,new_menu_id,dataMapByNotCloneTypes.get(cloneExclude.kitchenReq),t));
-                    }
-
-                    if (notCloneTypes.indexOf(cloneExclude.menuInclude) == -1) {
-                        // copy t_menu_include
-                        otherPromiseArr.push(this.copy(menuIncludeService,last_menu_id,new_menu_id,t));
-                    }else {
-                        otherPromiseArr.push(menuIncludeService.updateMenuIncludeItemsDirectly(activeIndStatus.REPLACE,last_menu_id,new_menu_id,dataMapByNotCloneTypes.get(cloneExclude.menuInclude),t))
-                    }
-                    if (notCloneTypes.indexOf(cloneExclude.menuChefNote) == -1) {
-                        // copy t_menu_chef_note
-                        otherPromiseArr.push(this.copy(menuChefNoteService,last_menu_id,new_menu_id,t));
-                    }else {
-                        console.log("when copy t_menu_chef_note,new menu_id",new_menu_id);
-                        otherPromiseArr.push(menuChefNoteService.updateChefNoteByDirectly(activeIndStatus.REPLACE,last_menu_id,new_menu_id,dataMapByNotCloneTypes.get(cloneExclude.menuChefNote),t,false))
-                    }
-                    if (notCloneTypes.indexOf(cloneExclude.menuBookingRule) == -1) {
-                        //copy t_menu_booking_rule
-                        otherPromiseArr.push(this.copy(menuBookingRuleService,last_menu_id,new_menu_id,t));
-                    }else {
-                        otherPromiseArr.push(menuBookingRuleService.updateBookingRuleDirectly(activeIndStatus.REPLACE,last_menu_id,new_menu_id,dataMapByNotCloneTypes.get(cloneExclude.menuBookingRule),t))
-                    }
-                    if (notCloneTypes.indexOf(cloneExclude.menuBookingRequirement) == -1) {
-                        //copy t_menu_booking_requirement
-                        otherPromiseArr.push(this.copy(menuBookingRequirementService,last_menu_id,new_menu_id,t));
-                    }else{
-                        otherPromiseArr.push(menuBookingRequirementService.updateBookingRequirementDirectly(activeIndStatus.REPLACE,last_menu_id,new_menu_id,dataMapByNotCloneTypes.get(cloneExclude.menuBookingRule),t))
-                    }
-                    if (notCloneTypes.indexOf(cloneExclude.menuExtraCharge) == -1) {
-                        // copy t_menu_extra_charge
-                        otherPromiseArr.push(this.copy(menuExtraChargeService,last_menu_id,new_menu_id,t));
-                    }
-                    if (notCloneTypes.indexOf(cloneExclude.menuPhoto) == -1) {
-                        // copy  t_menu_photo
-                        otherPromiseArr.push(this.copy(menuPhotoService,last_menu_id,new_menu_id,t));
-                    }
-                    return Promise.all(otherPromiseArr);
-                });
 
 
-            });
+                    });
+
+
+                }
+            )
+
         })
     }
+
     copy(service, last_menu_id,new_menu_id,t) {
         return service.getModel().findAll({where:{menu_id:last_menu_id},transaction:t}).then(list => {
             let copyList = [];
@@ -538,11 +546,12 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
     }
 
     publicMenuHandler(chefMenu,noOrderService,attrs,t,cloneExlcudes,dataMapByNotCloneTypes) {
-        console.log("public menu handler ....")
+        console.log("public menu handler ....",noOrderService)
         // If any existing outstanding orders (orders not yet performed) referencing this public menu_id
         return orderService.getModel().findAll({where:{menu_id:chefMenu.menu_id,active_ind:activeIndStatus.ACTIVE,event_date:{[Op.gt]:moment()}},transaction:t}).then(orderList => {
             console.log("orderlist =>",orderList)
             if (orderList && orderList.length>0) {
+
                return  this.baseUpdate({active_ind:activeIndStatus.REPLACE,public_ind:0},{where:{menu_id:chefMenu.menu_id,chef_id:chefMenu.chef_id},transaction:t}).then(updateCnt => {
                     console.log("begin to clone  its related records....")
                     let oldMenuId = chefMenu.menu_id;
@@ -552,19 +561,20 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
                     return this.cloneNewLogic(newMenu,t,cloneExlcudes,dataMapByNotCloneTypes).then(
                         resp => {
                             attrs.menu_code = chefMenu.menu_code; // 变性前的menu_code;
-                            return messageService.insertMessageByOrderList(orderList,attrs,t).then(
+                            return messageService.insertMessageByOrderList(orderList, attrs, t).then(
                                 msgList => {
                                     // old menu handler
-                                    console.log("old menu ========>",oldMenuId);
-                                    return this.oldMenuReferenceHandler(oldMenuId,t);
+                                    console.log("old menu ========>", oldMenuId);
+                                    return this.oldMenuReferenceHandler(oldMenuId, t);
                                 }
                             );
+
                         }
 
                     )
                 })
             }else {
-                return noOrderService;
+                return noOrderService.updateDirectly(activeIndStatus.DELETE, last_menu_id, null, attrs, t);
             }
         })
     }
@@ -625,16 +635,12 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
                     if (chefMenu.public_ind === true) {
                         let cloneExcludes = [cloneExclude.kitchenReq] ;
                         let dataMap = new Map();
-                        let noOrderService =  this.baseUpdate({active_ind:activeIndStatus.REPLACE,public_ind:0},{where:{},transaction:t}).then(updatedMenu => {
-                            return kitchenReqService.updateKitchenReqBySelf(activeIndStatus.DELETE,menu_id,menu_id,attrs.kitchen_req_items,t)
-                        })
-
                         dataMap.set(cloneExclude.kitchenReq,attrs.kitchen_req_items);
 
-                        return this.publicMenuHandler(chefMenu.toJSON(),noOrderService,attrs,t,cloneExcludes,dataMap);
+                        return this.publicMenuHandler(chefMenu.toJSON(),kitchenReqService,attrs,t,cloneExcludes,dataMap);
                     }else {
                         return this.baseUpdate({active_ind:activeIndStatus.REPLACE,public_ind:0},{where:{},transaction:t}).then(updatedMenu => {
-                            return kitchenReqService.updateKitchenReqBySelf(activeIndStatus.DELETE,menu_id,menu_id,attrs.kitchen_req_items,t)
+                            return kitchenReqService.updateDirectly(activeIndStatus.DELETE,menu_id,menu_id,attrs.kitchen_req_items,t)
                         })
                     }
                 }else {
@@ -649,14 +655,14 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
         return db.transaction(t=> {
             return this.getOne({where:{chef_id:chef_id,menu_id:menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(chefMenu => {
                 if (chefMenu) {
-                    let p = menuChefNoteService.updateChefNoteByDirectly(activeIndStatus.DELETE,menu_id,menu_id,attrs.menu_chef_note_list,t);
+
                     if (chefMenu.public_ind === true) {
                         let cloneExcludes = [cloneExclude.menuChefNote] ;
                         let dataMap = new Map();
                         dataMap.set(cloneExclude.menuChefNote,attrs.menu_chef_note_list);
                         return this.publicMenuHandler(chefMenu.toJSON(),menuChefNoteService,attrs,t,cloneExcludes,dataMap);
                     }else {
-                        return menuChefNoteService.updateChefNoteByDirectly(activeIndStatus.DELETE,menu_id,null,attrs.menu_chef_note_list,t);
+                        return menuChefNoteService.updateDirectly(activeIndStatus.DELETE,menu_id,null,attrs.menu_chef_note_list,t);
                     }
                 }else {
                     throw baseResult.MENU_ID_NOT_EXIST;
@@ -671,14 +677,14 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
         return db.transaction(t=> {
             return this.getOne({where:{chef_id:chef_id,menu_id:menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(chefMenu => {
                 if (chefMenu) {
-                    let noOrderService = menuIncludeService.updateMenuIncludeItemsDirectly(activeIndStatus.DELETE,menu_id,menu_id,attrs.include_items,t);
+                /*    let noOrderService = menuIncludeService.updateMenuIncludeItemsDirectly(activeIndStatus.DELETE,menu_id,menu_id,attrs.include_items,t);*/
                     if (chefMenu.public_ind === true) {
                         let cloneExcludes = [cloneExclude.menuInclude] ;
                         let dataMap = new Map();
                         dataMap.set(cloneExclude.menuInclude,attrs.include_items);
-                        return this.publicMenuHandler(chefMenu.toJSON(),noOrderService,attrs,t,cloneExcludes,dataMap);
+                        return this.publicMenuHandler(chefMenu.toJSON(),menuIncludeService,attrs,t,cloneExcludes,dataMap);
                     }else {
-                        return noOrderService;
+                        return menuIncludeService.updateDirectly(activeIndStatus.DELETE,menu_id,null,attrs.include_items,t);;
                     }
                 }else {
                     throw baseResult.MENU_ID_NOT_EXIST;
@@ -693,9 +699,9 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
                 if (chefMenu) {
                     let noOrderService = this.updateMenuAboutDirectly(chef_id,menu_id,attrs,t);
                     if (chefMenu.public_ind === true) {
-                        return this.publicMenuHandler(chefMenu.toJSON(),noOrderService,attrs,t,null,null);
+                        return this.publicMenuHandler(chefMenu.toJSON(),this,attrs,t,null,null);
                     }else {
-                        return noOrderService;
+                        return  this.updateDirectly(null, chefMenu.menu_id, null, attrs, t);;
                     }
                 }else {
                     throw baseResult.MENU_ID_NOT_EXIST;
@@ -704,8 +710,8 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
         })
     }
 
-    updateMenuAboutDirectly(chef_id,menu_id,attrs,t) {
-        return this.baseUpdate({about:attrs.about},{where:{menu_id:menu_id,chef_id:chef_id,active_ind:activeIndStatus.ACTIVE},transaction:t});
+    updateDirectly(status, last_menu_id, new_menu_id, attrs, t){
+        return this.baseUpdate({about:attrs.about},{where:{menu_id:last_menu_id,chef_id:attrs.chef_id,active_ind:activeIndStatus.ACTIVE},transaction:t});
     }
 
 

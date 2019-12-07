@@ -139,6 +139,10 @@ class OrderService extends BaseService{
         return db.query(sql,{replacements:{chef_id:chef_id,last30Days:last30Days,monthBeginDate:monthBeginDate},type:db.QueryTypes.SELECT});
 
     }
+
+    updateMenuIdWithNewMenuId(oldMenuId, new_menu_id,t) {
+        return this.baseUpdate({menu_id:new_menu_id},{where:{menu_id:oldMenuId,active_ind:activeIndStatus.ACTIVE},transaction:t})
+    }
 }
 // module.exports = new OrderService()
 export default new OrderService()
