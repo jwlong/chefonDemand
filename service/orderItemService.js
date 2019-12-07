@@ -70,7 +70,7 @@ class OrderItemService extends BaseService {
                    itemList.forEach(item => {
                        let p = this.baseUpdate({active_ind:activeIndStatus.DELETE},{where:
                                {order_id:order_id},transaction:t}).then(updated => {
-                           return orderItemOptionService.cancelOptionsByItemId(item.order_item_id,t).then(resp => {
+                           return this.cancelOptionsByItemId(item.order_item_id,t).then(resp => {
                                return orderGuestService.baseUpdate({active_ind:activeIndStatus.DELETE},{where:{order_id:order_id,active_ind:activeIndStatus.ACTIVE},transaction:t});
                            })
                        })

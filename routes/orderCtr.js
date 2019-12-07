@@ -71,7 +71,6 @@ class OrderController {
                 if (orderGuestStrArr && orderGuestStrArr.length > 1) {
                     attrs.order_guest_id = orderGuestStrArr[1];
                 }
-                debugger
                 //let menu = await  chefMenuService.getOneByMenuId(attrs.menu_id);
                 console.log("order_id,order_guest_id",attrs.order_id,attrs.order_guest_id)
                 let order = await  orderService.getOneByOrderId(attrs.order_id);
@@ -84,7 +83,6 @@ class OrderController {
                 if (!menu || !order) {
                     throw baseResult.ORDER_SECTION_GUEST_LIST_INVALID;
                 }
-                debugger
                 if (!moment().add(menu.preparation_days?menu.preparation_days:0, 'days').isBefore(moment(order.event_date))){
                     throw baseResult.ORDER_SECTION_GUEST_LIST_INVALID;
                 }
@@ -107,11 +105,17 @@ class OrderController {
                 if (!attrs || !attrs.order_id)  {
                     throw 'CancelOrderRequest is required!';
                 }
-                let user = userService.getById(req.user_id)
+                let user = await  userService.getById(req.user_id)
                 if (!user) {
                     throw baseResult.ORDER_ONLY_ACTIVE_USER_CANCEL;
                 }
-                await orderService.cancelOrderByOrderId(attrs,menu);
+                let order = await  orderService.getOneByOrderId(attrs.order_id);
+
+                if (!order) {
+                    throw 'order is not exist! order_id:'+attrs.order_id
+                }
+                attrs.user_id = user.user_id;
+                await orderService.cancelOrderByOrderId(attrs);
                 res.json(baseResult.SUCCESS)
             }catch (e){
                 next(e);

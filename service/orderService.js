@@ -69,15 +69,16 @@ class OrderService extends BaseService{
         return this.getOne({where:{order_id:order_id,active_ind:activeIndStatus.ACTIVE},transaction:t});
     }
 
-    cancelOrderByOrderId(attrs,user_id) {
+    cancelOrderByOrderId(attrs) {
         return db.transaction(t=> {
            return this.getOneByOrderId(attrs.order_id,t).then(order => {
-                if (order.user_id !== user_id){
+                if (order.user_id !== attrs.user_id){
                     throw baseResult.ORDER_NOT_BELONG_USER
                 }
                return  chefMenuService.getModel().findOne({where:{menu_id:order.menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(
                     chefMenu=> {
-                        if (!moment().add(chefMenu.cancel_hours?menu.cancel_hours:0, 'hours').isBefore(moment(order.create_on))){
+                   /*     console.log(moment().add(chefMenu.cancel_hours?chefMenu.cancel_hours:0, 'hours'),moment(order.create_on))*/
+                        if (!moment().add(chefMenu.cancel_hours?chefMenu.cancel_hours:0, 'hours').isBefore(moment(order.create_on))){
                             throw baseResult.ORDER_CANCEL_WITHIN_HOURS;
                         }else {
                             return this.cancelOrderAndRefs(order,t)

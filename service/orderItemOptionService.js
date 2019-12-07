@@ -24,4 +24,5 @@ class OrderItemOptionService extends BaseService {
 
     }
 }
-module.exports = new OrderItemOptionService()
+//module.exports = new OrderItemOptionService()
+export default new OrderItemOptionService()
