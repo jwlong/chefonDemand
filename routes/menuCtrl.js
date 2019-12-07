@@ -397,10 +397,11 @@ class MenuController {
                 if (!attrs.menu_id || !attrs.public_ind) {
                     throw baseResult.MENU_QUERY_PARAM_MANDATORY;
                 }
-                let chef = chefService.getChefByUserId(req.user_id);
+                let chef = await chefService.getChefByUserId(req.user_id);
                 if (!chef) {
                     throw baseResult.MENU_ONLY_CHEF_CAN_MODIFY
                 }
+                attrs.public_ind = Number(attrs.public_ind);
                 attrs.chef_id = chef.chef_id;
                 await  chefMenuService.updateMenuVisibility(attrs);
                 res.json(baseResult.SUCCESS)

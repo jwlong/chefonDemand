@@ -780,23 +780,18 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
                 ,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(
                 menu => {
                     if (menu){
-                        if (menu.public_ind === attrs.public_ind) {
+
+                        console.log("old menu =======>",menu.public_ind,attrs.public_ind)
+                        if (Number(menu.public_ind) === attrs.public_ind) {
                             throw baseResult.MENU_NO_CHANGE_AVAILABILITY;
                         }else {
                             return this.baseUpdate({public_ind:attrs.public_ind},
                                 {where:{menu_id:menu.menu_id,chef_id:menu.chef_id},transaction:t}).then(
                                     resp => {
-                                        if (attrs.public_ind === 0 && menu.public_ind === 1){
+                                        if (attrs.public_ind === 0 && Number(menu.public_ind) === 1){
                                             return orderService.getModel().findAll({where:{menu_id:menu.menu_id,active_ind:activeIndStatus.ACTIVE,event_date:{[Op.gt]:moment()}},transaction:t}).then(orderList => {
                                                 if (orderList) {
-                                                    let promiseArr = [];
-                                                    orderList.forEach( order => {
-                                                        let user = userService.getById(order.user_id);
-                                                        let notity_username = user.first_name+" "+user.last_name;
-                                                        let msgBody = msgCfg.update_menu_notify.format(notity_username);
-                                                        promiseArr.push(messageService.insertMessage(order.user_id,msgBody,{transaction:t}));
-                                                    })
-                                                    return Promise.all(promiseArr);
+                                                  return  messageService.insertMessageByOrderList(orderList, attrs, t);
                                                 }
                                             })
                                         }
