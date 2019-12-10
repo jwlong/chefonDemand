@@ -62,7 +62,7 @@ class MenuItemOptionService extends BaseService{
             let promiseArr = [];
             optionList.forEach(value => {
                 value.active_ind = updatedStatus;
-                promiseArr.push(this.baseUpdate(value,{transaction:t}));
+                promiseArr.push(this.baseUpdate(value,{where:{option_id:value.option_id},transaction:t}));
             })
             return Promise.all(promiseArr);
         })
@@ -85,6 +85,30 @@ class MenuItemOptionService extends BaseService{
             })
             return Promise.all(promiseArr);
         })
+    }
+
+    batchInsertOptions(menu_item_option_list, t) {
+        let promiseArr = [];
+        if (menu_item_option_list && menu_item_option_list.length > 0) {
+            menu_item_option_list.forEach(op => {
+                  if (op.option_id) {
+                       let p = this.getModel().findOne({where:{option_id:op.option_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(queryOp => {
+                          if (queryOp) {
+                              return this.baseUpdate(op,{where:{option_id:op.option_id},transaction:t});
+                          }else {
+                              return this.baseCreate(op,{transaction:t});
+                          }
+
+                      })
+                      promiseArr.push(p);
+
+                  }else {
+                      promiseArr.push(this.baseCreate(op,{transaction:t}));
+                  }
+            })
+            return Promise.all(promiseArr);
+        }
+
     }
 }
 //module.exports = new MenuItemOptionService()

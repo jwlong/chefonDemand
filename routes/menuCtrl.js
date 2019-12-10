@@ -218,11 +218,31 @@ class MenuController {
         ///menu/getMenuListByChefId
         router.get('/getMenuListByChefId',async(req,res,next) =>{
             try {
-                let chef = await chefService.getChefByUserId(req.user_id);
-                if (!chef) {
-                    throw baseResult.CHEF_ID_NOT_EXIST;
-                }
-                res.json(await  chefMenuService.getMenuListByChefId(chef.chef_id));
+               let headers = req.headers;
+               let chef_id;
+               // 匿名用户
+               if (!req.user_id)  {
+                   if (headers.chef_id) {
+                       chef_id = headers.chef_id;
+                   }else {
+                       throw baseResult.CHEF_ID_NOT_EXIST;
+                   }
+
+               }else  {
+                   let chef = await chefService.getChefByUserId(req.user_id);
+                   if (!chef) {
+                       if (!headers.chef_id)  {
+                           /*throw 'for user or anonymous user, they should supply chef_id in parameter';*/
+                           throw baseResult.CHEF_ID_NOT_EXIST;
+                       }
+                       chef_id = headers.chef_id;
+                   }else {
+                       chef_id = chef.chef_id;
+                   }
+               }
+
+
+                res.json(await  chefMenuService.getMenuListByChefId(chef_id));
             }catch (e) {
                 next(e);
             }

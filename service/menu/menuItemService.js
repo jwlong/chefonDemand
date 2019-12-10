@@ -18,7 +18,6 @@ class MenuItemService extends BaseService{
      * @returns {PromiseLike<T> | Promise<T>}
      */
     batchUpdateStatus(menu_id,status,t) {
-        debugger
         return this.getModel().findAll({where:{menu_id:menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(
             itemList => {
                 return this.baseUpdate({active_ind:status},{where:{menu_id:menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(cnt =>{
@@ -27,6 +26,22 @@ class MenuItemService extends BaseService{
             }
 
         )
+    }
+
+    insertItem(value, t) {
+        if (value.menu_item_id)  {
+            return this.getModel().findOne({where:{menu_item_id:value.menu_item_id},transaction:t}).then(item => {
+                if (item) {
+                    // update
+                    return this.baseUpdate(value,{where:{menu_item_id:value.menu_item_id},transaction:t}).then(updateCtn => {
+                        return item;
+                    })
+                }else {
+                    //create
+                    return this.baseCreate(value,{transaction:t})
+                }
+            })
+        }
     }
 }
 module.exports = new MenuItemService()

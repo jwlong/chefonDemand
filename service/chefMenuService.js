@@ -72,11 +72,11 @@ class ChefMenuService extends BaseService{
 
         attrs.menu_item_list.forEach(value => {
             value.menu_id = menu_id;
-            let  pm = menuItemService.baseCreate(value,{transaction:t}).then(item => {
+            let  pm = menuItemService.insertItem(value,t).then(item => {
                 value.menu_item_option_list.forEach(op =>{
                     op.menu_item_id = item.menu_item_id;
                 })
-                return menuItemOptionService.baseCreateBatch(value.menu_item_option_list,{transaction:t})
+                return menuItemOptionService.batchInsertOptions(value.menu_item_option_list,t)
             })
             promiseArr.push(pm);
         })
@@ -211,13 +211,18 @@ class ChefMenuService extends BaseService{
             active_ind: activeIndStatus.ACTIVE
         });
 */
-       let sql = `select m.chef_id, m.menu_id, m.menu_name, m.menu_code, m.public_ind, m.seq_no, m.min_pers, m.max_pers, m.menu_logo_url, m.unit_price,avg(rating.overall_rating) menu_rating ,count(rating.rating_id) num_of_review,min(m.unit_price) min_unit_price from chefondemand.t_chef_menu m left join chefondemand.t_order o on o.menu_id = m.menu_id and o.active_ind = 'A'
+       let sql = `select m.chef_id, m.menu_desc,m.menu_id, m.menu_name, m.menu_code, m.public_ind, m.seq_no, m.min_pers, m.max_pers, m.menu_logo_url, m.unit_price,avg(rating.overall_rating) menu_rating ,count(rating.rating_id) num_of_review,min(m.unit_price) min_unit_price from chefondemand.t_chef_menu m left join chefondemand.t_order o on o.menu_id = m.menu_id and o.active_ind = 'A'
 left join chefondemand.t_user_rating rating on o.order_id = rating.order_id and m.active_ind = 'A'
 where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
         return db.query(sql,{replacements:{chef_id:chef_id},type:db.QueryTypes.SELECT}).then(result => {
             return  locationService.baseFindByFilter(['district'],{chef:chef_id}).then(districtList => {
                 let menuList = {};
-                result.chef_service_locations = districtList;
+                if (result) {
+                    result.forEach(singleMenu => {
+                        singleMenu.public_ind = singleMenu.public_ind.readUInt8(0);
+                        singleMenu.chef_service_locations = districtList;
+                    })
+                }
                 menuList.menu_list = result;
                 return menuList;
             })
