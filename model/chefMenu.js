@@ -154,6 +154,10 @@ class ChefMenu extends BaseModel {
                 type: Sequelize.STRING(4000),
                 allowNull: true
             },
+            cancel_hours: {
+                type: Sequelize.INTEGER(3),
+                allowNull: true
+            },
             create_on: {
                 type: Sequelize.DATE,
                 allowNull: false,

@@ -77,8 +77,9 @@ class OrderService extends BaseService{
                 }
                return  chefMenuService.getModel().findOne({where:{menu_id:order.menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(
                     chefMenu=> {
-                   /*     console.log(moment().add(chefMenu.cancel_hours?chefMenu.cancel_hours:0, 'hours'),moment(order.create_on))*/
-                        if (!moment().add(chefMenu.cancel_hours?chefMenu.cancel_hours:0, 'hours').isBefore(moment(order.create_on))){
+                        console.log("cancel hours:%s",chefMenu.cancel_hours);
+                        console.log(moment(order.create_on).add(chefMenu.cancel_hours?chefMenu.cancel_hours:0, 'hours'),moment())
+                        if (moment(order.create_on).add(chefMenu.cancel_hours?chefMenu.cancel_hours:0, 'hours').isBefore(moment())){
                             throw baseResult.ORDER_CANCEL_WITHIN_HOURS;
                         }else {
                             return this.cancelOrderAndRefs(order,t)
