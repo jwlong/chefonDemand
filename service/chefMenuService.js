@@ -489,7 +489,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
             left join t_chef_service_location location  on location.chef_id = m.chef_id and location.active_ind ='A'
             left join t_order o on o.menu_id = m.menu_id and o.active_ind = 'A'
             left join t_user_rating rating  on rating.order_id = o.order_id
-            where m.start_date < :startDate and m.end_date > :startDate and m.end_date >:endDate
+            where m.start_date >= :startDate and m.end_date >= :startDate and m.end_date <=:endDate
             and m.active_ind = 'A'
             and m.applied_meal = :mealType
             and lang.lang_code in (:langCodeList)
@@ -514,8 +514,9 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
                 if (list) {
                     let promiseArr = [];
                     list.forEach(item => {
+                        debugger
                         if (!item.menu_logo_url) {
-                            promiseArr.push(this.getLastestMenu(item.chef_id).then(lastestMenu => {
+                            promiseArr.push(this.getLastestMenuLogoByChefId(item.chef_id).then(lastestMenu => {
                                 console.log("lastestMenu=> ",lastestMenu)
                                 item.menu_logo_url = lastestMenu.menu_logo_url;
                                 return item;
@@ -533,9 +534,13 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
         })
     }
 
-    getLastestMenu(chef_id) {
-        let sql = `select * from t_chef_menu where chef_id = :chefId and active_ind= 'A' order by create_on limit  1`;
-        return db.query(sql,{replacements:{chefId:chef_id}});
+    getLastestMenuLogoByChefId(chef_id) {
+        let sql = `select * from t_chef_menu where chef_id = :chefId and menu_logo_url is not null and active_ind= 'A' order by create_on limit  1`;
+        return db.query(sql,{replacements:{chefId:chef_id},type:db.QueryTypes.SELECT}).then(list => {
+            if (list && list.length > 0) {
+                return list[0];
+            }
+        });
     }
 
     updateMenuServingDetailByMenuId(chef_id, menu_id,attrs) {
@@ -944,7 +949,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
           left join t_user on tc.user_id = t_user.user_id and t_user.active_ind = 'A'
           left join t_order o on o.menu_id = m.menu_id and  o.active_ind = 'A'
           left join t_user_rating rating on o.order_id = rating.order_id and rating.active_ind ='A'  
-          where m.start_date < :start_date and m.end_date > :start_date and m.end_date >:end_date  and
+          where m.start_date >= :start_date and m.end_date >= :start_date and m.end_date <=:end_date  and
           m.active_ind = 'A' and applied_meal=:meal_type
            and m.applied_meal = :meal_type
             and lang.lang_code in (:langCodes)
