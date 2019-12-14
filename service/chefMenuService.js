@@ -525,7 +525,9 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
                         if (!item.menu_logo_url) {
                             promiseArr.push(this.getLastestMenuLogoByChefId(item.chef_id).then(lastestMenu => {
                                 console.log("lastestMenu=> ",lastestMenu)
-                                item.menu_logo_url = lastestMenu.menu_logo_url;
+                                if (lastestMenu) {
+                                    item.menu_logo_url = lastestMenu.menu_logo_url;
+                                }
                                 return item;
                             }))
                         }else {
