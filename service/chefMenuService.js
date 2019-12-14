@@ -104,7 +104,8 @@ class ChefMenuService extends BaseService{
                                return this.baseCreate(attrs,{transaction:t}).then(resp => {
                                     // copy menu_item
                                     let promiseArr = [];
-
+                                    console.log("update order menu_id:%s to new menu_id:%s",chefMenu.menu_id,resp.menu_id)
+                                    promiseArr.push(orderService.updateMenuIdWithNewMenuId(chefMenu.menu_id,resp.menu_id,t));
                                     attrs.menu_item_list.forEach(value => {
                                         value.menu_id = menu_id;
                                        promiseArr.push(menuItemService.baseCreate(value,{transaction:t}).then(item => {
