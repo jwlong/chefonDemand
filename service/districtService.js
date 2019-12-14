@@ -33,11 +33,11 @@ class DistrictService extends BaseService{
 
                     if(!_district) throw baseResult.CHEF_DISTRICT_CODE_NOT_EXIST;
                     //insert t_chef_service_location
-                    let handlerObj = {chef:attrs.chef_id,district:districtObj.district_code};
+                    let handlerObj = {chef_id:attrs.chef_id,district_code:districtObj.district_code};
 
                    return chefLocationService.getModel().findOne({where:handlerObj}).then( chefLocation => {
                         if (chefLocation) {
-                            return chefLocationService.baseUpdate({active_ind:districtObj.active_ind},{where:{chef:attrs.chef_id,district:districtObj.district_code},transaction:t})
+                            return chefLocationService.baseUpdate({active_ind:districtObj.active_ind},{where:{chef_id:attrs.chef_id,district_code:districtObj.district_code},transaction:t})
                         }else{
                             handlerObj.active_ind = districtObj.active_ind;
                             return chefLocationService.baseCreate(handlerObj,{transaction:t})
@@ -48,7 +48,7 @@ class DistrictService extends BaseService{
             })
            // inactive  the record of  not in update list
            if (district_codes.length > 0) {
-               let inactivePromise = chefLocationService.baseUpdate({active_ind:activeIndStatus.INACTIVE},{where:{chef:attrs.chef_id,active_ind:activeIndStatus.ACTIVE,district:{[Op.notIn]:district_codes}},transaction:t})
+               let inactivePromise = chefLocationService.baseUpdate({active_ind:activeIndStatus.INACTIVE},{where:{chef:attrs.chef_id,active_ind:activeIndStatus.ACTIVE,district_code:{[Op.notIn]:district_codes}},transaction:t})
                promiseArr.push(inactivePromise);
            }
            return Promise.all(promiseArr);

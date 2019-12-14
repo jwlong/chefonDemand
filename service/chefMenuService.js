@@ -486,7 +486,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
             left join t_user user on chef.user_id = user.user_id and user.active_ind = 'A'
             left join t_chef_language lang on lang.chef_id = m.chef_id and lang.active_ind ='A'
             left join t_chef_cuisine cuisine  on cuisine.chef_id = m.chef_id and  cuisine.active_ind ='A'
-            left join t_chef_service_location location  on location.chef = m.chef_id and location.active_ind ='A'
+            left join t_chef_service_location location  on location.chef_id = m.chef_id and location.active_ind ='A'
             left join t_order o on o.menu_id = m.menu_id and o.active_ind = 'A'
             left join t_user_rating rating  on rating.order_id = o.order_id
             where m.start_date < :startDate and m.end_date > :startDate and m.end_date >:endDate
@@ -494,7 +494,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
             and m.applied_meal = :mealType
             and lang.lang_code in (:langCodeList)
             and cuisine.cuisine_type_id in (:typeIds)
-            and location.district in (:districtCodes)
+            and location.district_code in (:districtCodes)
             group by m.chef_id,m.menu_id`;
         let limitSql = ` order by menu_rating desc limit :startIndex , :pageSize`;
         let queryTotalSql = preSql + totalSql + sql;
@@ -940,7 +940,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
           left join t_chef tc on m.chef_id = tc.chef_id and tc.active_ind = 'A'
           left join t_chef_language lang on lang.chef_id = m.chef_id and lang.active_ind ='A'
           left join t_chef_cuisine cuisine  on cuisine.chef_id = m.chef_id and  cuisine.active_ind ='A'
-          left join t_chef_service_location location  on location.chef = m.chef_id and location.active_ind ='A'
+          left join t_chef_service_location location  on location.chef_id = m.chef_id and location.active_ind ='A'
           left join t_user on tc.user_id = t_user.user_id and t_user.active_ind = 'A'
           left join t_order o on o.menu_id = m.menu_id and  o.active_ind = 'A'
           left join t_user_rating rating on o.order_id = rating.order_id and rating.active_ind ='A'  
@@ -949,7 +949,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
            and m.applied_meal = :meal_type
             and lang.lang_code in (:langCodes)
             and cuisine.cuisine_type_id in (:cuisineTypeIds)
-            and location.district in (:districtCodes)
+            and location.district_code in (:districtCodes)
         group by  m.menu_id `;
         let orderBySql = ' order by menu_rating desc limit :startIndex,:pageSize ';
         let totalSql = countSql + sql;

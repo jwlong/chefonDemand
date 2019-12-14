@@ -13,7 +13,7 @@ class ChefLocationService extends BaseService{
             let promiseArr = [];
             menuList.forEach(value => {
 
-                promiseArr.push(this.baseFindByFilter(['district'],{chef:value.chef_id}).then(districtList => {
+                promiseArr.push(this.baseFindByFilter(['district_code'],{chef_id:value.chef_id}).then(districtList => {
                     value.chef_service_locations = districtList;
                     value.public_ind = value.public_ind.readUInt8(0)
                     value.total_pages = total_pages;
@@ -25,7 +25,7 @@ class ChefLocationService extends BaseService{
     }
 
     countByDistrict(districtCode) {
-        return this.getModel().count({where:{district:districtCode,active_ind:activeIndStatus.ACTIVE}})
+        return this.getModel().count({where:{district_code:districtCode,active_ind:activeIndStatus.ACTIVE}})
     }
 }
 module.exports = new ChefLocationService()
