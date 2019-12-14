@@ -558,9 +558,9 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
                 if (chefMenu) {
                     console.log("chef Menu ====>",chefMenu.public_ind)
                     if (chefMenu.public_ind === true) {
-                        return this.publicMenuHandler(chefMenu.toJSON(),this.updateMenuServingDetailByMenuIdDirectly(attrs,t),attrs,t);
+                        return this.publicMenuHandler(chefMenu.toJSON(),this,attrs,t);
                     }else {
-                        return this.updateMenuServingDetailByMenuIdDirectly(attrs,t);
+                        return  this.updateDirectly(null, chefMenu.menu_id, null, attrs, t);
                     }
                 }else {
                     throw baseResult.MENU_ID_NOT_EXIST;
@@ -586,12 +586,15 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
                     let newMenu = chefMenu;
                     newMenu.public_ind = 0;
                     newMenu.parent_menu_id = chefMenu.menu_id;
-                    if (attrs.about) {
+                    /*if (attrs.about) {
                         newMenu.about = attrs.about;
                     }
                     if (attrs.cancel_policy) {
                         newMenu.cancel_policy = attrs.cancel_policy;
                     }
+*/
+                    this.menuUpdatedAttrProcessor(attrs,newMenu);
+
                     return this.cloneNewLogic(newMenu,t,cloneExlcudes,dataMapByNotCloneTypes).then(
                         resp => {
                             attrs.menu_code = chefMenu.menu_code; // 变性前的menu_code;
@@ -735,7 +738,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
                     if (chefMenu.public_ind === true) {
                         return this.publicMenuHandler(chefMenu.toJSON(),this,attrs,t,null,null);
                     }else {
-                        return  this.updateDirectly(null, chefMenu.menu_id, null, attrs, t);;
+                        return  this.updateDirectly(null, chefMenu.menu_id, null, attrs, t);
                     }
                 }else {
                     throw baseResult.MENU_ID_NOT_EXIST;
@@ -744,14 +747,56 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
         })
     }
 
-    updateDirectly(status, last_menu_id, new_menu_id, attrs, t){
-        let updateAttr = {};
+
+    menuUpdatedAttrProcessor(attrs,updateAttr) {
+        if (!updateAttr) {
+            updateAttr = {};
+        }
+        if (attrs.applied_meal)  {
+            updateAttr.applied_meal = attrs.applied_meal;
+        }
+        if (attrs.min_pers) {
+            updateAttr.min_pers = attrs.min_pers;
+        }
+        if (attrs.max_pers) {
+            updateAttr.max_pers = attrs.max_pers;
+        }
+        if (attrs.event_duration_hr) {
+            updateAttr.event_duration_hr = attrs.event_duration_hr;
+        }
+        if (attrs.chef_arrive_prior_hr)  {
+            updateAttr.chef_arrive_prior_hr = attrs.chef_arrive_prior_hr;
+        }
+        if (attrs.child_menu_note)  {
+            updateAttr.child_menu_note = attrs.child_menu_note;
+        }
         if (attrs.about) {
             updateAttr.about = attrs.about;
         }
         if (attrs.cancel_policy) {
             updateAttr.cancel_policy = attrs.cancel_policy;
         }
+        return updateAttr;
+    }
+    /**
+     * func 22
+     *
+     {
+         "menu_id": 0,
+         "applied_meal": 1,
+         "min_pers": 0,
+         "max_pers": 0,
+         "event_duration_hr": 0,
+         "chef_arrive_prior_hr": 0,
+         "child_menu_note": "string"
+     }
+     * update about
+     * update cancel policy
+     *
+     *
+     */
+    updateDirectly(status, last_menu_id, new_menu_id, attrs, t){
+        let updateAttr = this.menuUpdatedAttrProcessor(attrs);
         return this.baseUpdate(updateAttr,{where:{menu_id:last_menu_id,chef_id:attrs.chef_id,active_ind:activeIndStatus.ACTIVE},transaction:t});
     }
 
@@ -817,6 +862,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
                                 {where:{menu_id:menu.menu_id,chef_id:menu.chef_id},transaction:t}).then(
                                     resp => {
                                         if (attrs.public_ind === 0 && Number(menu.public_ind) === 1){
+                                            attrs.menu_code = menu.menu_code;
                                             return orderService.getModel().findAll({where:{menu_id:menu.menu_id,active_ind:activeIndStatus.ACTIVE,event_date:{[Op.gt]:moment()}},transaction:t}).then(orderList => {
                                                 if (orderList) {
                                                   return  messageService.insertMessageByOrderList(orderList, attrs, t);
