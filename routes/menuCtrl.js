@@ -38,7 +38,7 @@ class MenuController {
 
         router.get('/getMenuByMenuId',async(req, res,next) => {
             try {
-                let query = req.query;
+                let query = req.headers;
                 let userId = req.user_id;
                 if (!query.menu_id) {
                     throw baseResult.MENU_ID_NOT_EXIST

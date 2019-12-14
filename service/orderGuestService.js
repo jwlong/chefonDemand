@@ -74,7 +74,7 @@ class OrderGuestService extends BaseService {
                         let orderItemPrmArr = [];
 
                         attrs.order_item_list.forEach(item => {
-                            let orderItemPrm = orderItemService.getModel().findAll({where:{order_id:attrs.order_id,order_guest_id:attrs.order_guest_id},transaction:t}).then(items => {
+                            let orderItemPrm = orderItemService.getModel().findAll({where:{order_id:attrs.order_id,order_guest_id:attrs.order_guest_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(items => {
                                 debugger
                                 console.log("item list =>",items);
                                 if (items && items.length > 0) {

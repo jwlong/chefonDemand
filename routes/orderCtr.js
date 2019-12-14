@@ -73,11 +73,15 @@ class OrderController {
                 }
                 //let menu = await  chefMenuService.getOneByMenuId(attrs.menu_id);
                 console.log("order_id,order_guest_id",attrs.order_id,attrs.order_guest_id)
+                if (!attrs.order_guest_id) {
+                    throw 'unique_id is invalid!'
+                }
                 let order = await  orderService.getOneByOrderId(attrs.order_id);
 
                 if (!order) {
                     throw 'order is not exist! order_id:'+attrs.order_id
                 }
+
                 let menu = await  chefMenuService.getOneByMenuId(order.menu_id);
 
                 if (!menu || !order) {

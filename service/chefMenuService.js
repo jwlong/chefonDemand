@@ -178,10 +178,12 @@ class ChefMenuService extends BaseService{
     }
     getMenuByMenuId(criteria) {
         //no user id only can get public menu
-        return this.getModel().findOne({attributes:['chef_id','menu_id','menu_name',
-                'menu_code','menu_desc','public_ind'],where:criteria}).then(resp => {
+       /* let attributes = ['chef_id','menu_id','menu_name',
+            'menu_code','menu_desc','public_ind']*/
+       // item options ['menu_item_id','seq_no','item_type_id','max_choice','note','optional']
+        return this.getModel().findOne({where:criteria}).then(resp => {
                     let result  = resp.toJSON();
-            return menuItemService.baseFindByFilter(['menu_item_id','seq_no','item_type_id','max_choice','note','optional'],{menu_id:criteria.menu_id,active_ind:activeIndStatus.ACTIVE}).then(menuItems => {
+            return menuItemService.baseFindByFilter(null,{menu_id:criteria.menu_id,active_ind:activeIndStatus.ACTIVE}).then(menuItems => {
 
                 return menuItemOptionService.getMenuItemOptionsByMenuItems(menuItems).then(menuItemResult => {
                     result.menu_item_list = menuItemResult;

@@ -29,7 +29,10 @@ class OrderItemService extends BaseService {
 
     updateItemAndOptions(items, attrs, t) {
         let promiseArr = [];
-        items.forEach(i => {
+        items.forEach(orderItem => {
+            // update order option
+            let optionUpdatePromise = orderItemOptionService.baseUpdate({active_ind:activeIndStatus.REPLACE},{where:{order_item_id:orderItem.order_item_id,active_ind:activeIndStatus.ACTIVE}})
+            promiseArr.push(optionUpdatePromise);
             let p =  this.baseUpdate({active_ind:activeIndStatus.REPLACE},{where:{order_id:attrs.order_id,order_guest_id:attrs.order_guest_id},transaction:t}).then(
                 resp => {
                     return this.newInsert(attrs,t);

@@ -12,7 +12,8 @@ class MenuItemOptionService extends BaseService{
     getMenuItemOptionsByMenuItems(menuItems) {
         let promiseArr = [];
         menuItems.forEach(value => {
-            let p = this.baseFindByFilter(['option_id','seq_no','opt_txt','opt_desc','unit_price','currency_code'],{menu_item_id:value.menu_item_id,active_ind:activeIndStatus.ACTIVE}).then(options => {
+            // ['option_id','seq_no','opt_txt','opt_desc','unit_price','currency_code']
+            let p = this.baseFindByFilter(null,{menu_item_id:value.menu_item_id,active_ind:activeIndStatus.ACTIVE}).then(options => {
                 let rawValue = value.toJSON();
                 rawValue.menu_item_option_list = options;
                 return rawValue;
