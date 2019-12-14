@@ -329,21 +329,21 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
                      return Promise.all(promiseArr).then(result=> {
                          let otherPromiseArr = [];
                          //t_menu_cuisine
-                         otherPromiseArr.push(this.copy(menuCuisineService,last_menu_id,new_menu_id,t));
+                         otherPromiseArr.push(this.copy(menuCuisineService,last_menu_id,new_menu_id,null,t));
                          // copy t_menu_kitchen_req
-                         otherPromiseArr.push(this.copy(kitchenReqService,last_menu_id,new_menu_id,t));
+                         otherPromiseArr.push(this.copy(kitchenReqService,last_menu_id,new_menu_id,null,t));
                          // copy t_menu_include
-                         otherPromiseArr.push(this.copy(menuIncludeService,last_menu_id,new_menu_id,t));
+                         otherPromiseArr.push(this.copy(menuIncludeService,last_menu_id,new_menu_id,null,t));
                          // copy t_menu_chef_note
-                         otherPromiseArr.push(this.copy(menuChefNoteService,last_menu_id,new_menu_id,t));
+                         otherPromiseArr.push(this.copy(menuChefNoteService,last_menu_id,new_menu_id,'menu_chef_note_id',t));
                          //copy t_menu_booking_rule
-                         otherPromiseArr.push(this.copy(menuBookingRuleService,last_menu_id,new_menu_id,t));
+                         otherPromiseArr.push(this.copy(menuBookingRuleService,last_menu_id,new_menu_id,'booking_rule_id',t));
                          //copy t_menu_booking_requirement
-                         otherPromiseArr.push(this.copy(menuBookingRequirementService,last_menu_id,new_menu_id,t));
+                         otherPromiseArr.push(this.copy(menuBookingRequirementService,last_menu_id,new_menu_id,'booking_requirement_id',t));
                          // copy t_menu_extra_charge
-                         otherPromiseArr.push(this.copy(menuExtraChargeService,last_menu_id,new_menu_id,t));
+                         otherPromiseArr.push(this.copy(menuExtraChargeService,last_menu_id,new_menu_id,'extra_charge_id',t));
                          // copy  t_menu_photo
-                         otherPromiseArr.push(this.copy(menuPhotoService,last_menu_id,new_menu_id,t));
+                         otherPromiseArr.push(this.copy(menuPhotoService,last_menu_id,new_menu_id,'photo_id',t));
                          return Promise.all(otherPromiseArr);
                      });
 
@@ -402,47 +402,47 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
                             let otherPromiseArr = [];
                             //t_menu_cuisine
                             if (notCloneTypes.indexOf(cloneExclude.menuCuisine) == -1) {
-                                otherPromiseArr.push(this.copy(menuCuisineService,last_menu_id,new_menu_id,t));
+                                otherPromiseArr.push(this.copy(menuCuisineService,last_menu_id,new_menu_id,null,t));
                             }
                             if (notCloneTypes.indexOf(cloneExclude.kitchenReq) == -1) {
                                 // copy t_menu_kitchen_req
-                                otherPromiseArr.push(this.copy(kitchenReqService,last_menu_id,new_menu_id,t));
+                                otherPromiseArr.push(this.copy(kitchenReqService,last_menu_id,new_menu_id,null,t));
                             }else{
                                 otherPromiseArr.push(kitchenReqService.updateDirectly(activeIndStatus.DELETE,last_menu_id,new_menu_id,dataMapByNotCloneTypes.get(cloneExclude.kitchenReq),t));
                             }
 
                             if (notCloneTypes.indexOf(cloneExclude.menuInclude) == -1) {
                                 // copy t_menu_include
-                                otherPromiseArr.push(this.copy(menuIncludeService,last_menu_id,new_menu_id,t));
+                                otherPromiseArr.push(this.copy(menuIncludeService,last_menu_id,new_menu_id,null,t));
                             }else {
                                 otherPromiseArr.push(menuIncludeService.updateDirectly(activeIndStatus.DELETE,last_menu_id,new_menu_id,dataMapByNotCloneTypes.get(cloneExclude.menuInclude),t))
                             }
                             if (notCloneTypes.indexOf(cloneExclude.menuChefNote) == -1) {
                                 // copy t_menu_chef_note
-                                otherPromiseArr.push(this.copy(menuChefNoteService,last_menu_id,new_menu_id,t));
+                                otherPromiseArr.push(this.copy(menuChefNoteService,last_menu_id,new_menu_id,'menu_chef_note_id',t));
                             }else {
                                 console.log("when copy t_menu_chef_note,new menu_id",new_menu_id);
                                 otherPromiseArr.push(menuChefNoteService.updateDirectly(activeIndStatus.DELETE,last_menu_id,new_menu_id,dataMapByNotCloneTypes.get(cloneExclude.menuChefNote),t,false))
                             }
                             if (notCloneTypes.indexOf(cloneExclude.menuBookingRule) == -1) {
                                 //copy t_menu_booking_rule
-                                otherPromiseArr.push(this.copy(menuBookingRuleService,last_menu_id,new_menu_id,t));
+                                otherPromiseArr.push(this.copy(menuBookingRuleService,last_menu_id,new_menu_id,'booking_rule_id',t));
                             }else {
                                 otherPromiseArr.push(menuBookingRuleService.updateDirectly(activeIndStatus.DELETE,last_menu_id,new_menu_id,dataMapByNotCloneTypes.get(cloneExclude.menuBookingRule),t))
                             }
                             if (notCloneTypes.indexOf(cloneExclude.menuBookingRequirement) == -1) {
                                 //copy t_menu_booking_requirement
-                                otherPromiseArr.push(this.copy(menuBookingRequirementService,last_menu_id,new_menu_id,t));
+                                otherPromiseArr.push(this.copy(menuBookingRequirementService,last_menu_id,new_menu_id,'booking_requirement_id',t));
                             }else{
                                 otherPromiseArr.push(menuBookingRequirementService.updateDirectly(activeIndStatus.DELETE,last_menu_id,new_menu_id,dataMapByNotCloneTypes.get(cloneExclude.menuBookingRule),t))
                             }
                             if (notCloneTypes.indexOf(cloneExclude.menuExtraCharge) == -1) {
                                 // copy t_menu_extra_charge
-                                otherPromiseArr.push(this.copy(menuExtraChargeService,last_menu_id,new_menu_id,t));
+                                otherPromiseArr.push(this.copy(menuExtraChargeService,last_menu_id,new_menu_id,'extra_charge_id',t));
                             }
                             if (notCloneTypes.indexOf(cloneExclude.menuPhoto) == -1) {
                                 // copy  t_menu_photo
-                                otherPromiseArr.push(this.copy(menuPhotoService,last_menu_id,new_menu_id,t));
+                                otherPromiseArr.push(this.copy(menuPhotoService,last_menu_id,new_menu_id,'photo_id',t));
                             }
                             return Promise.all(otherPromiseArr);
                         });
@@ -457,13 +457,18 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
         })
     }
 
-    copy(service, last_menu_id,new_menu_id,t) {
+    copy(service, last_menu_id,new_menu_id,autoIncrementKey,t) {
         return service.getModel().findAll({where:{menu_id:last_menu_id},transaction:t}).then(list => {
             let copyList = [];
             list.forEach(single => {
-                let  copyCuisine = single.toJSON();
-                copyCuisine.menu_id = new_menu_id;
-                copyList.push(copyCuisine);
+                let  copyObj = single.toJSON();
+                copyObj.menu_id = new_menu_id;
+                //如果设置处自增key的情况
+                if (autoIncrementKey) {
+                    debugger
+                    copyObj[autoIncrementKey] = null;
+                }
+                copyList.push(copyObj);
             })
            return  service.baseCreateBatch(copyList,{transaction:t});
         })
@@ -959,11 +964,11 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
         let orderBySql = ' order by menu_rating desc limit :startIndex,:pageSize ';
         let totalSql = countSql + sql;
         let filterSql = querySql + sql + orderBySql;
-        return db.query(totalSql,{replacements:query}).then(totalRecord => {
+        return db.query(totalSql,{replacements:query,type:db.QueryTypes.SELECT}).then(totalRecord => {
             let result = {};
-            console.log("totalRecord==========>",totalRecord[0])
-            if (totalRecord[0] && totalRecord[0][0] ) {
-                result.total_pages = (totalRecord[0][0].total  +  query.pageSize  - 1) /  query.pageSize;
+            console.log("totalRecord==========>",totalRecord)
+            if (totalRecord && totalRecord.length > 0) {
+                result.total_pages = (totalRecord[0].total  +  query.pageSize  - 1) /  query.pageSize;
             }else {
                 result.total_pages = 0;
                 result.page_no = query.page_no;
