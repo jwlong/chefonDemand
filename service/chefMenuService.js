@@ -218,7 +218,7 @@ class ChefMenuService extends BaseService{
 left join chefondemand.t_user_rating rating on o.order_id = rating.order_id and m.active_ind = 'A'
 where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
         return db.query(sql,{replacements:{chef_id:chef_id},type:db.QueryTypes.SELECT}).then(result => {
-            return  locationService.baseFindByFilter(['district'],{chef:chef_id}).then(districtList => {
+            return  locationService.baseFindByFilter(['district_code'],{chef_id:chef_id}).then(districtList => {
                 let menuList = {};
                 if (result) {
                     result.forEach(singleMenu => {

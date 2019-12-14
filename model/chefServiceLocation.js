@@ -4,7 +4,7 @@ import moment from 'moment'
 class ChefServiceLocation extends BaseModel {
     constructor () {
         super('t_chef_service_location', {
-            chef: {
+            chef_id: {
                 type: Sequelize.INTEGER(11),
                 allowNull: false,
                 primaryKey: true,
@@ -13,7 +13,7 @@ class ChefServiceLocation extends BaseModel {
                     key: 'chef_id'
                 }
             },
-            district: {
+            district_code: {
                 type: Sequelize.STRING(5),
                 allowNull: false,
                 primaryKey: true,
