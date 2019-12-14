@@ -17,6 +17,7 @@ class OrderGuestService extends BaseService {
            return this.getModel().findAll({
                 where: {order_id: updateOrderGuestList.order_id,active_ind:activeIndStatus.ACTIVE}, transaction: t
             }).then(guestListResp => {
+                 debugger
                 let requiredAddList = updateOrderGuestList.guest_list;
                 let actInsertArr = [];
                 let matchOldguestNameArr = [];
@@ -47,6 +48,7 @@ class OrderGuestService extends BaseService {
 
                console.log("add arr,",actInsertArr);
                console.log("delete arr,",oldNeedDeleted);
+
                 return this.baseCreateBatch(actInsertArr,{transaction:t}).then(resp => {
                     if (oldNeedDeleted.length > 0) {
                         let promiseArr = [];
@@ -66,12 +68,14 @@ class OrderGuestService extends BaseService {
       return  db.transaction(t=> {
             return this.getModel().findOne({where:{order_id:attrs.order_id,order_guest_id:attrs.order_guest_id}}).then(
                 guest =>{
+                    debugger
                     if (guest && guest.active_ind === activeIndStatus.ACTIVE) {
                         // replace
                         let orderItemPrmArr = [];
 
                         attrs.order_item_list.forEach(item => {
                             let orderItemPrm = orderItemService.getModel().findAll({where:{order_id:attrs.order_id,order_guest_id:attrs.order_guest_id},transaction:t}).then(items => {
+                                debugger
                                 console.log("item list =>",items);
                                 if (items && items.length > 0) {
                                     // replaces

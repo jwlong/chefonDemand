@@ -27,7 +27,7 @@ class OrderController {
                     throw 'CreateOrderRequest is required!';
                 }
                 let menu_id = createOrderRequest.menu_id;
-                let menu = await  chefMenuService.checkMenuCanCreateOrder(menu_id);
+                let menu = await  chefMenuService.checkMenuCanCreateOrder(createOrderRequest);
                 createOrderRequest.user_name = user.user_name;
                 createOrderRequest.user_id = req.user_id;
                 let orderId = await orderService.createOrderByMenuId(createOrderRequest);
@@ -47,7 +47,6 @@ class OrderController {
                 if (!updateOrderGuestList || !updateOrderGuestList.order_id)  {
                     throw 'UpdateOrderGuestList is required!';
                 }
-                let order_id = updateOrderGuestList.order_id;
                 await orderGuestService.updateOrderGuestListByOrderId(updateOrderGuestList);
                 res.json(baseResult.SUCCESS)
             }catch (e){
@@ -57,6 +56,7 @@ class OrderController {
         //func#57: /order/updateOrderGuestSelectionByOrderId
         router.post('/updateOrderGuestSelectionByOrderId',async(req,res,next) =>{
             try {
+                debugger
                 if (!req.user_id) {
                     throw baseResult.ORDER_SECTION_USER_ONLY_ACTIVE_GUEST;
                 }

@@ -255,8 +255,8 @@ WHERE cc.chef_id = :chef_id and ct.active_ind = 'A' `;
             throw baseResult.PAGE_NUMBER_INVALID;
         }
         if (query.start_date) {
-            //
-            if(moment(query.start_date).isBefore(moment())) {
+            //对比 day级别的
+            if(moment(query.start_date).isBefore(moment(),'day')) {
                 throw baseResult.MENU_START_DATE_ERROR;
             }
             if (query.end_date) {

@@ -34,6 +34,7 @@ class ChefMenuService extends BaseService{
         return this.getOne({where:{menu_id:menu_id,active_ind:activeIndStatus.ACTIVE}})
     }
     getPublicIndStatusArr(user_id) {
+        console.log("getPublicIndStatusArr userId:",user_id);
         if (!user_id) {
             return new Promise(resolve => {
                 let result = [1]
@@ -43,6 +44,7 @@ class ChefMenuService extends BaseService{
         return chefService.getChefByUserId(user_id).then(
             chef => {
                 let arr = [];
+                console.log("chef =>",chef)
                 if (chef) {
                     arr = [0,1];
                 }else {
@@ -513,9 +515,12 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
                     list.forEach(item => {
                         if (!item.menu_logo_url) {
                             promiseArr.push(this.getLastestMenu(item.chef_id).then(lastestMenu => {
+                                console.log("lastestMenu=> ",lastestMenu)
                                 item.menu_logo_url = lastestMenu.menu_logo_url;
                                 return item;
                             }))
+                        }else {
+                           promiseArr.push(item);
                         }
                     })
                     return Promise.all(promiseArr).then( resultList => {
@@ -542,7 +547,10 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
                     }else {
                         return this.updateMenuServingDetailByMenuIdDirectly(attrs,t);
                     }
-                }})
+                }else {
+                    throw baseResult.MENU_ID_NOT_EXIST;
+                }
+            })
         })
 
     }
@@ -822,7 +830,10 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
                     }else {
                         return  this.updateDirectly(null, chefMenu.menu_id, null, attrs, t);;
                     }
-                }})
+                }else {
+                    throw baseResult.MENU_ID_NOT_EXIST;
+                }
+            })
         })
     }
     updateMenuCancelPolicyDirectly(attrs, t) {
@@ -860,7 +871,12 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
         return db.query(queryPageCount,{replacements:{publicIndArr:attrs.publicIndArr},
             type:db.QueryTypes.SELECT}).then(totalCount => {
                 console.log("query totalCount:========>",totalCount)
-            let total_pages = (totalCount[0].total  +  attrs.pageSize  - 1) /  attrs.pageSize;
+            let total_pages;
+            if (totalCount  && totalCount[0]) {
+                total_pages = (totalCount[0].total  +  attrs.pageSize  - 1) /  attrs.pageSize;
+            }else {
+                total_pages = 0;
+            }
             return db.query(pageQuerySql,{replacements:{publicIndArr:attrs.publicIndArr,startIdx:attrs.startIdx,pageSize:attrs.pageSize},
                 type:db.QueryTypes.SELECT}).then(
                 menuList => {
@@ -891,17 +907,22 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
     }
 
 
-    checkMenuCanCreateOrder(menu_id) {
-        return this.getOneByMenuId(menu_id).then(
+    checkMenuCanCreateOrder(creatOrderRequest) {
+        return this.getOneByMenuId(creatOrderRequest.menu_id).then(
             menu => {
-                if (menu.public_ind === 0) {
-                    throw baseResult.ORDER_ONLY_PUBLIC_MENU_CAN_CREATED;
-                }else if(menu.public_ind === 1) {
-                    let d1 = moment(menu.event_date);
-                    let diffDays = d1.diff(moment(),'days');
-                    if (diffDays < menu.preparation_days) {
-                        throw baseResult.ORDER_MUSE_BE_PLACED_BEFORE_PREORDER_DATE
+                if (menu) {
+                    if (menu.public_ind === false) {
+                        throw baseResult.ORDER_ONLY_PUBLIC_MENU_CAN_CREATED;
+                    }else if(menu.public_ind === true) {
+                        let d1 = moment(creatOrderRequest.event_date);
+                        let diffDays = d1.diff(moment(),'days');
+                        console.log("diff days=>",diffDays)
+                        if (diffDays < menu.preparation_days) {
+                            throw baseResult.ORDER_MUSE_BE_PLACED_BEFORE_PREORDER_DATE
+                        }
                     }
+                }else {
+                    throw baseResult.MENU_ID_NOT_EXIST;
                 }
             }
         );
