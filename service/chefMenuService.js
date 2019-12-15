@@ -587,6 +587,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
                return  this.baseUpdate({active_ind:activeIndStatus.REPLACE,public_ind:0},{where:{menu_id:chefMenu.menu_id,chef_id:chefMenu.chef_id},transaction:t}).then(updateCnt => {
                     console.log("begin to clone  its related records....")
                     let oldMenuId = chefMenu.menu_id;
+                    let oldMenuCode = chefMenu.menu_code;
                     let newMenu = chefMenu;
                     newMenu.public_ind = 0;
                     newMenu.parent_menu_id = chefMenu.menu_id;
@@ -601,7 +602,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
 
                     return this.cloneNewLogic(newMenu,t,cloneExlcudes,dataMapByNotCloneTypes).then(
                         resp => {
-                            attrs.menu_code = chefMenu.menu_code; // 变性前的menu_code;
+                            attrs.menu_code = oldMenuCode; // 变性前的menu_code;
                             return messageService.insertMessageByOrderList(orderList, attrs, t).then(
                                 msgList => {
                                     // old menu handler
