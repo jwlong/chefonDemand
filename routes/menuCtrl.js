@@ -204,8 +204,12 @@ class MenuController {
                     throw baseResult.MENU_ID_FILED_MANDATORY;
                 }
                 let chef = await chefService.getChefByUserId(req.user_id);
+
                 if (!chef) {
                     throw baseResult.MENU_ONLY_CHEF_CAN_UPDATE;
+                }
+                if (req.body.menu_code) {
+                    await chefMenuService.checkMenuCode(menu_id,req.body.menu_code)
                 }
                 await chefMenuService.updateMenuByChefId(chef.chef_id,menu_id,req.body)
                 res.json(baseResult.SUCCESS)

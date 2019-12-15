@@ -29,19 +29,9 @@ class MenuItemService extends BaseService{
     }
 
     insertItem(value, t) {
-        if (value.menu_item_id)  {
-            return this.getModel().findOne({where:{menu_item_id:value.menu_item_id},transaction:t}).then(item => {
-                if (item) {
-                    // update
-                    return this.baseUpdate(value,{where:{menu_item_id:value.menu_item_id},transaction:t}).then(updateCtn => {
-                        return item;
-                    })
-                }else {
-                    //create
-                    return this.baseCreate(value,{transaction:t})
-                }
-            })
-        }
+                //create
+        value.menu_item_id = null;
+        return this.baseCreate(value,{transaction:t})
     }
 
 }

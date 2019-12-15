@@ -58,8 +58,9 @@ class ChefMenuService extends BaseService{
     updateMenuByChefIdDirectly(chef_id,menu_id,attrs,t) {
         console.log("start to update menu by chef id",attrs);
         let promiseArr = [];
-        attrs.active_ind = activeIndStatus.REPLACE;
+        attrs.active_ind = activeIndStatus.ACTIVE;
         // 直接修改chef menu
+        // check menu_code
         let part1 =  this.baseUpdate(attrs,{where:{menu_id:menu_id,chef_id:chef_id},transaction:t});
         promiseArr.push(part1);
         let part2 = menuItemService.batchUpdateStatus(menu_id,activeIndStatus.DELETE,t).then(updatdItemList => {
@@ -71,19 +72,22 @@ class ChefMenuService extends BaseService{
             }
         )
         promiseArr.push(part2);
-
-
-        attrs.menu_item_list.forEach(value => {
-            value.menu_id = menu_id;
-            let  pm = menuItemService.insertItem(value,t).then(item => {
-                value.menu_item_option_list.forEach(op =>{
-                    op.menu_item_id = item.menu_item_id;
+        return Promise.all(promiseArr).then(resp => {
+            let promiseArr2 = [];
+            attrs.menu_item_list.forEach(value => {
+                value.menu_id = menu_id;
+                let  pm = menuItemService.insertItem(value,t).then(item => {
+                    value.menu_item_option_list.forEach(op =>{
+                        op.menu_item_id = item.menu_item_id;
+                        op.option_id = null;
+                    })
+                    return menuItemOptionService.batchInsertOptions(value.menu_item_option_list,t)
                 })
-                return menuItemOptionService.batchInsertOptions(value.menu_item_option_list,t)
+                promiseArr2.push(pm);
             })
-            promiseArr.push(pm);
-        })
-        return Promise.all(promiseArr);
+            return Promise.all(promiseArr2);
+        });
+
 
 
     }
@@ -1073,8 +1077,17 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
 
 
     }
-}
 
+    checkMenuCode(menu_id, menu_code) {
+        // menu_code 唯一
+        return this.getOne({where:{menu_code:menu_code}}).then(menu => {
+            console.log("menu_code get menu =>",menu_code,menu)
+            if (menu && menu.menu_id !== menu_id){
+                throw 'menu_code:'+menu_code+" is used with  menu_id:"+menu.menu_id;
+            }
+        })
+    }
+}
 
 //module.exports = new ChefMenuService()
 export default new ChefMenuService()
