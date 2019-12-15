@@ -19,22 +19,28 @@ class MenuIncludeService extends BaseService{
             return this.baseCreateBatch(copyIncludeList,{transaction:t});
         })
     }
-
+    getItemInclude(menu_id,include_item_id,t) {
+        return this.getOne({where:{menu_id:menu_id,include_item_id:include_item_id},transaction:t});
+    }
 
     updateDirectly(status, last_menu_id, new_menu_id, attrs, t) {
         console.log("updateMenuIncludeItemsDirectly...")
-        return chefMenuService.baseUpdate({active_ind:activeIndStatus.REPLACE,public_ind:0},{where:{menu_id:last_menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(updatedMenu => {
-            let promiseArr = [];
-            let newList = [];
-            let p1 = this.baseUpdate({active_ind:status},{where:{menu_id:last_menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t});
-            promiseArr.push(p1);
-            attrs.forEach(item => {
-                item.menu_id = new_menu_id;
-                newList.push(item);
+        let promiseArr = [];
+        // check include_item is exits or not
+        attrs.forEach(item => {
+            item.active_ind = activeIndStatus.ACTIVE;
+            let p = this.getItemInclude(last_menu_id,item.include_item_id,t).then(includeItem => {
+                if (includeItem) {
+
+                    return this.baseUpdate(item,{where:{menu_id:last_menu_id,include_item_id:item.include_item_id},transaction:t})
+                } else {
+                    item.menu_id = last_menu_id;
+                    return this.baseCreate(item,{transaction:t});
+                }
             })
-            promiseArr.push(this.baseCreateBatch(newList,{transaction:t}));
-            return Promise.all(promiseArr);
+            promiseArr.push(p);
         })
+        return Promise.all(promiseArr);
     }
 
 }

@@ -33,24 +33,18 @@ class MenuChefNoteService extends BaseService{
 
     updateDirectly(status, last_menu_id, new_menu_id, attrs, t){
 
-       return chefMenuService.baseUpdate({active_ind:activeIndStatus.REPLACE,public_ind:0},{where:{menu_id:last_menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(updatedMenu => {
-            let promiseArr = [];
-            let newList = [];
-            let p1 = this.baseUpdate({active_ind:status},{where:{menu_id:last_menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t});
-            promiseArr.push(p1);
+        let promiseArr = [];
+        let newList = [];
+        let p1 = this.baseUpdate({active_ind:status},{where:{menu_id:last_menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(updateCnt => {
             console.log("attrs ==========>",attrs)
             attrs.forEach((item,index) => {
-                item.menu_id = new_menu_id;
-                let p = this.nextId('menu_chef_note_id',{transaction:t}).then(nextId => {
-                    item.menu_chef_note_id = nextId + index;
-                    return this.baseCreate(item,{transaction:t})
-                })
-                promiseArr.push(p);
-               // promiseArr.push(this.baseCreateBatch(newList,{transaction:t}));
+                item.menu_id = last_menu_id;
+                newList.push(item);
             })
-
-            return Promise.all(promiseArr);
-        })
+            return this.baseCreateBatch(newList,{transaction:t})
+        });
+        promiseArr.push(p1);
+        return Promise.all(promiseArr);
     }
 
 }

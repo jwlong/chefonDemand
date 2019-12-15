@@ -51,6 +51,7 @@ class MenuItemOptionService extends BaseService{
                 let p = this.nextId('seq_no',{transaction:t}).then(nextSeq => {
                     o.menu_item_id = menuItem.menu_item_id;
                     o.seq_no = nextSeq;
+                    o.option_id = null; //
                     return this.baseCreate(o,{transaction:t})
                 })
                 promiseArr.push(p);

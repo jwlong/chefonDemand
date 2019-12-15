@@ -100,9 +100,11 @@ class ChefMenuService extends BaseService{
                             if (orderList && orderList.length > 0) {
                                 // clone menu
                                attrs.chef_id = chefMenu.chef_id;
+                               let oldMenuId = chefMenu.menu_id;
+                               attrs.menu_code = chefMenu.chef_id+moment().format('YYYYMMDDHHmmSSSS')
                                attrs.instant_ind = true;
                                attrs.menu_id = null;
-                               attrs.parent_menu_id = chefMenu.menu_id;
+                               attrs.parent_menu_id = oldMenuId
                                return this.baseCreate(attrs,{transaction:t}).then(resp => {
                                     // copy menu_item
                                     let promiseArr = [];
@@ -110,6 +112,8 @@ class ChefMenuService extends BaseService{
                                     promiseArr.push(orderService.updateMenuIdWithNewMenuId(chefMenu.menu_id,resp.menu_id,t));
                                     attrs.menu_item_list.forEach(value => {
                                         value.menu_id = resp.menu_id;
+                                        // insert new menu_id
+                                        value.menu_item_id = null;
                                        promiseArr.push(menuItemService.baseCreate(value,{transaction:t}).then(item => {
                                             return menuItemOptionService.batchInsert(item,t);
                                         }))
@@ -469,9 +473,9 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
             list.forEach(single => {
                 let  copyObj = single.toJSON();
                 copyObj.menu_id = new_menu_id;
+                copyObj.parent_menu_id = last_menu_id; // for t_menu_include
                 //如果设置处自增key的情况
                 if (autoIncrementKey) {
-                    debugger
                     copyObj[autoIncrementKey] = null;
                 }
                 copyList.push(copyObj);
@@ -681,9 +685,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
 
                         return this.publicMenuHandler(chefMenu.toJSON(),kitchenReqService,attrs,t,cloneExcludes,dataMap);
                     }else {
-                        return this.baseUpdate({active_ind:activeIndStatus.REPLACE,public_ind:0},{where:{},transaction:t}).then(updatedMenu => {
-                            return kitchenReqService.updateDirectly(activeIndStatus.DELETE,menu_id,menu_id,attrs.kitchen_req_items,t)
-                        })
+                        return kitchenReqService.updateDirectly(activeIndStatus.DELETE,menu_id,menu_id,attrs.kitchen_req_items,t)
                     }
                 }else {
                     throw baseResult.MENU_ID_NOT_EXIST;

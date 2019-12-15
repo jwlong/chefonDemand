@@ -22,18 +22,17 @@ class MenuBookingRuleService extends BaseService{
     }
 
     updateDirectly(status, last_menu_id, new_menu_id, attrs, t) {
-        return chefMenuService.baseUpdate({active_ind:activeIndStatus.REPLACE,public_ind:0},{where:{menu_id:last_menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(updatedMenu => {
-            let promiseArr = [];
-            let newList = [];
-            let p1 = this.baseUpdate({active_ind:status},{where:{menu_id:last_menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t});
-            promiseArr.push(p1);
+        let promiseArr = [];
+        let newList = [];
+        let p1 = this.baseUpdate({active_ind:status},{where:{menu_id:last_menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(resp => {
             attrs.forEach(item => {
-                item.menu_id = new_menu_id;
+                item.menu_id = last_menu_id;
                 newList.push(item);
             })
-            promiseArr.push(this.baseCreateBatch(newList,{transaction:t}));
-            return Promise.all(promiseArr);
-        })
+            return this.baseCreateBatch(newList,{transaction:t});
+        });
+        promiseArr.push(p1);
+        return Promise.all(promiseArr);
     }
 }
 module.exports = new MenuBookingRuleService()
