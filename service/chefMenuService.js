@@ -58,7 +58,8 @@ class ChefMenuService extends BaseService{
     updateMenuByChefIdDirectly(chef_id,menu_id,attrs,t) {
         console.log("start to update menu by chef id",attrs);
         let promiseArr = [];
-        // 删除之前已经存在的记录
+        attrs.active_ind = activeIndStatus.REPLACE;
+        // 直接修改chef menu
         let part1 =  this.baseUpdate(attrs,{where:{menu_id:menu_id,chef_id:chef_id},transaction:t});
         promiseArr.push(part1);
         let part2 = menuItemService.batchUpdateStatus(menu_id,activeIndStatus.DELETE,t).then(updatdItemList => {
@@ -101,13 +102,14 @@ class ChefMenuService extends BaseService{
                                attrs.chef_id = chefMenu.chef_id;
                                attrs.instant_ind = true;
                                attrs.menu_id = null;
+                               attrs.parent_menu_id = chefMenu.menu_id;
                                return this.baseCreate(attrs,{transaction:t}).then(resp => {
                                     // copy menu_item
                                     let promiseArr = [];
                                     console.log("update order menu_id:%s to new menu_id:%s",chefMenu.menu_id,resp.menu_id)
                                     promiseArr.push(orderService.updateMenuIdWithNewMenuId(chefMenu.menu_id,resp.menu_id,t));
                                     attrs.menu_item_list.forEach(value => {
-                                        value.menu_id = menu_id;
+                                        value.menu_id = resp.menu_id;
                                        promiseArr.push(menuItemService.baseCreate(value,{transaction:t}).then(item => {
                                             return menuItemOptionService.batchInsert(item,t);
                                         }))
@@ -115,6 +117,8 @@ class ChefMenuService extends BaseService{
                                    let p = this.baseUpdate({active_ind:activeIndStatus.REPLACE,public_ind:0},{where:{menu_id:menu_id,chef_id:chef_id},transaction:t}).then(updateCnt => {
                                       return messageService.insertMessageByOrderList(orderList,attrs,t);
                                    })
+
+                                    promiseArr.push(this.oldMenuReferenceHandler(chefMenu.menu_id,t));
                                     promiseArr.push(p);
                                     return Promise.all(promiseArr);
                                 })
@@ -748,11 +752,32 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
     }
 
 
-    menuUpdatedAttrProcessor(attrs,updateAttr) {
+    menuUpdatedAttrProcessor(attrs, updateAttr) {
         if (!updateAttr) {
             updateAttr = {};
         }
-        if (attrs.applied_meal)  {
+
+        if (attrs.menu_name) {
+            updateAttr.menu_name = attrs.menu_name;
+        }
+
+        if (attrs.menu_code) {
+            updateAttr.menu_code = attrs.menu_code;
+        }
+
+        if (attrs.menu_desc) {
+            updateAttr.menu_desc = attrs.menu_desc;
+        }
+        if (attrs.hasOwnProperty('public_ind')) {
+            updateAttr.public_ind = attrs.public_ind;
+        }
+        if (attrs.unit_price) {
+            updateAttr.unit_price = attrs.unit_price;
+        }
+        if (attrs.seq_no) {
+            updateAttr.seq_no = attrs.seq_no;
+        }
+        if (attrs.applied_meal) {
             updateAttr.applied_meal = attrs.applied_meal;
         }
         if (attrs.min_pers) {
@@ -764,10 +789,10 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
         if (attrs.event_duration_hr) {
             updateAttr.event_duration_hr = attrs.event_duration_hr;
         }
-        if (attrs.chef_arrive_prior_hr)  {
+        if (attrs.chef_arrive_prior_hr) {
             updateAttr.chef_arrive_prior_hr = attrs.chef_arrive_prior_hr;
         }
-        if (attrs.child_menu_note)  {
+        if (attrs.child_menu_note) {
             updateAttr.child_menu_note = attrs.child_menu_note;
         }
         if (attrs.about) {
@@ -776,6 +801,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
         if (attrs.cancel_policy) {
             updateAttr.cancel_policy = attrs.cancel_policy;
         }
+
         return updateAttr;
     }
     /**
