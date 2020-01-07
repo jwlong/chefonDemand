@@ -103,9 +103,11 @@ class ChefMenuService extends BaseService{
                         return orderService.getModel().findAll({where:{menu_id:menu_id,active_ind:activeIndStatus.ACTIVE,event_date:{[Op.gt]:moment()}},transaction:t}).then(orderList => {
                             if (orderList && orderList.length > 0) {
                                 // clone menu
+
                                attrs.chef_id = chefMenu.chef_id;
                                let oldMenuId = chefMenu.menu_id;
-                               attrs.menu_code = chefMenu.chef_id+moment().format('YYYYMMDDHHmmSSSS')
+                               //attrs.menu_code = chefMenu.chef_id+moment().format('YYYYMMDDHHmmSSSS')
+                               attrs.menu_code = chefMenu.menu_code;
                                attrs.instant_ind = true;
                                attrs.menu_id = null;
                                attrs.parent_menu_id = oldMenuId
