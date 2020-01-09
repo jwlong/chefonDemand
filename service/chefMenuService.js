@@ -121,6 +121,7 @@ class ChefMenuService extends BaseService{
                                         // insert new menu_id
                                         value.menu_item_id = null;
                                        promiseArr.push(menuItemService.baseCreate(value,{transaction:t}).then(item => {
+                                           item.menu_item_option_list = value.menu_item_option_list;
                                             return menuItemOptionService.batchInsert(item,t);
                                         }))
                                     })
@@ -128,7 +129,7 @@ class ChefMenuService extends BaseService{
                                       return messageService.insertMessageByOrderList(orderList,attrs,t);
                                    })
 
-                                    promiseArr.push(this.oldMenuReferenceHandler(chefMenu.menu_id,t));
+                                    promiseArr.push(this.oldMenuReferenceHandler(chefMenu.menu_id,null,t));
                                     promiseArr.push(p);
                                     return Promise.all(promiseArr);
                                 })
@@ -608,11 +609,11 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
                         resp => {
                             attrs.menu_code = oldMenuCode; // 变性前的menu_code;
                             return messageService.insertMessageByOrderList(orderList, attrs, t).then(
-                                /*msgList => {
+                                msgList => {
                                     // old menu handler
                                     console.log("old menu ========>", oldMenuId);
-                                    return this.oldMenuReferenceHandler(oldMenuId, t);
-                                }*/
+                                    return this.oldMenuReferenceHandler(oldMenuId, cloneExlcudes,t);
+                                }
                             );
 
                         }
@@ -620,25 +621,44 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
                     )
                 })
             }else {
-                return noOrderService.updateDirectly(activeIndStatus.DELETE, chefMenu.menu_id, null, attrs, t);
+                return noOrderService.updateDirectly(activeIndStatus.DELETE, chefMenu.menu_id, chefMenu.menu_id, attrs, t);
             }
         })
     }
 
-    oldMenuReferenceHandler(menu_id,t) {
+    oldMenuReferenceHandler(menu_id,replaceExempt,t) {
+            if (!replaceExempt) {
+                replaceExempt = [];
+            }
             // update
             // (t_menu_item, t_menu_item_option, t_menu_cuisine, t_menu_kitchen_req, t_menu_include, t_menu_chef_note, t_menu_booking_rule, t_menu_booking_requirement, t_menu_extra_charge, t_menu_photo).
             let promiseArr = [];
             promiseArr.push(this.replace(menuItemService, menu_id, t));
+
             promiseArr.push(menuItemOptionService.updateStatusByMenuId(menu_id, activeIndStatus.REPLACE, t));
+
+            if (replaceExempt.indexOf(cloneExclude.kitchenReq) === -1) {
+                promiseArr.push(this.replace(kitchenReqService, menu_id, t));
+            }
             promiseArr.push(this.replace(menuCuisineService, menu_id, t));
-            promiseArr.push(this.replace(kitchenReqService, menu_id, t));
-            promiseArr.push(this.replace(menuIncludeService, menu_id, t));
-            promiseArr.push(this.replace(menuChefNoteService, menu_id, t));
-            promiseArr.push(this.replace(menuBookingRuleService, menu_id, t));
-            promiseArr.push(this.replace(menuBookingRequirementService, menu_id, t));
-            promiseArr.push(this.replace(menuExtraChargeService, menu_id, t));
-            promiseArr.push(this.replace(menuPhotoService, menu_id, t));
+            if (replaceExempt.indexOf(cloneExclude.menuInclude) === -1) {
+                promiseArr.push(this.replace(menuIncludeService, menu_id, t));
+            }
+            if (replaceExempt.indexOf(cloneExclude.menuChefNote) == -1) {
+                promiseArr.push(this.replace(menuChefNoteService, menu_id, t));
+            }
+            if (replaceExempt.indexOf(cloneExclude.menuBookingRule) == -1) {
+                promiseArr.push(this.replace(menuBookingRuleService, menu_id, t));
+            }
+            if (replaceExempt.indexOf(cloneExclude.menuBookingRequirement) == -1) {
+                promiseArr.push(this.replace(menuBookingRequirementService, menu_id, t));
+            }
+            if (replaceExempt.indexOf(cloneExclude.menuExtraCharge) == -1) {
+                promiseArr.push(this.replace(menuExtraChargeService, menu_id, t));
+            }
+            if (replaceExempt.indexOf(cloneExclude.menuPhoto) == -1) {
+                promiseArr.push(this.replace(menuPhotoService, menu_id, t));
+            }
             return Promise.all(promiseArr);
     }
 
@@ -706,7 +726,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
                         dataMap.set(cloneExclude.menuChefNote,attrs.menu_chef_note_list);
                         return this.publicMenuHandler(chefMenu.toJSON(),menuChefNoteService,attrs,t,cloneExcludes,dataMap);
                     }else {
-                        return menuChefNoteService.updateDirectly(activeIndStatus.DELETE,menu_id,null,attrs.menu_chef_note_list,t);
+                        return menuChefNoteService.updateDirectly(activeIndStatus.DELETE,menu_id,menu_id,attrs.menu_chef_note_list,t);
                     }
                 }else {
                     throw baseResult.MENU_ID_NOT_EXIST;
@@ -728,7 +748,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
                         dataMap.set(cloneExclude.menuInclude,attrs.include_items);
                         return this.publicMenuHandler(chefMenu.toJSON(),menuIncludeService,attrs,t,cloneExcludes,dataMap);
                     }else {
-                        return menuIncludeService.updateDirectly(activeIndStatus.DELETE,menu_id,null,attrs.include_items,t);;
+                        return menuIncludeService.updateDirectly(activeIndStatus.DELETE,menu_id,menu_id,attrs.include_items,t);;
                     }
                 }else {
                     throw baseResult.MENU_ID_NOT_EXIST;

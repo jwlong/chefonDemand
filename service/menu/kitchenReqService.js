@@ -50,14 +50,22 @@ class KitchenReqService extends BaseService{
         console.log("updateMenuIncludeItemsDirectly...")
         let promiseArr = [];
         let newList = [];
-        let p1 = this.baseUpdate({active_ind:status},{where:{menu_id:last_menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t});
+        let p1 = null;
+        if (activeIndStatus.REPLACE === status ) {
+            p1 = this.baseUpdate({active_ind:status},{where:{menu_id:last_menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t});
+
+        }else if (activeIndStatus.DELETE === status) {
+            p1 = this.baseDelete({menu_id:last_menu_id},{transaction:t});
+        }
         promiseArr.push(p1);
-        attrs.forEach(kitchenReq => {
-            kitchenReq.menu_id = new_menu_id;
-            newList.push(kitchenReq);
+        return Promise.all(promiseArr).then(resp => {
+            attrs.forEach(kitchenReq => {
+                kitchenReq.menu_id = new_menu_id;
+                kitchenReq.active_ind = activeIndStatus.ACTIVE;
+                newList.push(kitchenReq);
+            })
+          return this.baseCreateBatch(newList,{transaction:t});
         })
-        promiseArr.push(this.baseCreateBatch(newList,{transaction:t}));
-        return Promise.all(promiseArr);
 
     }
 

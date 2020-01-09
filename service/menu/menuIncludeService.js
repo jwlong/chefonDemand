@@ -26,21 +26,24 @@ class MenuIncludeService extends BaseService{
     updateDirectly(status, last_menu_id, new_menu_id, attrs, t) {
         console.log("updateMenuIncludeItemsDirectly...")
         let promiseArr = [];
-        // check include_item is exits or not
-        attrs.forEach(item => {
-            item.active_ind = activeIndStatus.ACTIVE;
-            let p = this.getItemInclude(last_menu_id,item.include_item_id,t).then(includeItem => {
-                if (includeItem) {
+        let newList = [];
+        let p1 = null;
+        if (activeIndStatus.REPLACE === status ) {
+            p1 = this.baseUpdate({active_ind:status},{where:{menu_id:last_menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t});
 
-                    return this.baseUpdate(item,{where:{menu_id:last_menu_id,include_item_id:item.include_item_id},transaction:t})
-                } else {
-                    item.menu_id = last_menu_id;
-                    return this.baseCreate(item,{transaction:t});
-                }
+        }else if (activeIndStatus.DELETE === status) {
+            p1 = this.baseDelete({menu_id:last_menu_id},{transaction:t});
+        }
+        promiseArr.push(p1);
+        return Promise.all(promiseArr).then(resp => {
+            attrs.forEach(menuInclude => {
+                menuInclude.menu_id = new_menu_id;
+                menuInclude.parent_menu_id = last_menu_id;
+                menuInclude.active_ind = activeIndStatus.ACTIVE;
+                newList.push(menuInclude);
             })
-            promiseArr.push(p);
+            return this.baseCreateBatch(newList,{transaction:t});
         })
-        return Promise.all(promiseArr);
     }
 
 }
