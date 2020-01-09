@@ -1040,19 +1040,20 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
     }
     dateTimeDiff() {
         //case 1
-        let criteria = ` m.start_date >= :start_date and m.end_date <=:end_date `;
+        let criteria = ` ( m.start_date >= :start_date and m.end_date <=:end_date `;
         // case 2
-        criteria += ` and m.start_date<=:end_date `;
+        criteria += ` or (m.start_date<=:end_date) `;
         // case 3
-        criteria += ` and m.end_date >= :start_date `;
+        criteria += ` or (m.end_date >= :start_date) `;
         // case 4
-        criteria += 'and m.start_date <=:start_date and m.end_date >=:end_date  ';
+        criteria += 'and (m.start_date <=:start_date and m.end_date >=:end_date) )  ';
         return criteria;
     }
     findMenuByFilters(query) {
         let countSql = `select count(distinct m.menu_id) total`;
-        let querySql = ` select tc.chef_id,m.menu_id,
-          t_user.photo_url chef_photo_url,m.menu_logo_url,t_user.user_id,
+        let querySql = ` select tc.chef_id,m.menu_id,m.menu_name,m.menu_desc,u.first_name,u.last_name,u.middle_name,
+          m.min_pers,m.max_pers,m.unit_price,
+          u.photo_url chef_photo_url,m.menu_logo_url,u.user_id,
           count(rating.user_id) num_of_review,
           avg(overall_rating) menu_rating `;
         let sql = ` from t_chef_menu m
@@ -1060,7 +1061,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
           left join t_chef_language lang on lang.chef_id = m.chef_id and lang.active_ind ='A'
           left join t_chef_cuisine cuisine  on cuisine.chef_id = m.chef_id and  cuisine.active_ind ='A'
           left join t_chef_service_location location  on location.chef_id = m.chef_id and location.active_ind ='A'
-          left join t_user on tc.user_id = t_user.user_id and t_user.active_ind = 'A'
+          left join t_user u on tc.user_id = u.user_id and u.active_ind = 'A'
           left join t_order o on o.menu_id = m.menu_id and  o.active_ind = 'A'
           left join t_user_rating rating on o.order_id = rating.order_id and rating.active_ind ='A'  
           where `+this.dateTimeDiff()+` and
