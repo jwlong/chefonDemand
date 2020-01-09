@@ -224,17 +224,12 @@ class ChefMenuService extends BaseService{
      "unit_price": 0,
      * @param chef_id
      */
-    getMenuListByChefId(chef_id) {
-       /* return this.baseFindByFilter(['chef_id', 'menu_id', 'menu_name', 'menu_code', 'public_ind', 'seq_no', 'min_pers', 'max_pers', 'menu_logo_url', 'unit_price'], {
-            chef_id: chef_id,
-            active_ind: activeIndStatus.ACTIVE
-        });
-*/
+    getMenuListByChefId(attrs) {
        let sql = `select m.chef_id, m.menu_desc,m.menu_id, m.menu_name, m.menu_code, m.public_ind, m.seq_no, m.min_pers, m.max_pers, m.menu_logo_url, m.unit_price,avg(rating.overall_rating) menu_rating ,count(rating.rating_id) num_of_review,min(m.unit_price) min_unit_price from chefondemand.t_chef_menu m left join chefondemand.t_order o on o.menu_id = m.menu_id and o.active_ind = 'A'
 left join chefondemand.t_user_rating rating on o.order_id = rating.order_id and m.active_ind = 'A'
-where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
-        return db.query(sql,{replacements:{chef_id:chef_id},type:db.QueryTypes.SELECT}).then(result => {
-            return  locationService.baseFindByFilter(['district_code'],{chef_id:chef_id}).then(districtList => {
+where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIndArr) group by m.menu_id`;
+        return db.query(sql,{replacements:attrs,type:db.QueryTypes.SELECT}).then(result => {
+            return  locationService.baseFindByFilter(['district_code'],{chef_id:attrs.chef_id}).then(districtList => {
                 let menuList = {};
                 if (result) {
                     result.forEach(singleMenu => {
@@ -424,27 +419,27 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
                                 // copy t_menu_kitchen_req
                                 otherPromiseArr.push(this.copy(kitchenReqService,last_menu_id,new_menu_id,null,t));
                             }else{
-                                otherPromiseArr.push(kitchenReqService.updateDirectly(activeIndStatus.DELETE,last_menu_id,new_menu_id,dataMapByNotCloneTypes.get(cloneExclude.kitchenReq),t));
+                                otherPromiseArr.push(kitchenReqService.updateDirectly(activeIndStatus.REPLACE,last_menu_id,new_menu_id,dataMapByNotCloneTypes.get(cloneExclude.kitchenReq),t));
                             }
 
                             if (notCloneTypes.indexOf(cloneExclude.menuInclude) == -1) {
                                 // copy t_menu_include
                                 otherPromiseArr.push(this.copy(menuIncludeService,last_menu_id,new_menu_id,null,t));
                             }else {
-                                otherPromiseArr.push(menuIncludeService.updateDirectly(activeIndStatus.DELETE,last_menu_id,new_menu_id,dataMapByNotCloneTypes.get(cloneExclude.menuInclude),t))
+                                otherPromiseArr.push(menuIncludeService.updateDirectly(activeIndStatus.REPLACE,last_menu_id,new_menu_id,dataMapByNotCloneTypes.get(cloneExclude.menuInclude),t))
                             }
                             if (notCloneTypes.indexOf(cloneExclude.menuChefNote) == -1) {
                                 // copy t_menu_chef_note
                                 otherPromiseArr.push(this.copy(menuChefNoteService,last_menu_id,new_menu_id,'menu_chef_note_id',t));
                             }else {
                                 console.log("when copy t_menu_chef_note,new menu_id",new_menu_id);
-                                otherPromiseArr.push(menuChefNoteService.updateDirectly(activeIndStatus.DELETE,last_menu_id,new_menu_id,dataMapByNotCloneTypes.get(cloneExclude.menuChefNote),t,false))
+                                otherPromiseArr.push(menuChefNoteService.updateDirectly(activeIndStatus.REPLACE,last_menu_id,new_menu_id,dataMapByNotCloneTypes.get(cloneExclude.menuChefNote),t,false))
                             }
                             if (notCloneTypes.indexOf(cloneExclude.menuBookingRule) == -1) {
                                 //copy t_menu_booking_rule
                                 otherPromiseArr.push(this.copy(menuBookingRuleService,last_menu_id,new_menu_id,'booking_rule_id',t));
                             }else {
-                                otherPromiseArr.push(menuBookingRuleService.updateDirectly(activeIndStatus.DELETE,last_menu_id,new_menu_id,dataMapByNotCloneTypes.get(cloneExclude.menuBookingRule),t))
+                                otherPromiseArr.push(menuBookingRuleService.updateDirectly(activeIndStatus.REPLACE,last_menu_id,new_menu_id,dataMapByNotCloneTypes.get(cloneExclude.menuBookingRule),t))
                             }
                             if (notCloneTypes.indexOf(cloneExclude.menuBookingRequirement) == -1) {
                                 //copy t_menu_booking_requirement
@@ -510,7 +505,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
             left join t_chef_service_location location  on location.chef_id = m.chef_id and location.active_ind ='A'
             left join t_order o on o.menu_id = m.menu_id and o.active_ind = 'A'
             left join t_user_rating rating  on rating.order_id = o.order_id
-            where m.start_date >= :startDate and m.end_date >= :startDate and m.end_date <=:endDate
+            where `+this.dateTimeDiff+`
             and m.active_ind = 'A'
             and m.applied_meal = :mealType
             and lang.lang_code in (:langCodeList)
@@ -520,7 +515,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
         let limitSql = ` order by menu_rating desc limit :startIndex , :pageSize`;
         let queryTotalSql = preSql + totalSql + sql;
         let filterSql = preSql + querySql + sql +limitSql;
-        let replacements = {mealType:query.meal_type,langCodeList:query.langCodes,typeIds:query.cuisineTypeIds,districtCodes:query.districtCodes,startDate:query.start_date,endDate:query.end_date};
+        let replacements = {mealType:query.meal_type,langCodeList:query.langCodes,typeIds:query.cuisineTypeIds,districtCodes:query.districtCodes,start_date:query.start_date,end_date:query.end_date};
 
         return db.query(queryTotalSql,{replacements:replacements,type:db.QueryTypes.SELECT}).then(totalRecord => {
             let result = {};
@@ -535,7 +530,6 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
                 if (list) {
                     let promiseArr = [];
                     list.forEach(item => {
-                        debugger
                         if (!item.menu_logo_url) {
                             promiseArr.push(this.getLastestMenuLogoByChefId(item.chef_id).then(lastestMenu => {
                                 console.log("lastestMenu=> ",lastestMenu)
@@ -614,11 +608,11 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
                         resp => {
                             attrs.menu_code = oldMenuCode; // 变性前的menu_code;
                             return messageService.insertMessageByOrderList(orderList, attrs, t).then(
-                                msgList => {
+                                /*msgList => {
                                     // old menu handler
                                     console.log("old menu ========>", oldMenuId);
                                     return this.oldMenuReferenceHandler(oldMenuId, t);
-                                }
+                                }*/
                             );
 
                         }
@@ -626,7 +620,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
                     )
                 })
             }else {
-                return noOrderService.updateDirectly(activeIndStatus.DELETE, last_menu_id, null, attrs, t);
+                return noOrderService.updateDirectly(activeIndStatus.DELETE, chefMenu.menu_id, null, attrs, t);
             }
         })
     }
@@ -1024,7 +1018,17 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
         );
 
     }
-
+    dateTimeDiff() {
+        //case 1
+        let criteria = ` m.start_date >= :start_date and m.end_date <=:end_date `;
+        // case 2
+        criteria += ` and m.start_date<=:end_date `;
+        // case 3
+        criteria += ` and m.end_date >= :start_date `;
+        // case 4
+        criteria += 'and m.start_date <=:start_date and m.end_date >=:end_date  ';
+        return criteria;
+    }
     findMenuByFilters(query) {
         let countSql = `select count(distinct m.menu_id) total`;
         let querySql = ` select tc.chef_id,m.menu_id,
@@ -1039,7 +1043,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id group by m.menu_id`;
           left join t_user on tc.user_id = t_user.user_id and t_user.active_ind = 'A'
           left join t_order o on o.menu_id = m.menu_id and  o.active_ind = 'A'
           left join t_user_rating rating on o.order_id = rating.order_id and rating.active_ind ='A'  
-          where m.start_date >= :start_date and m.end_date >= :start_date and m.end_date <=:end_date  and
+          where `+this.dateTimeDiff()+` and
           m.active_ind = 'A' and applied_meal=:meal_type
            and m.applied_meal = :meal_type
             and lang.lang_code in (:langCodes)

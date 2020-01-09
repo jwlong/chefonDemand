@@ -43,42 +43,22 @@ class KitchenReqService extends BaseService{
         })
     }
     getKitchenReq(menuId,kitchenReqId,t) {
-        return this.getOne({where:{menu_id:menuId,kitchen_req_item_id:kitchenReqId},transaction:t})
+        return this.getOne({where:{menu_id:menuId,kitchen_req_item_id:kitchenReqId,active_ind:activeIndStatus.ACTIVE},transaction:t})
 
     }
     updateDirectly(status,last_menu_id, new_menu_id,attrs, t) {
         console.log("updateMenuIncludeItemsDirectly...")
         let promiseArr = [];
-        // check include_item is exits or not
+        let newList = [];
+        let p1 = this.baseUpdate({active_ind:status},{where:{menu_id:last_menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t});
+        promiseArr.push(p1);
         attrs.forEach(kitchenReq => {
-            kitchenReq.active_ind = activeIndStatus.ACTIVE;
-            let p = this.getKitchenReq(last_menu_id,kitchenReq.kitchen_req_item_id,t).then(reqItem => {
-                if (reqItem) {
-                    return this.baseUpdate(kitchenReq,{where:{menu_id:last_menu_id,kitchen_req_item_id:kitchenReq.kitchen_req_item_id},transaction:t})
-                } else {
-                    kitchenReq.menu_id = last_menu_id;
-                    return this.baseCreate(kitchenReq,{transaction:t});
-                }
-            })
-            promiseArr.push(p);
+            kitchenReq.menu_id = new_menu_id;
+            newList.push(kitchenReq);
         })
+        promiseArr.push(this.baseCreateBatch(newList,{transaction:t}));
         return Promise.all(promiseArr);
 
-
-
-
-
-  /*      let promiseArr = [];
-        let newList = [];
-        let p1 = this.baseUpdate({active_ind:status},{where:{menu_id:last_menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(resp=>{
-            attrs.forEach(kitchenReq => {
-                kitchenReq.menu_id = last_menu_id;
-                newList.push(kitchenReq);
-            })
-            return this.baseCreateBatch(newList,{transaction:t});
-        });
-        promiseArr.push(p1);
-        return Promise.all(promiseArr);*/
     }
 
 }
