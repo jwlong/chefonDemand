@@ -506,17 +506,14 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
             left join t_chef_service_location location  on location.chef_id = m.chef_id and location.active_ind ='A'
             left join t_order o on o.menu_id = m.menu_id and o.active_ind = 'A'
             left join t_user_rating rating  on rating.order_id = o.order_id
-            where `+this.dateTimeDiff+`
+            where `+this.dateTimeDiff(query)+`
             and m.active_ind = 'A'
-            and m.applied_meal = :mealType
-            and lang.lang_code in (:langCodeList)
-            and cuisine.cuisine_type_id in (:typeIds)
-            and location.district_code in (:districtCodes)
+            `+this.filterCriteriaAppend(query)+`
             group by m.chef_id,m.menu_id`;
         let limitSql = ` order by menu_rating desc limit :startIndex , :pageSize`;
         let queryTotalSql = preSql + totalSql + sql;
         let filterSql = preSql + querySql + sql +limitSql;
-        let replacements = {mealType:query.meal_type,langCodeList:query.langCodes,typeIds:query.cuisineTypeIds,districtCodes:query.districtCodes,start_date:query.start_date,end_date:query.end_date};
+        let replacements = {meal_type:query.meal_type,langCodes:query.langCodes,cuisineTypeIds:query.cuisineTypeIds,districtCodes:query.districtCodes,start_date:query.start_date,end_date:query.end_date};
 
         return db.query(queryTotalSql,{replacements:replacements,type:db.QueryTypes.SELECT}).then(totalRecord => {
             let result = {};
@@ -527,7 +524,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
                 result.total_pages = 0;
             }
             result.page_no = query.page_no;
-            return db.query(filterSql,{replacements:{mealType:query.meal_type,langCodeList:query.langCodes,typeIds:query.cuisineTypeIds,districtCodes:query.districtCodes,startIndex:query.startIndex,pageSize:query.pageSize,startDate:query.start_date,endDate:query.end_date},type:db.QueryTypes.SELECT}).then(list=> {
+            return db.query(filterSql,{replacements:{meal_type:query.meal_type,langCodes:query.langCodes,cuisineTypeIds:query.cuisineTypeIds,districtCodes:query.districtCodes,startIndex:query.startIndex,pageSize:query.pageSize,start_date:query.start_date,end_date:query.end_date},type:db.QueryTypes.SELECT}).then(list=> {
                 if (list) {
                     let promiseArr = [];
                     list.forEach(item => {
@@ -1038,17 +1035,48 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
         );
 
     }
-    dateTimeDiff() {
-        //case 1
-        let criteria = ` ( m.start_date >= :start_date and m.end_date <=:end_date `;
-        // case 2
-        criteria += ` or (m.start_date<=:end_date) `;
-        // case 3
-        criteria += ` or (m.end_date >= :start_date) `;
-        // case 4
-        criteria += 'and (m.start_date <=:start_date and m.end_date >=:end_date) )  ';
+    dateTimeDiff(query) {
+        let criteria = '';
+        if (query.start_date && query.end_date) {
+            //case 1
+             criteria = ` ( m.start_date >= :start_date and m.end_date <=:end_date `;
+            // case 2
+            criteria += ` or (m.start_date<=:end_date) `;
+            // case 3
+            criteria += ` or (m.end_date >= :start_date) `;
+            // case 4
+            criteria += ' or (m.start_date <=:start_date and m.end_date >=:end_date) )  ';
+
+        }else if (query.start_date) {
+            // first over all test  updated
+            criteria =  `(m.start_date >=:start_date `;
+            // case 3;
+            criteria += `or (m.end_date >= :start_date)  )`;
+
+        }else if(query.end_date) {
+            criteria = `( m.end_date >= sysdate() `;
+            criteria +=  ` or (m.start_date <=:end_date and m.end_date >=:end_date ) ) `;
+        }
+        return criteria;
+
+    }
+    filterCriteriaAppend(query) {
+        let criteria = '';
+        if (query.meal_type) {
+            criteria += ` and applied_meal=:meal_type `;
+        }
+        if (query.langCodes && query.langCodes.length > 0) {
+            criteria += ` and lang.lang_code in (:langCodes) `;
+        }
+        if (query.cuisineTypeIds && query.cuisineTypeIds.length > 0)  {
+            criteria += ` and cuisine.cuisine_type_id in (:cuisineTypeIds) `;
+        }
+        if (query.districtCodes && query.districtCodes.length > 0)  {
+            criteria += `  and location.district_code in (:districtCodes) `;
+        }
         return criteria;
     }
+
     findMenuByFilters(query) {
         let countSql = `select count(distinct m.menu_id) total`;
         let querySql = ` select tc.chef_id,m.menu_id,m.menu_name,m.menu_desc,u.first_name,u.last_name,u.middle_name,
@@ -1064,13 +1092,8 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
           left join t_user u on tc.user_id = u.user_id and u.active_ind = 'A'
           left join t_order o on o.menu_id = m.menu_id and  o.active_ind = 'A'
           left join t_user_rating rating on o.order_id = rating.order_id and rating.active_ind ='A'  
-          where `+this.dateTimeDiff()+` and
-          m.active_ind = 'A' and applied_meal=:meal_type
-           and m.applied_meal = :meal_type
-            and lang.lang_code in (:langCodes)
-            and cuisine.cuisine_type_id in (:cuisineTypeIds)
-            and location.district_code in (:districtCodes)
-        group by  m.menu_id `;
+          where `+this.dateTimeDiff(query)+` and
+          m.active_ind = 'A' `+this.filterCriteriaAppend(query)+` group by  m.menu_id `;
         let orderBySql = ' order by menu_rating desc limit :startIndex,:pageSize ';
         let totalSql = countSql + sql;
         let filterSql = querySql + sql + orderBySql;
