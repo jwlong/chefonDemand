@@ -107,7 +107,7 @@ export default  {
 
 
     MENU_START_DATE_ERROR:new baseResult(400,'start_date can not be earlier than today.'),
-    MENU_END_DATE_MUST_AFTER_START_DATE:new baseResult(401,'end_date must be => start_date.'),
+    MENU_END_DATE_MUST_AFTER_START_DATE:new baseResult(401,'end_date must be => start_date,and end_date must not be earlier than today. '),
     MENU_LANGUAGE_CODE_LIST_INVALID:new baseResult(402,'one of language code is invalid.'),
     MENU_CUISINE_TYPE_LIST_INVALID:new baseResult(403,'one of cuisine type code is invalid.'),
     MENU_DISTRICT_CODE_INVALID:new baseResult(404,'one of district code is invalid.'),
@@ -118,6 +118,8 @@ export default  {
 
     // order
     ORDER_USER_INVALID:new baseResult(999,'user_id is a not a valid active user, then he is not allow to place an order.'),
+    INVALID_ORDER_ID:new baseResult(400,'Invalid order ID'),
+
     ORDER_ONLY_ACTIVE_USER_CANCEL:new baseResult(402,'Only valid active user can cancel his order.'),
     ORDER_NOT_BELONG_USER:new baseResult(401,'Order does not belong to user.'),
     ORDER_USER_ONLY_ACTIVE_GUEST:new baseResult(402,'Only valid active user can enter guest list.'),

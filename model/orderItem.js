@@ -15,7 +15,6 @@ class OrderItem extends BaseModel {
             },
             order_guest_id: {
                 type: Sequelize.INTEGER(11),
-                allowNull: false
             },
             seq_no: {
                 type: Sequelize.INTEGER(11),

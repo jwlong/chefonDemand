@@ -9,11 +9,11 @@ class OrderItemService extends BaseService {
     constructor() {
         super(OrderItemService.model)
     }
-    addItemList(orderItemList,guest,t) {
+
+    addItemList(orderItemList, order_id, t) {
         let promiseArr = [];
         orderItemList.forEach( item => {
-            item.order_guest_id = guest.order_guest_id;
-            item.order_id = guest.order_id;
+            item.order_id = order_id;
             let itemOptions = item.order_item_option_list;
             delete  item.order_item_option_list;
            let p = this.baseCreate(item,{transaction:t}).then(insertedItem => {

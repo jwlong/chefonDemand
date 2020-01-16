@@ -28,21 +28,16 @@ class OrderService extends BaseService{
                     addOrder.accept_terms_ind = 0;
                 }
                 return this.baseCreate(addOrder,{transaction:t}).then(resp => {
-                    return orderGuestService.createGuestByCreateOrderRequest(createOrderRequest,resp.order_id,t).then(createdGuest => {
-                        //orderItemService.baseCreate()
-                        console.log("create guest list =>",createdGuest)
-                        return orderItemService.addItemList(orderItemList,createdGuest,t).then(
-                            result => {
-                                console.log("order ==> order_id:"+resp.order_id)
-                                return resp.order_id;
-                            }
-                        );
-
-                    })
+                    let newOrderId = resp.order_id;
+                    return orderItemService.addItemList(orderItemList, newOrderId, t).then(
+                        result => {
+                            console.log("order ==> order_id:"+resp.order_id)
+                            return resp.order_id;
+                        }
+                    );
                 })
 
             })
-
         })
     }
     createOrderAndGuestList(createOrderRequest) {
@@ -181,6 +176,15 @@ class OrderService extends BaseService{
 
     updateMenuIdWithNewMenuId(oldMenuId, new_menu_id,t) {
         return this.baseUpdate({menu_id:new_menu_id},{where:{menu_id:oldMenuId,active_ind:activeIndStatus.ACTIVE},transaction:t})
+    }
+
+    checkUpdateOrderGuestList(order_id, user_id) {
+        return this.getOne({where:{order_id:order_id,user_id:user_id,active_ind:activeIndStatus.ACTIVE}}).then(order => {
+            if (!order) {
+                throw baseResult.INVALID_ORDER_ID
+            }
+            return order;
+        })
     }
 }
 // module.exports = new OrderService()

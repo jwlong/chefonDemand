@@ -47,6 +47,8 @@ class OrderController {
                 if (!updateOrderGuestList || !updateOrderGuestList.order_id)  {
                     throw 'UpdateOrderGuestList is required!';
                 }
+                await orderService.checkUpdateOrderGuestList(updateOrderGuestList.order_id,user.user_id);
+
                 await orderGuestService.updateOrderGuestListByOrderId(updateOrderGuestList);
                 res.json(baseResult.SUCCESS)
             }catch (e){
