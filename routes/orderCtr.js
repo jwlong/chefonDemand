@@ -58,7 +58,6 @@ class OrderController {
         //func#57: /order/updateOrderGuestSelectionByOrderId
         router.post('/updateOrderGuestSelectionByOrderId',async(req,res,next) =>{
             try {
-                debugger
                 if (!req.user_id) {
                     throw baseResult.ORDER_SECTION_USER_ONLY_ACTIVE_GUEST;
                 }
