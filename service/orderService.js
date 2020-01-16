@@ -98,12 +98,13 @@ class OrderService extends BaseService{
     }
 
     getOrdersByUserId(attrs) {
-        let queryOrder = ` select o.order_id,o.event_date,o.total,o.order_status`;
-        let sql = ` from t_order o`;
+        let queryOrder = ` select o.order_id,o.event_date,o.total,o.order_status,u.user_name,u.first_name,o.num_of_guest `;
+        let sql = ` from t_order o `;
         if (attrs.chef_id) {
             sql += ` left join t_chef_menu menu on o.menu_id = menu.menu_id and menu.active_ind = 'A' `
         }
-        let whereSql = `where 1=1 `;
+        sql += ` left join t_user u on u.user_id = o.user_id and u.active_ind= 'A' `
+        let whereSql = ` where 1=1 `;
         let orderSql = ``;
         if (attrs.chef_id) {
             whereSql += ' and menu.chef_id = :chef_id ';
@@ -112,8 +113,8 @@ class OrderService extends BaseService{
         }else {
             whereSql += `and o.user_id=:user_id`
             orderSql = queryOrder + sql + whereSql;
-
         }
+
         return db.query(orderSql,{replacements:attrs,type:db.QueryTypes.SELECT}).then(orderList => {
             let result = {};
             result.order_list = orderList;
@@ -156,12 +157,12 @@ class OrderService extends BaseService{
         let last30Days = moment().subtract(30, 'days').format("YYYY-MM-DD HH:mm:ss");
         let monthBeginDate = moment().startOf('month').format("YYYY-MM-DD HH:mm:ss");
         let sql = `select
-            (case when o.create_on >:last30Days then count(distinct o.order_id) end) 30_days_bookings,
-            (case when view.viewed_on>:last30Days then count(distinct view.view_id) end) 30_days_views,
+            count(distinct case when o.create_on >:last30Days then  o.order_id end) 30_days_bookings,
+            count(distinct case when view.viewed_on>:last30Days then view.view_id end) 30_days_views,
             avg(rating.overall_rating) overall_rating,
             count(distinct rating.rating_id) num_of_review,
-            (case when o.create_on > :monthBeginDate then sum(o.total) end )month_to_day_earnings,
-            CONCAT (ROUND(case when  (count(distinct am.message_id) +3 /count(distinct tm.message_id)) >1 then 1 else
+            sum(distinct case when o.create_on > :monthBeginDate then  o.total end ) month_to_day_earnings,
+            CONCAT (ROUND(case when (count(distinct am.message_id) +3 /count(distinct tm.message_id)) >1 then 1 else
             (count(distinct am.message_id)+3 /count(distinct tm.message_id)) end)*100 ,'%') response_rate
             from t_order o
             left join t_chef_menu m on o.menu_id = m.menu_id and m.active_ind = 'A'
@@ -169,7 +170,7 @@ class OrderService extends BaseService{
             left join t_user_menu_view view on m.menu_id = view.menu_id and view.active_ind = 'A'
             left join t_message am on  am.to_user_id = o.user_id and am.active_ind = 'A'
             left join t_message tm on  tm.from_user_id = o.user_id and tm.active_ind = 'A'
-            where m.chef_id = :chef_id and o.active_ind = 'A' and o.order_status = 'C' ` ;
+            where m.chef_id = :chef_id and o.active_ind = 'A' and o.order_status = 'C' group by m.chef_id ` ;
         return db.query(sql,{replacements:{chef_id:chef_id,last30Days:last30Days,monthBeginDate:monthBeginDate},type:db.QueryTypes.SELECT});
 
     }

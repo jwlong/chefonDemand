@@ -15,7 +15,6 @@ class OrderItemOptionService extends BaseService {
                 let result = {};
                 result =  item.toJSON();
                 result.guest_order_item_option_list = options;
-                console.log("Guest options =============>",result);
                 return result;
             })
             promiseArr.push(p);

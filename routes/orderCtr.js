@@ -140,7 +140,9 @@ class OrderController {
                 if (chefUser) {
                     attrs.chef_id = chefUser.chef_id;
                 }
-                res.json(await orderService.getOrdersByUserId(attrs));
+                let result = {};
+                result.order_list = await orderService.getOrdersByUserId(attrs);
+                res.json(result);
             }catch (e) {
                 next(e);
             }
