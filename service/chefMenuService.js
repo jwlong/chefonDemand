@@ -957,12 +957,15 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
                 count(o.order_id) orderPlacedNum,
                 sum(rating.rating_id)      num_of_review`;
         let total_sql = `select count(DISTINCT m.menu_id) total `;
-        let sql =` FROM t_chef_menu m
+        let sql =` FROM t_chef_menu m  
                 LEFT JOIN t_order o ON o.menu_id = m.menu_id AND o.active_ind = 'A'
                 LEFT JOIN t_user_rating rating ON o.order_id = rating.order_id AND rating.active_ind = 'A'
-                WHERE m.public_ind IN (:publicIndArr) `
+                WHERE m.active_ind = 'A' and  m.public_ind IN (:publicIndArr) `
+        if (attrs.chef_id) {
+            sql += ` AND m.chef_id = :chef_id `
+        }
         if(attrs.byRecommend) {
-            sql += `AND m.chef_recommend_ind = 1`;
+            sql += ` AND m.chef_recommend_ind = 1 `;
         }
             sql += ` GROUP BY `;
 
@@ -975,7 +978,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
         let limit_sql = ` limit :startIdx , :pageSize `;
         let queryPageCount = total_sql + sql;
         let pageQuerySql = query_col_sql + sql +orderBySql+ limit_sql;
-        return db.query(queryPageCount,{replacements:{publicIndArr:attrs.publicIndArr},
+        return db.query(queryPageCount,{replacements:attrs,
             type:db.QueryTypes.SELECT}).then(totalCount => {
                 console.log("query totalCount:========>",totalCount)
             let total_pages;
@@ -984,7 +987,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
             }else {
                 total_pages = 0;
             }
-            return db.query(pageQuerySql,{replacements:{publicIndArr:attrs.publicIndArr,startIdx:attrs.startIdx,pageSize:attrs.pageSize},
+            return db.query(pageQuerySql,{replacements:attrs,
                 type:db.QueryTypes.SELECT}).then(
                 menuList => {
                     if (menuList) {
@@ -1003,8 +1006,8 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
           count(DISTINCT m.menu_id) menu_qty,
           count(DISTINCT section.menu_section_id) section_qty,
           count(DISTINCT food.food_item_id) dish_qty,
-          (CASE WHEN m.family_menu = 1 THEN count(DISTINCT menu_id) END) family_menu_qty,
-          (CASE WHEN m.work_menu = 1 THEN count(DISTINCT menu_id) END) work_menu_qty
+          count(DISTINCT CASE WHEN m.family_menu = 1 THEN  menu_id END) family_menu_qty,
+          count(DISTINCT CASE WHEN m.work_menu = 1 THEN menu_id END) work_menu_qty
         from t_chef_menu m
         LEFT JOIN t_food_item food on food.chef_id = m.chef_id AND food.active_ind ='A'
         LEFT JOIN t_menu_section section  on section.chef_id = m.chef_id AND  section.active_ind ='A'

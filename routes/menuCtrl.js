@@ -445,6 +445,13 @@ class MenuController {
                 if (!attrs.page_no) {
                     throw 'page_no is required!'
                 }
+                if (req.user_id) {
+                    let chef = await chefService.getChefByUserId(req.user_id);
+                    if (chef) {
+                        attrs.chef_id = chef.chef_id;
+                    }
+                }
+
                 let publicStatusArr = await chefMenuService.getPublicIndStatusArr(req.user_id);
                 attrs.pageSize = await userPrefService.getPageSize(req.user_id)
                 if (attrs.page_no <= 0) {
@@ -453,7 +460,8 @@ class MenuController {
                 attrs.startIdx = (attrs.page_no -1)*attrs.pageSize;
                 attrs.publicIndArr = publicStatusArr;
                 attrs.byRecommend = true;
-                console.log("func 52 attrs: =========>",attrs)
+                console.log("func 52 attrs: =========>",attrs);
+
                 res.json(await chefMenuService.getMenuListByChefsChoice(attrs));
             }catch (e){
                 next(e);
@@ -466,6 +474,14 @@ class MenuController {
                 if (!attrs.page_no) {
                     throw 'page_no is required!'
                 }
+                if (req.user_id) {
+
+                    let chef = await chefService.getChefByUserId(req.user_id);
+                    if (chef) {
+                        attrs.chef_id = chef.chef_id;
+                    }
+                }
+
                 let publicStatusArr = await chefMenuService.getPublicIndStatusArr(req.user_id);
                 attrs.pageSize = await userPrefService.getPageSize(req.user_id)
                 attrs.startIdx = (attrs.page_no -1)*attrs.pageSize;
@@ -482,6 +498,12 @@ class MenuController {
                 let attrs = req.headers;
                 if (!attrs.page_no) {
                     throw 'page_no is required!'
+                }
+                if (req.user_id) {
+                    let chef = await chefService.getChefByUserId(req.user_id);
+                    if (chef) {
+                        attrs.chef_id = chef.chef_id;
+                    }
                 }
                 let publicStatusArr = await chefMenuService.getPublicIndStatusArr(req.user_id);
                 attrs.pageSize = await userPrefService.getPageSize(req.user_id)
@@ -505,9 +527,6 @@ class MenuController {
                 next(e);
             }
         })
-
-
-
 
         return router;
 
