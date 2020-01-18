@@ -155,7 +155,11 @@ class OrderController {
                 if (!chefUser) {
                     throw baseResult.MENU_ONLY_CHEF_CAN_DO_THIS;
                 }
-                res.json(await  orderService.getOrderStatisticsByChefId(chefUser.chef_id));
+                let result = await  orderService.getOrderStatisticsByChefId(chefUser.chef_id);
+                if (result) {
+                    result.response_rate = await  orderService.getResponseRate(chefUser.chef_id);
+                }
+                res.json(result);
             }catch (e) {
                 next(e);
             }

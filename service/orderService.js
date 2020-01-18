@@ -153,7 +153,7 @@ class OrderService extends BaseService{
 
     }
 
-    getOrderStatisticsByChefId(chef_id) {
+    getOrderStatisticsByChefId(chef_id ) {
         let last30Days = moment().subtract(30, 'days').format("YYYY-MM-DD HH:mm:ss");
         let monthBeginDate = moment().startOf('month').format("YYYY-MM-DD HH:mm:ss");
         let sql = `select
@@ -161,17 +161,63 @@ class OrderService extends BaseService{
             count(distinct case when view.viewed_on>:last30Days then view.view_id end) 30_days_views,
             avg(rating.overall_rating) overall_rating,
             count(distinct rating.rating_id) num_of_review,
-            sum(distinct case when o.create_on > :monthBeginDate then  o.total end ) month_to_day_earnings,
-            CONCAT (ROUND(case when (count(distinct am.message_id) +3 /count(distinct tm.message_id)) >1 then 1 else
-            (count(distinct am.message_id)+3 /count(distinct tm.message_id)) end)*100 ,'%') response_rate
+            sum(distinct case when o.create_on > :monthBeginDate then  o.total end ) month_to_day_earnings
             from t_order o
             left join t_chef_menu m on o.menu_id = m.menu_id and m.active_ind = 'A'
+            left join t_chef chef on chef.chef_id = m.chef_id and chef.active_ind = 'A'
             left join t_user_rating rating on o.order_id = rating.order_id and rating.active_ind = 'A'
             left join t_user_menu_view view on m.menu_id = view.menu_id and view.active_ind = 'A'
-            left join t_message am on  am.to_user_id = o.user_id and am.active_ind = 'A'
-            left join t_message tm on  tm.from_user_id = o.user_id and tm.active_ind = 'A'
-            where m.chef_id = :chef_id and o.active_ind = 'A' and o.order_status = 'C' group by m.chef_id ` ;
-        return db.query(sql,{replacements:{chef_id:chef_id,last30Days:last30Days,monthBeginDate:monthBeginDate},type:db.QueryTypes.SELECT});
+            where m.chef_id = :chef_id and o.active_ind = 'A'  and o.order_status = 'C' group by m.chef_id and m.active_ind = 'A' ` ;
+
+        return db.query(sql,{replacements:{chef_id:chef_id,last30Days:last30Days,monthBeginDate:monthBeginDate},type:db.QueryTypes.SELECT}).then(resp => {
+            if (resp && resp.length > 0) {
+                let result = resp[0];
+                return result;
+            }
+        });
+
+    }
+
+    getResponseRate(chef_id) {
+        let sql = ` select  count(distinct am.message_id) custToChefMsgCnt,
+                    count(distinct tm.message_id) chefReplyCnt
+            from t_order o
+            left join t_chef_menu m on o.menu_id = m.menu_id and m.active_ind = 'A'
+            left join t_chef chef on chef.chef_id = m.chef_id and chef.active_ind = 'A'
+            left join t_message am on am.to_user_id = chef.user_id and am.from_user_id = o.user_id and am.active_ind = 'A'
+            left join t_message tm on tm.parent_message_id is not null and tm.from_user_id = chef.user_id and tm.to_user_id = o.user_id and tm.active_ind = 'A'
+            and m.chef_id =:chef_id and o.active_ind = 'A' `;
+
+        let missReponseCntSql = ` select count(distinct o.order_id) missCnt from  t_order o
+        left join t_chef_menu m on m.menu_id = o.menu_id and m.active_ind = 'A'
+        where o.active_ind = 'A' and m.chef_id = :chef_id and  ( (order_status = 'C' and 
+        o.confirmed_datetime > DATE_ADD(o.create_on,INTERVAL 1 DAY) 
+        or (order_status = 'R' and now() > DATE_ADD(o.create_on,INTERVAL 1 DAY)))
+        or (order_status = 'D' and o.declined_datetime >  DATE_ADD(o.create_on,INTERVAL 1 DAY))) `;
+
+
+        return db.query(sql,{replacements:{chef_id:chef_id},type:db.QueryTypes.SELECT}).then(resp => {
+                if (resp && resp.length > 0) {
+                    let response_rate = null;
+                    return db.query(missReponseCntSql,{replacements:{chef_id:chef_id},type:db.QueryTypes.SELECT}).then(result => {
+                        let forgiveCnt = 3;
+
+                        if (result && result.length > 0) {
+                            forgiveCnt = forgiveCnt - result[0].missCnt;
+                        }
+                        let replyCnt = resp[0].chefReplyCnt + forgiveCnt;
+                        if (replyCnt < 0) {
+                            replyCnt = 0;
+                        }
+
+                        if ((resp[0].chefReplyCnt + resp[0].custToChefMsgCnt) !== 0) {
+                            let rate = replyCnt / replyCnt+ resp[0].custToChefMsgCnt;
+                            response_rate =  Math.round(rate*100) /100;
+                        }
+                        return response_rate;
+                    })
+                }
+        })
 
     }
 
