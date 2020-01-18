@@ -48,7 +48,7 @@ class ChefMenuService extends BaseService{
                 if (chef) {
                     arr = [0,1];
                 }else {
-                    arr = [0];
+                    arr = [1];
                 }
                 return arr;
             }
@@ -1143,7 +1143,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
 
     checkMenuCode(menu_id, menu_code) {
         // menu_code 唯一
-        return this.getOne({where:{menu_code:menu_code}}).then(menu => {
+        return this.getOne({where:{menu_code:menu_code,active_ind:'A'}}).then(menu => {
             console.log("menu_code get menu =>",menu_code,menu)
             if (menu && menu.menu_id !== menu_id){
                 throw 'menu_code:'+menu_code+" is used with  menu_id:"+menu.menu_id;
