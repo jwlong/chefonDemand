@@ -201,17 +201,23 @@ class OrderService extends BaseService{
                     let response_rate = null;
                     return db.query(missReponseCntSql,{replacements:{chef_id:chef_id},type:db.QueryTypes.SELECT}).then(result => {
                         let forgiveCnt = 3;
-
+                        let activeMissCnt = 0;
                         if (result && result.length > 0) {
                             forgiveCnt = forgiveCnt - result[0].missCnt;
+                            // 当三次机会用完了之后，下单信息未反馈的数量将被计算到总信息数中
+                            if (forgiveCnt < 0) {
+                                forgiveCnt = 0;
+                                activeMissCnt = forgiveCnt;
+                            }
                         }
+
                         let replyCnt = resp[0].chefReplyCnt + forgiveCnt;
                         if (replyCnt < 0) {
                             replyCnt = 0;
                         }
 
                         if ((resp[0].chefReplyCnt + resp[0].custToChefMsgCnt) !== 0) {
-                            let rate = replyCnt / replyCnt+ resp[0].custToChefMsgCnt;
+                            let rate = replyCnt / (replyCnt+ resp[0].custToChefMsgCnt+activeMissCnt) ;
                             response_rate =  Math.round(rate*100) /100;
                         }
                         return response_rate;
