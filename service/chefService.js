@@ -303,7 +303,7 @@ WHERE cc.chef_id = :chef_id and ct.active_ind = 'A' `;
     }
 
     getCityList(menu,districtCodes) {
-        let sql = `select city.city_name,city.city_code from t_city city
+        let sql = `select distinct city.city_name,city.city_code from t_city city
                   left join t_district t on city.city_code = t.city_code and t.active_ind = 'A'
                   left join t_chef_service_location t2 on t.district_code = t2.district_code and t2.active_ind = 'A'
                   left join t_chef tc on t2.chef_id = tc.chef_id and tc.active_ind = 'A'
