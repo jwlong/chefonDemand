@@ -59,6 +59,9 @@ class KitchenReqService extends BaseService{
         }
         promiseArr.push(p1);
         return Promise.all(promiseArr).then(resp => {
+            if (!Array.isArray(attrs)) {
+                attrs = attrs.kitchen_req_items;
+            }
             attrs.forEach(kitchenReq => {
                 kitchenReq.menu_id = new_menu_id;
                 kitchenReq.active_ind = activeIndStatus.ACTIVE;

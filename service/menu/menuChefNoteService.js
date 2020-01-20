@@ -37,6 +37,9 @@ class MenuChefNoteService extends BaseService{
         let newList = [];
         let p1 = this.baseUpdate({active_ind:status},{where:{menu_id:last_menu_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(updateCnt => {
             console.log("attrs ==========>",attrs)
+            if (!Array.isArray(attrs)) {
+                attrs = attrs.menu_chef_note_list;
+            }
             attrs.forEach((item,index) => {
                 item.menu_id = new_menu_id;
                 newList.push(item);

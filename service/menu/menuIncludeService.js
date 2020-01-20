@@ -36,6 +36,10 @@ class MenuIncludeService extends BaseService{
         }
         promiseArr.push(p1);
         return Promise.all(promiseArr).then(resp => {
+            if (!Array.isArray(attrs)) {
+                attrs = attrs.include_items;
+            }
+
             attrs.forEach(menuInclude => {
                 menuInclude.menu_id = new_menu_id;
                 menuInclude.parent_menu_id = last_menu_id;
