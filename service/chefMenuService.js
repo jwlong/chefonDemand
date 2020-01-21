@@ -954,13 +954,13 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
         let query_col_sql = `SELECT m.menu_id, m.chef_id, m.menu_name, m.menu_code, m.menu_desc,
                 m.public_ind, m.min_pers, m.max_pers, m.menu_logo_url,m.unit_price, m.seq_no,
                 avg(rating.overall_rating) menu_rating,
-                count(o.order_id) orderPlacedNum,
+                count(distinct o.order_id) orderPlacedNum,
                 sum(rating.rating_id)      num_of_review`;
         let total_sql = `select count(DISTINCT m.menu_id) total `;
         let sql =` FROM t_chef_menu m  
-                LEFT JOIN t_order o ON o.menu_id = m.menu_id AND o.active_ind = 'A'
+                LEFT JOIN t_order o ON o.menu_id = m.menu_id AND o.active_ind = 'A' and o.order_status = 'C'
                 LEFT JOIN t_user_rating rating ON o.order_id = rating.order_id AND rating.active_ind = 'A'
-                WHERE m.active_ind = 'A' and o.order_status = 'C' and m.public_ind IN (:publicIndArr) `;
+                WHERE m.active_ind = 'A' and m.public_ind IN (:publicIndArr) `;
         if (attrs.byRecommend) {
             sql += `AND m.chef_recommend_ind = 1`;
         }
