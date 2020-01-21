@@ -950,7 +950,6 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
     getMenuListByChefsChoice(attrs) {
         return this.getMenuListBy(attrs);
     }
-
     getMenuListBy(attrs) {
         let query_col_sql = `SELECT m.menu_id, m.chef_id, m.menu_name, m.menu_code, m.menu_desc,
                 m.public_ind, m.min_pers, m.max_pers, m.menu_logo_url,m.unit_price, m.seq_no,
@@ -958,8 +957,8 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
                 count(o.order_id) orderPlacedNum,
                 sum(rating.rating_id)      num_of_review`;
         let total_sql = `select count(DISTINCT m.menu_id) total `;
-        let sql = ` FROM t_chef_menu m
-                LEFT JOIN t_order o ON o.menu_id = m.menu_id AND o.active_ind = 'A' 
+        let sql =` FROM t_chef_menu m  
+                LEFT JOIN t_order o ON o.menu_id = m.menu_id AND o.active_ind = 'A'
                 LEFT JOIN t_user_rating rating ON o.order_id = rating.order_id AND rating.active_ind = 'A'
                 WHERE m.active_ind = 'A' and o.order_status = 'C' and m.public_ind IN (:publicIndArr) `;
         if (attrs.byRecommend) {
@@ -975,23 +974,19 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
         orderBySql += ` menu_rating desc, m.update_on desc `;
         let limit_sql = ` limit :startIdx , :pageSize `;
         let queryPageCount = total_sql + sql;
-        let pageQuerySql = query_col_sql + sql + orderBySql + limit_sql;
-        return db.query(queryPageCount, {
-            replacements: {publicIndArr: attrs.publicIndArr},
-            type: db.QueryTypes.SELECT
-        }).then(totalCount => {
-            console.log("query totalCount:========>", totalCount)
+        let pageQuerySql = query_col_sql + sql +orderBySql+ limit_sql;
+        return db.query(queryPageCount,{replacements:attrs,
+            type:db.QueryTypes.SELECT}).then(totalCount => {
+            console.log("query totalCount:========>",totalCount)
             let total_pages;
-            if (totalCount && totalCount[0]) {
-                total_pages = (totalCount[0].total + attrs.pageSize - 1) / attrs.pageSize;
-            } else {
+            if (totalCount  && totalCount[0]) {
+                total_pages = (totalCount[0].total  +  attrs.pageSize  - 1) /  attrs.pageSize;
+            }else {
                 total_pages = 0;
             }
 
-            return db.query(pageQuerySql, {
-                replacements: {publicIndArr: attrs.publicIndArr, startIdx: attrs.startIdx, pageSize: attrs.pageSize},
-                type: db.QueryTypes.SELECT
-            }).then(
+            return db.query(pageQuerySql,{replacements:attrs,
+                type:db.QueryTypes.SELECT}).then(
                 menuList => {
                     if (menuList) {
                         return locationService.getLocationsByMenuList(menuList).then(list => {
@@ -1004,9 +999,9 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
                     }
                 }
             )
-
-        })
+        } )
     }
+
     getMenuListByRating(attrs) {
         return this.getMenuListBy(attrs);
     }

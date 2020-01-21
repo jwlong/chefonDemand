@@ -98,13 +98,13 @@ class OrderService extends BaseService{
     }
 
     getOrdersByUserId(attrs) {
-        let queryOrder = ` select o.order_id,o.event_date,o.total,o.order_status,u.user_name,u.first_name,o.num_of_guest `;
+        let queryOrder = ` select distinct o.order_id,o.event_date,o.total,o.order_status,u.user_name,u.first_name,o.num_of_guest `;
         let sql = ` from t_order o `;
         if (attrs.chef_id) {
             sql += ` left join t_chef_menu menu on o.menu_id = menu.menu_id and menu.active_ind = 'A' `
         }
         sql += ` left join t_user u on u.user_id = o.user_id and u.active_ind= 'A' `
-        let whereSql = ` where 1=1 `;
+        let whereSql = ` where 1=1 and o.active_ind = 'A'  `;
         let orderSql = ``;
         if (attrs.chef_id) {
             whereSql += ' and menu.chef_id = :chef_id ';
@@ -122,15 +122,12 @@ class OrderService extends BaseService{
             orderList.forEach( order => {
                 let p = orderItemService.getItemsAndOptionsByOrder(order.order_id).then(itemList => {
                     order.order_item_list = itemList;
-                    return order;
+                    return orderGuestService.getGuestListAndOptionsByOrder(order.order_id).then(guestList => {
+                        order.guest_list =   guestList;
+                        return order;
+                    })
                 });
-
-               let p2 = orderGuestService.getGuestListAndOptionsByOrder(order.order_id).then(guestList => {
-                   order.guest_list =   guestList;
-                   return order;
-               })
                 oPrmArr.push(p);
-                oPrmArr.push(p2);
             })
             return Promise.all(oPrmArr);
         })
@@ -218,7 +215,7 @@ class OrderService extends BaseService{
 
                         if ((resp[0].chefReplyCnt + resp[0].custToChefMsgCnt) !== 0) {
                             let rate = replyCnt / (replyCnt+ resp[0].custToChefMsgCnt+activeMissCnt) ;
-                            response_rate =  Math.round(rate*100) /100;
+                            response_rate =  Math.round(rate*100) + '%';
                         }
                         return response_rate;
                     })
@@ -238,6 +235,22 @@ class OrderService extends BaseService{
             }
             return order;
         })
+    }
+
+    checkEventDate(order_id, user_id) {
+        return this.checkUpdateOrderGuestList(order_id,user_id).then(order =>{
+
+            return chefMenuService.getOneByMenuId(order.menu_id).then(menu => {
+                if (!menu) {
+                    throw 'no active menu! order id:'+order_id ;
+                }
+                if (!moment().add(menu.preparation_days?menu.preparation_days:0, 'days').isBefore(moment(order.event_date))){
+                    throw baseResult.ORDER_SECTION_GUEST_LIST_INVALID;
+                }
+                return order;
+            })
+        })
+
     }
 }
 // module.exports = new OrderService()

@@ -17,9 +17,12 @@ class OrderGuestService extends BaseService {
            return this.getModel().findAll({
                 where: {order_id: updateOrderGuestList.order_id,active_ind:activeIndStatus.ACTIVE}, transaction: t
             }).then(guestListResp => {
-                 debugger
                 let requiredAddList = updateOrderGuestList.guest_list;
                 let actInsertArr = [];
+                if (requiredAddList && requiredAddList.length > updateOrderGuestList.num_of_guest ) {
+                    throw 'the guest list size can be less than t_order.num_of_guest'
+                }
+
                 let matchOldguestNameArr = [];
                 let oldNeedDeleted = [];
                 requiredAddList.forEach(value => {

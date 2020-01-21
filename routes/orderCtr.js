@@ -45,7 +45,10 @@ class OrderController {
                 if (!updateOrderGuestList || !updateOrderGuestList.order_id)  {
                     throw 'UpdateOrderGuestList is required!';
                 }
-                await orderService.checkUpdateOrderGuestList(updateOrderGuestList.order_id,user.user_id);
+
+                let order = await orderService.checkEventDate(updateOrderGuestList.order_id,user.user_id);
+
+                updateOrderGuestList.num_of_guest  = order.num_of_guest ?order.num_of_guest:0;
 
                 await orderGuestService.updateOrderGuestListByOrderId(updateOrderGuestList);
                 res.json(baseResult.SUCCESS)
@@ -53,6 +56,7 @@ class OrderController {
                 next(e);
             }
         })
+
         //func#57: /order/updateOrderGuestSelectionByOrderId
         router.post('/updateOrderGuestSelectionByOrderId',async(req,res,next) =>{
             try {
@@ -102,9 +106,6 @@ class OrderController {
         router.post('/cancelOrderByOrderId',async(req,res,next) =>{
             try {
                 let attrs  = req.body;
-                if (!req.user_id) {
-                    throw baseResult.ORDER_SECTION_USER_ONLY_ACTIVE_GUEST;
-                }
                 if (!attrs || !attrs.order_id)  {
                     throw 'CancelOrderRequest is required!';
                 }
