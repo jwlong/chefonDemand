@@ -5,6 +5,8 @@ import activeIndStatus from "../model/activeIndStatus";
 import orderItemService from './orderItemService'
 import orderItemOptionService from './orderItemOptionService'
 import baseResult from "../model/baseResult";
+import chefMenuService from "./chefMenuService";
+import moment from 'moment'
 
 @AutoWritedOrderGuest
 class OrderGuestService extends BaseService {
@@ -67,31 +69,45 @@ class OrderGuestService extends BaseService {
         })
     }
 
-    updateOrderGuestSelectionByOrderId(attrs,menu) {
+
+    updateOrderGuestSelectionByOrderId(attrs,order) {
       return  db.transaction(t=> {
+
             return this.getModel().findOne({where:{order_id:attrs.order_id,order_guest_id:attrs.order_guest_id}}).then(
                 guest =>{
-                    debugger
                     if (guest && guest.active_ind === activeIndStatus.ACTIVE) {
-                        // replace
-                        let orderItemPrmArr = [];
+                        if (!order) {
+                            throw baseResult.ORDER_SECTION_GUEST_LIST_INVALID
+                        }
 
-                        attrs.order_item_list.forEach(item => {
-                            let orderItemPrm = orderItemService.getModel().findAll({where:{order_id:attrs.order_id,order_guest_id:attrs.order_guest_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(items => {
-                                debugger
-                                console.log("item list =>",items);
-                                if (items && items.length > 0) {
-                                    // replaces
-                                    return orderItemService.updateItemAndOptions(items,attrs,t);
+                        return chefMenuService.getOneByMenuId(order.menu_id).then(menu =>{
+                            if (!menu) {
+                                console.error("order id" + order.order_id + ' no active menu!');
+                                throw baseResult.ORDER_SECTION_USER_ONLY_ACTIVE_GUEST;
+                            }
+                            if (!moment().add(menu.preparation_days?menu.preparation_days:0, 'days').isBefore(moment(order.event_date))){
+                                throw baseResult.ORDER_SECTION_GUEST_LIST_INVALID;
+                            }
+                            // replace
+                            let orderItemPrmArr = [];
 
-                                }else {
-                                    // new add
-                                    return orderItemService.newInsert(attrs,t);
-                                }
+                            attrs.order_item_list.forEach(item => {
+                                let orderItemPrm = orderItemService.getModel().findAll({where:{order_id:attrs.order_id,order_guest_id:attrs.order_guest_id,active_ind:activeIndStatus.ACTIVE},transaction:t}).then(items => {
+                                    console.log("item list =>",items);
+                                    if (items && items.length > 0) {
+                                        // replaces
+                                        return orderItemService.updateItemAndOptions(items,attrs,t);
+
+                                    }else {
+                                        // new add
+                                        return orderItemService.newInsert(attrs,t);
+                                    }
+                                })
+                                orderItemPrmArr.push(orderItemPrm);
                             })
-                            orderItemPrmArr.push(orderItemPrm);
+                            return Promise.all(orderItemPrmArr);
+
                         })
-                        return Promise.all(orderItemPrmArr);
 
                     }else {
                         // new add

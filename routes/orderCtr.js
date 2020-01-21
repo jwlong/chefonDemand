@@ -60,16 +60,13 @@ class OrderController {
         //func#57: /order/updateOrderGuestSelectionByOrderId
         router.post('/updateOrderGuestSelectionByOrderId',async(req,res,next) =>{
             try {
-                if (!req.user_id) {
-                    throw baseResult.ORDER_SECTION_USER_ONLY_ACTIVE_GUEST;
-                }
                 let attrs  = req.body;
-                let verityUnique = (attrs.order_id)+'' +attrs.unique_id;
 
                 if (!attrs || !attrs.order_id)  {
                     throw 'UpdateOrderGuestList is required!';
                 }
                 let unique_id_str = String(attrs.unique_id);
+
                 let orderGuestStrArr = unique_id_str.split(attrs.order_id);
                 if (orderGuestStrArr && orderGuestStrArr.length > 1) {
                     attrs.order_guest_id = orderGuestStrArr[1];
@@ -77,24 +74,15 @@ class OrderController {
                 //let menu = await  chefMenuService.getOneByMenuId(attrs.menu_id);
                 console.log("order_id,order_guest_id",attrs.order_id,attrs.order_guest_id)
                 if (!attrs.order_guest_id) {
-                    throw 'unique_id is invalid!'
+                    throw baseResult.ORDER_SECTION_USER_ONLY_ACTIVE_GUEST
                 }
+
                 let order = await  orderService.getOneByOrderId(attrs.order_id);
 
                 if (!order) {
                     throw 'order is not exist! order_id:'+attrs.order_id
                 }
-
-                let menu = await  chefMenuService.getOneByMenuId(order.menu_id);
-
-                if (!menu || !order) {
-                    throw baseResult.ORDER_SECTION_GUEST_LIST_INVALID;
-                }
-                if (!moment().add(menu.preparation_days?menu.preparation_days:0, 'days').isBefore(moment(order.event_date))){
-                    throw baseResult.ORDER_SECTION_GUEST_LIST_INVALID;
-                }
-
-                await orderGuestService.updateOrderGuestSelectionByOrderId(attrs,menu);
+                await orderGuestService.updateOrderGuestSelectionByOrderId(attrs,order);
                 res.json(baseResult.SUCCESS)
             }catch (e){
                 next(e);
