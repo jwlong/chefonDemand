@@ -583,7 +583,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
     publicMenuHandler(chefMenu,noOrderService,attrs,t,cloneExlcudes,dataMapByNotCloneTypes) {
         console.log("public menu handler ....",noOrderService)
         // If any existing outstanding orders (orders not yet performed) referencing this public menu_id
-        return orderService.getModel().findAll({where:{menu_id:chefMenu.menu_id,active_ind:activeIndStatus.ACTIVE,event_date:{[Op.gt]:moment()}},transaction:t}).then(orderList => {
+        return orderService.getModel().findAll({where:{menu_id:chefMenu.menu_id,active_ind:activeIndStatus.ACTIVE,event_date:{[Op.lt]:moment()}},transaction:t}).then(orderList => {
             console.log("orderlist =>",orderList)
             if (orderList && orderList.length>0) {
                 return  this.baseUpdate({active_ind:activeIndStatus.REPLACE,public_ind:0},{where:{menu_id:chefMenu.menu_id,chef_id:chefMenu.chef_id},transaction:t}).then(updateCnt => {
@@ -1138,7 +1138,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
 
     checkMenuCode(menu_id, menu_code) {
         // menu_code 唯一
-        return this.getOne({where:{menu_code:menu_code,active_ind:'A'}}).then(menu => {
+        return this.getOne({where:{menu_code:menu_code,menu_id:menu_id,active_ind:'A'}}).then(menu => {
             console.log("menu_code get menu =>",menu_code,menu)
             if (menu && menu.menu_id !== menu_id){
                 throw 'menu_code:'+menu_code+" is used with  menu_id:"+menu.menu_id;
