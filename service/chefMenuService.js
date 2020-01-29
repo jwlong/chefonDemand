@@ -961,6 +961,9 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
                 LEFT JOIN t_order o ON o.menu_id = m.menu_id AND o.active_ind = 'A' and o.order_status = 'C'
                 LEFT JOIN t_user_rating rating ON o.order_id = rating.order_id AND rating.active_ind = 'A'
                 WHERE m.active_ind = 'A' and m.public_ind IN (:publicIndArr) `;
+        if (attrs.chef_id) {
+            sql += ` AND m.chef_id = :chef_id `
+        }
         if (attrs.byRecommend) {
             sql += `AND m.chef_recommend_ind = 1`;
         }
