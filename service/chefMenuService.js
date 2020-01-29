@@ -582,8 +582,10 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
 
     publicMenuHandler(chefMenu,noOrderService,attrs,t,cloneExlcudes,dataMapByNotCloneTypes) {
         console.log("public menu handler ....",noOrderService)
+        let now = moment().format("YYYY-MM-DD HH:mm:ss");
+        console.log("execute publici menu datetime: " ,now);
         // If any existing outstanding orders (orders not yet performed) referencing this public menu_id
-        return orderService.getModel().findAll({where:{menu_id:chefMenu.menu_id,active_ind:activeIndStatus.ACTIVE,event_date:{[Op.lt]:moment()}},transaction:t}).then(orderList => {
+        return orderService.getModel().findAll({where:{menu_id:chefMenu.menu_id,active_ind:activeIndStatus.ACTIVE,start_datetime:{[Op.lt]:now}},transaction:t}).then(orderList => {
             console.log("orderlist =>",orderList)
             if (orderList && orderList.length>0) {
                 return  this.baseUpdate({active_ind:activeIndStatus.REPLACE,public_ind:0},{where:{menu_id:chefMenu.menu_id,chef_id:chefMenu.chef_id},transaction:t}).then(updateCnt => {
@@ -955,7 +957,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
                 m.public_ind, m.min_pers, m.max_pers, m.menu_logo_url,m.unit_price, m.seq_no,
                 avg(rating.overall_rating) menu_rating,
                 count(distinct o.order_id) orderPlacedNum,
-                sum(rating.rating_id)      num_of_review`;
+                count(distinct rating.rating_id)      num_of_review`;
         let total_sql = `select count(DISTINCT m.menu_id) total `;
         let sql =` FROM t_chef_menu m  
                 LEFT JOIN t_order o ON o.menu_id = m.menu_id AND o.active_ind = 'A' and o.order_status = 'C'
@@ -966,6 +968,9 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
         }
         if (attrs.byRecommend) {
             sql += `AND m.chef_recommend_ind = 1`;
+        }
+        if (attrs.byRating) {
+            sql += ` AND rating.overall_rating is not null `;
         }
         sql += ` GROUP BY `;
 

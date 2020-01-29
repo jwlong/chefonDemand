@@ -474,13 +474,14 @@ class MenuController {
                 if (!attrs.page_no) {
                     throw 'page_no is required!'
                 }
-                if (req.user_id) {
+                // by rating不需要chef id
+           /*     if (req.user_id) {
 
                     let chef = await chefService.getChefByUserId(req.user_id);
                     if (chef) {
                         attrs.chef_id = chef.chef_id;
                     }
-                }
+                }*/
 
                 let publicStatusArr = await chefMenuService.getPublicIndStatusArr(req.user_id);
                 attrs.pageSize = await userPrefService.getPageSize(req.user_id)
