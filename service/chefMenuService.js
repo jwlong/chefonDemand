@@ -100,7 +100,10 @@ class ChefMenuService extends BaseService{
                     console.log("to updated menu ===>",chefMenu.toJSON());
                     if (chefMenu.public_ind === true) {
                         // If any existing outstanding orders (orders not yet performed) referencing this public menu_id
-                        return orderService.getModel().findAll({where:{menu_id:menu_id,active_ind:activeIndStatus.ACTIVE,event_date:{[Op.gt]:moment()}},transaction:t}).then(orderList => {
+                        let now = moment().format("YYYY-MM-DD HH:mm:ss");
+                        console.log("execute public menu datetime: " ,now);
+
+                        return orderService.getModel().findAll({where:{menu_id:menu_id,active_ind:activeIndStatus.ACTIVE,start_datetime:{[Op.lt]:now}},transaction:t}).then(orderList => {
                             if (orderList && orderList.length > 0) {
                                 // clone menu
 
@@ -374,7 +377,8 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
     cloneNewLogic(menu,t,notCloneTypes,dataMapByNotCloneTypes) {
         // create new menu
         let last_menu_id = menu.menu_id;
-        menu.menu_code =  menu.chef_id+moment().format('YYYYMMDDHHmmSSSS');
+        //去掉將要生成新menu code的邏輯。
+        // menu.menu_code =  menu.chef_id+moment().format('YYYYMMDDHHmmSSSS');
         if (!notCloneTypes) {
             notCloneTypes = [];
         }
@@ -595,13 +599,7 @@ where m.active_ind = 'A' and m.chef_id = :chef_id and m.public_ind in (:publicIn
                     let newMenu = chefMenu;
                     newMenu.public_ind = 0;
                     newMenu.parent_menu_id = chefMenu.menu_id;
-                    /*if (attrs.about) {
-                        newMenu.about = attrs.about;
-                    }
-                    if (attrs.cancel_policy) {
-                        newMenu.cancel_policy = attrs.cancel_policy;
-                    }
-*/
+
                     this.menuUpdatedAttrProcessor(attrs,newMenu);
 
                     return this.cloneNewLogic(newMenu,t,cloneExlcudes,dataMapByNotCloneTypes).then(
