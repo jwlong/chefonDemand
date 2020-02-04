@@ -3,11 +3,13 @@ import {AutoWritedOrder} from '../common/AutoWrite.js'
 import orderItemService from './orderItemService'
 import orderGuestService from './orderGuestService'
 import db from "../config/db";
+import Sequelize from 'sequelize'
 import chefMenuService from './chefMenuService'
 import activeIndStatus from "../model/activeIndStatus";
 import baseResult from "../model/baseResult";
 import moment from  'moment'
 
+const Op = Sequelize.Op
 @AutoWritedOrder
 class OrderService extends BaseService{
     constructor(){
@@ -264,6 +266,10 @@ class OrderService extends BaseService{
             })
         })
 
+    }
+
+    updateRefMenuIdWithOrderIds(futureOrderIdList, newMenuId, t) {
+        return this.baseUpdate({menu_id:newMenuId},{where:{order_id:{[Op.in]:futureOrderIdList}},transaction:t});
     }
 }
 // module.exports = new OrderService()
