@@ -213,7 +213,7 @@ class MenuController {
                     delete attrs.menu_code;
                    // await chefMenuService.checkMenuCode(menu_id,req.body.menu_code)
                 }
-                await chefMenuService.updateMenuByChefId(chef.chef_id,menu_id,req.body)
+                await chefMenuService.updateMenuByChefId(chef.chef_id,menu_id,attrs)
                 res.json(baseResult.SUCCESS)
             }catch (e) {
                 next(e);
