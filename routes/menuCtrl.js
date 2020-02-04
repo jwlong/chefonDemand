@@ -208,8 +208,10 @@ class MenuController {
                 if (!chef) {
                     throw baseResult.MENU_ONLY_CHEF_CAN_UPDATE;
                 }
-                if (req.body.menu_code) {
-                    await chefMenuService.checkMenuCode(menu_id,req.body.menu_code)
+                let attrs = req.body;
+                if (attrs.menu_code) {
+                    delete attrs.menu_code;
+                   // await chefMenuService.checkMenuCode(menu_id,req.body.menu_code)
                 }
                 await chefMenuService.updateMenuByChefId(chef.chef_id,menu_id,req.body)
                 res.json(baseResult.SUCCESS)
