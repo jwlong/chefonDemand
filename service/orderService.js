@@ -172,71 +172,57 @@ class OrderService extends BaseService{
             if (resp && resp.length > 0) {
                 let result = resp[0];
                 return result;
+            }else {
+                return {'30_days_bookings':null,'30_days_views':null,'overall_rating':null,'num_of_review':null,'month_to_day_earnings':null};
             }
         });
 
     }
 
     getResponseRate(chef_id) {
+
         let sql = ` select  count(distinct am.message_id) custToChefMsgCnt,
                     count(distinct tm.message_id) chefReplyCnt
             from t_order o
             left join t_chef_menu m on o.menu_id = m.menu_id and m.active_ind = 'A'
             left join t_chef chef on chef.chef_id = m.chef_id and chef.active_ind = 'A'
-            left join t_message am on am.to_user_id = chef.user_id and am.from_user_id = o.user_id and am.active_ind = 'A'
-            left join t_message tm on tm.parent_message_id is not null and tm.from_user_id = chef.user_id and tm.to_user_id = o.user_id and tm.active_ind = 'A'
-            and m.chef_id =:chef_id and o.active_ind = 'A' `;
+            left join t_message am on am.to_user_id = chef.user_id and am.from_user_id = o.user_id and am.active_ind = 'A' and am.sys_message_ind = 0
+            left join t_message tm on tm.parent_message_id=am.message_id and tm.from_user_id = chef.user_id and tm.to_user_id = o.user_id and tm.active_ind = 'A' and tm.create_on <= DATE_ADD(am.create_on,INTERVAL 1 DAY)
+            where m.chef_id =:chef_id and o.active_ind = 'A' `;
 
-        let missReponseCntSql = ` select count(distinct o.order_id) missCnt from  t_order o
+        let nonInstanceOrderSql = ` select o.* from  t_order o
         left join t_chef_menu m on m.menu_id = o.menu_id and m.active_ind = 'A'
-        where o.active_ind = 'A' and m.chef_id = :chef_id and  ( (order_status = 'C' and 
-        o.confirmed_datetime > DATE_ADD(o.create_on,INTERVAL 1 DAY) 
-        or (order_status = 'R' and now() > DATE_ADD(o.create_on,INTERVAL 1 DAY)))
-        or (order_status = 'D' and o.declined_datetime >  DATE_ADD(o.create_on,INTERVAL 1 DAY))) `;
-
+        where o.active_ind = 'A' and m.chef_id = :chef_id and o.instant_ind = 0 `;
 
         return db.query(sql,{replacements:{chef_id:chef_id},type:db.QueryTypes.SELECT}).then(resp => {
+                let totalMsg = 0;
+                let totalReply = 0;
+                let response_rate = null;
                 if (resp && resp.length > 0) {
-                    let response_rate = null;
-                    return db.query(missReponseCntSql,{replacements:{chef_id:chef_id},type:db.QueryTypes.SELECT}).then(result => {
-                        let forgiveCnt = 3;
-                        let activeMissCnt = 0;
-                        let replyCnt = resp[0].chefReplyCnt;
-                        if (result && result.length > 0) {
-                            forgiveCnt = forgiveCnt - result[0].missCnt;
-                            // 当三次机会用完了之后，信息未反馈的数量将被计算到总信息数中
-                            if (forgiveCnt < 0) {
-                                // 超过了三次时，添加到未回复的数据中
-                                activeMissCnt = Math.abs(forgiveCnt);
-                            }
+                    totalMsg = resp[0].custToChefMsgCnt;
+                    totalReply = resp[0].chefReplyCnt;
+                }
+            return db.query(nonInstanceOrderSql,{replacements:{chef_id:chef_id},type:db.QueryTypes.SELECT}).then(nonInstanceOrderList => {
+
+                if (nonInstanceOrderList && nonInstanceOrderList.length > 0) {
+                    totalMsg = totalMsg + nonInstanceOrderList.length;
+                    nonInstanceOrderList.forEach(order => {
+                        if ((order.order_status === 'C' && moment(order.confirmed_datetime).isBefore(moment(order.create_on).add(1,'days')))
+                            || (order.order_status === 'D' &&  moment(order.declined_datetime).isBefore(moment(order.create_on).add(1,'days')))
+                        ) {
+                            totalReply++;
                         }
-
-                        if (replyCnt < 0) {
-                            replyCnt = 0;
-                        }
-
-                        if ( resp[0].custToChefMsgCnt !== 0) {
-
-                            if (resp[0].custToChefMsgCnt < replyCnt) {
-                                console.warn("custToChefMsgCnt less then replyCnt, return 100%")
-                                return '100%';
-                            }
-
-                            let rate = replyCnt / (resp[0].custToChefMsgCnt+activeMissCnt);
-                            if (rate > 1) {
-                                response_rate = '100%';
-                            }else {
-                                response_rate =  Math.round(rate*100) + '%';
-                            }
-
-                        }else {
-                            response_rate = '100%';
-                        }
-                        return response_rate;
                     })
                 }
+                if ((totalMsg - totalReply) <=3) {
+                    response_rate = '100%';
+                }else {
+                    let rate = totalReply / (totalMsg -3)
+                    response_rate =  Math.round(rate*100) + '%';
+                }
+                return response_rate;
+            })
         })
-
     }
 
     updateMenuIdWithNewMenuId(oldMenuId, new_menu_id,t) {
